@@ -17,7 +17,7 @@ endfunction()
 set(ncnn_SRCS
     allocator.cpp
     blob.cpp
-    cpu.cpp
+    cpu.c
     datareader.cpp
     layer.cpp
     mat.cpp

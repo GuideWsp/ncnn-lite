@@ -17,7 +17,6 @@
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
-#include <vector>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -168,10 +167,15 @@ static int get_cpucount()
     return count;
 }
 
-static int g_cpucount = get_cpucount();
+static int g_cpucount = -1;
 
-int get_cpu_count()
+inline int get_cpu_count()
 {
+    // retrieve gpu count if not initialized
+    if (g_cpucount == -1)
+    {
+        g_cpucount = get_cpucount();
+    }
     return g_cpucount;
 }
 
@@ -325,13 +329,13 @@ static size_t g_thread_affinity_mask_big = 0;
 
 static int setup_thread_affinity_masks()
 {
-    g_thread_affinity_mask_all = (1 << g_cpucount) - 1;
+    g_thread_affinity_mask_all = (1 << get_cpu_count()) - 1;
 
 #ifdef __ANDROID__
     int max_freq_khz_min = INT_MAX;
     int max_freq_khz_max = 0;
-    std::vector<int> cpu_max_freq_khz(g_cpucount);
-    for (int i=0; i<g_cpucount; i++)
+    std::vector<int> cpu_max_freq_khz(get_cpu_count());
+    for (int i=0; i<get_cpu_count(); i++)
     {
         int max_freq_khz = get_max_freq_khz(i);
 
@@ -353,7 +357,7 @@ static int setup_thread_affinity_masks()
         return 0;
     }
 
-    for (int i=0; i<g_cpucount; i++)
+    for (int i=0; i<get_cpu_count(); i++)
     {
         if (cpu_max_freq_khz[i] < max_freq_khz_medium)
             g_thread_affinity_mask_little |= (1 << i);
