@@ -21,10 +21,6 @@
 
 struct Blob
 {
-    // empty
-    Blob();
-    ~Blob();
-
 #if NCNN_STRING
     // blob name
     char name[256];
@@ -36,5 +32,11 @@ struct Blob
     // shape hint
     Mat shape;
 };
+
+/* blob initialization */
+void init_blob(Blob *blob);
+
+/* blob uninitialization */
+void uninit_blob(Blob *blob);
 
 #endif // NCNN_BLOB_H

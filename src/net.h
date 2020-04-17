@@ -23,6 +23,8 @@
 #include "mat.h"
 #include "option.h"
 
+#include "cstl/vector.h"
+
 struct DataReader;
 struct Extractor;
 struct Net
@@ -117,7 +119,7 @@ struct Net
     Layer* create_custom_layer(int index);
     int forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const;
 
-    std::vector<Blob> blobs;
+    vector_def(Blob) blobs;
     std::vector<Layer*> layers;
 
     std::vector<layer_registry_entry> custom_layer_registry;

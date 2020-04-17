@@ -132,6 +132,39 @@
             free((vector).data_ptr);                                        \
             (vector).data_ptr = ptr;                                        \
             (vector).size = new_size;                                       \
+            (vector).count = new_size;                                      \
+            (vector).err_num = ERR_OK;                                      \
+        }                                                                   \
+    }                                                                       \
+} while (0)
+
+/* Reserve the vector capacity */
+#define vector_reserve(vector, new_size) do {                               \
+    if ((new_size) <= (vector).size)                                        \
+    {                                                                       \
+        /* limit the element count max to the new size */                   \
+        if ((vector).count > (new_size))                                    \
+        {                                                                   \
+            (vector).count = new_size;                                      \
+        }                                                                   \
+        (vector).err_num = ERR_OK;                                          \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        void *ptr = malloc(sizeof(*(vector).data_ptr) * new_size);          \
+        if (ptr == NULL)                                                    \
+        {                                                                   \
+            (vector).err_num = ERR_MEMORY_FAILURE;                          \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            unsigned int copy_size =                                        \
+                sizeof(*(vector).data_ptr) * (vector).count;                \
+            /*lint -e(1415) Copy without copy constructor */                \
+            memcpy(ptr, (vector).data_ptr, copy_size);                      \
+            free((vector).data_ptr);                                        \
+            (vector).data_ptr = ptr;                                        \
+            (vector).size = new_size;                                       \
             (vector).err_num = ERR_OK;                                      \
         }                                                                   \
     }                                                                       \

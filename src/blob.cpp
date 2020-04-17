@@ -14,13 +14,26 @@
 
 #include "blob.h"
 
-Blob::Blob()
+void init_blob(Blob *blob)
 {
-    producer = -1;
-    vector_init(consumers);
+    // init producer and consumers
+    blob->producer = -1;
+    vector_init(blob->consumers);
+
+    // init the matrix
+    blob->shape.data = 0;
+    blob->shape.refcount = 0;
+    blob->shape.elemsize = 0;
+    blob->shape.elempack = 0;
+    blob->shape.allocator = 0;
+    blob->shape.dims = 0;
+    blob->shape.w = 0;
+    blob->shape.h = 0;
+    blob->shape.c = 0;
+    blob->shape.cstep = 0;
 }
 
-Blob::~Blob()
+void uninit_blob(Blob *blob)
 {
-    vector_destroy(consumers);
+    vector_destroy(blob->consumers);
 }

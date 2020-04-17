@@ -34,11 +34,13 @@
 
 Net::Net()
 {
+    vector_init(blobs);
 }
 
 Net::~Net()
 {
     clear();
+    vector_destroy(blobs);
 }
 
 #if NCNN_STRING
@@ -126,7 +128,13 @@ int Net::load_param(const DataReader& dr)
     }
 
     layers.resize((size_t)layer_count);
-    blobs.resize((size_t)blob_count);
+
+    // initialize blobs, need init manually
+    vector_resize(blobs, blob_count);
+    for (int i = 0; i < vector_size(blobs); i++)
+    {
+        init_blob(&vector_get(blobs, i));
+    }
 
     ParamDict pd;
 
@@ -168,7 +176,7 @@ int Net::load_param(const DataReader& dr)
             int bottom_blob_index = find_blob_index_by_name(bottom_name);
             if (bottom_blob_index == -1)
             {
-                Blob& blob = blobs[blob_index];
+                Blob& blob = vector_get(blobs, blob_index);
 
                 bottom_blob_index = blob_index;
 
@@ -178,7 +186,7 @@ int Net::load_param(const DataReader& dr)
                 blob_index++;
             }
 
-            Blob& blob = blobs[bottom_blob_index];
+            Blob& blob = vector_get(blobs, bottom_blob_index);
 
             vector_pushback(blob.consumers, i);
 
@@ -188,7 +196,7 @@ int Net::load_param(const DataReader& dr)
         layer->tops.resize(top_count);
         for (int j=0; j<top_count; j++)
         {
-            Blob& blob = blobs[blob_index];
+            Blob& blob = vector_get(blobs, blob_index);
 
             char blob_name[256];
             SCAN_VALUE("%255s", blob_name)
@@ -218,7 +226,7 @@ int Net::load_param(const DataReader& dr)
             const int* psh = shape_hints;
             for (int j=0; j<top_count; j++)
             {
-                Blob& blob = blobs[layer->tops[j]];
+                Blob& blob = vector_get(blobs, layer->tops[j]);
 
                 int dims = psh[0];
                 if (dims == 1)
@@ -242,13 +250,13 @@ int Net::load_param(const DataReader& dr)
         layer->bottom_shapes.resize(bottom_count);
         for (int j=0; j<bottom_count; j++)
         {
-            layer->bottom_shapes[j] = blobs[layer->bottoms[j]].shape;
+            layer->bottom_shapes[j] = vector_get(blobs, layer->bottoms[j]).shape;
         }
 
         layer->top_shapes.resize(top_count);
         for (int j=0; j<top_count; j++)
         {
-            layer->top_shapes[j] = blobs[layer->tops[j]].shape;
+            layer->top_shapes[j] = vector_get(blobs, layer->tops[j]).shape;
         }
 
         int lr = layer->load_param(pd);
@@ -294,7 +302,13 @@ int Net::load_param_bin(const DataReader& dr)
     }
 
     layers.resize(layer_count);
-    blobs.resize(blob_count);
+
+    // initialize blobs, need init manually
+    vector_resize(blobs, blob_count);
+    for (int i = 0; i < vector_size(blobs); i++)
+    {
+        init_blob(&vector_get(blobs, i));
+    }
 
     ParamDict pd;
 
@@ -330,7 +344,7 @@ int Net::load_param_bin(const DataReader& dr)
             int bottom_blob_index;
             READ_VALUE(bottom_blob_index)
 
-            Blob& blob = blobs[bottom_blob_index];
+            Blob& blob = vector_get(blobs, bottom_blob_index);
 
             vector_pushback(blob.consumers, i);
 
@@ -343,7 +357,7 @@ int Net::load_param_bin(const DataReader& dr)
             int top_blob_index;
             READ_VALUE(top_blob_index)
 
-            Blob& blob = blobs[top_blob_index];
+            Blob& blob = vector_get(blobs, top_blob_index);
 
 //             strcpy_s(blob.name, 256, blob_name);
 //             fprintf(stderr, "new blob %s\n", blob_name);
@@ -368,7 +382,7 @@ int Net::load_param_bin(const DataReader& dr)
             const int* psh = shape_hints;
             for (int j=0; j<top_count; j++)
             {
-                Blob& blob = blobs[layer->tops[j]];
+                Blob& blob = vector_get(blobs, layer->tops[j]);
 
                 int dims = psh[0];
                 if (dims == 1)
@@ -392,13 +406,13 @@ int Net::load_param_bin(const DataReader& dr)
         layer->bottom_shapes.resize(bottom_count);
         for (int j=0; j<bottom_count; j++)
         {
-            layer->bottom_shapes[j] = blobs[layer->bottoms[j]].shape;
+            layer->bottom_shapes[j] = vector_get(blobs, layer->bottoms[j]).shape;
         }
 
         layer->top_shapes.resize(top_count);
         for (int j=0; j<top_count; j++)
         {
-            layer->top_shapes[j] = blobs[layer->tops[j]].shape;
+            layer->top_shapes[j] = vector_get(blobs, layer->tops[j]).shape;
         }
 
         int lr = layer->load_param(pd);
@@ -717,7 +731,13 @@ int Net::fuse_network()
 
 void Net::clear()
 {
-    blobs.clear();
+    // deinit blobs
+    for (int i = 0; i < vector_size(blobs); i++)
+    {
+        uninit_blob(&vector_get(blobs, i));
+    }
+    vector_clear(blobs);
+
     for (size_t i=0; i<layers.size(); i++)
     {
         int dret = layers[i]->destroy_pipeline(opt);
@@ -734,15 +754,15 @@ void Net::clear()
 
 Extractor Net::create_extractor() const
 {
-    return Extractor(this, blobs.size());
+    return Extractor(this, vector_size(blobs));
 }
 
 #if NCNN_STRING
 int Net::find_blob_index_by_name(const char* name) const
 {
-    for (size_t i=0; i<blobs.size(); i++)
+    for (size_t i=0; i<vector_size(blobs); i++)
     {
-        const Blob& blob = blobs[i];
+        const Blob& blob = vector_get(blobs, i);
         if (strcmp(blob.name, name) == 0)
         {
             return static_cast<int>(i);
@@ -817,7 +837,7 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
 
         if (blob_mats[bottom_blob_index].dims == 0)
         {
-            int ret = forward_layer(blobs[bottom_blob_index].producer, blob_mats, opt);
+            int ret = forward_layer(vector_get(blobs, bottom_blob_index).producer, blob_mats, opt);
             if (ret != 0)
                 return ret;
         }
@@ -907,7 +927,7 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
 
             if (blob_mats[bottom_blob_index].dims == 0)
             {
-                int ret = forward_layer(blobs[bottom_blob_index].producer, blob_mats, opt);
+                int ret = forward_layer(vector_get(blobs, bottom_blob_index).producer, blob_mats, opt);
                 if (ret != 0)
                     return ret;
             }
@@ -1075,7 +1095,7 @@ int Extractor::extract(int blob_index, Mat& feat)
 
     if (blob_mats[blob_index].dims == 0)
     {
-        int layer_index = net->blobs[blob_index].producer;
+        int layer_index = vector_get(net->blobs, blob_index).producer;
     }
 
     feat = blob_mats[blob_index];
