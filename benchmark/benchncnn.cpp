@@ -120,7 +120,7 @@ int main(int argc, char** argv)
     }
     if (argc >= 5)
     {
-        cooling_down = atoi(argv[5]);
+        cooling_down = atoi(argv[4]);
     }
 
     g_enable_cooling_down = cooling_down != 0;
