@@ -26,7 +26,6 @@ set(ncnn_SRCS
     mat_pixel_rotate.cpp
     modelbin.cpp
     net.cpp
-    opencv.cpp
     option.cpp
     paramdict.cpp
     benchmark.cpp
@@ -271,7 +270,6 @@ if(NCNN_INSTALL_SDK)
         mat.h
         modelbin.h
         net.h
-        opencv.h
         option.h
         paramdict.h
         benchmark.h
