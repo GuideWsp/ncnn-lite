@@ -36,10 +36,8 @@ option(NCNN_BUILD_BENCHMARK "build benchmark" ON)
 
 if(ANDROID OR IOS)
     option(NCNN_DISABLE_RTTI "disable rtti" ON)
-    option(NCNN_BUILD_TOOLS "build tools" OFF)
 else()
     option(NCNN_DISABLE_RTTI "disable rtti" OFF)
-    option(NCNN_BUILD_TOOLS "build tools" ON)
 endif()
 
 if(ANDROID OR IOS OR LINUX)
