@@ -19,7 +19,6 @@
 
 struct Crop_arm : virtual public Crop
 {
-public:
     Crop_arm();
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;

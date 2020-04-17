@@ -19,7 +19,6 @@
 
 struct Bias_arm : virtual public Bias
 {
-public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
 

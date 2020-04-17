@@ -19,12 +19,10 @@
 
 struct Packing_arm : virtual public Packing
 {
-public:
     Packing_arm();
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
 

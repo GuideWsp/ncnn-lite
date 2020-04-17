@@ -19,14 +19,12 @@
 
 struct Packing : public Layer
 {
-public:
     Packing();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     int out_elempack;
     int use_padding;
 };

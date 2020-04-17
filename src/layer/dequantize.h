@@ -19,7 +19,6 @@
 
 struct Dequantize : public Layer
 {
-public:
     Dequantize();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     float scale;
     int bias_term;
     int bias_data_size;

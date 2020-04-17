@@ -19,12 +19,10 @@
 
 struct Clip_arm : virtual public Clip
 {
-public:
     Clip_arm();
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
 

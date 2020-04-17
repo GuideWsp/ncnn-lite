@@ -20,11 +20,9 @@
 struct Allocator;
 struct Option
 {
-public:
     // default option
     Option();
 
-public:
     // light mode
     // intermediate blob will be recycled when enabled
     // enabled by default

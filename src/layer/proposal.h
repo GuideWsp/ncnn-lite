@@ -19,14 +19,12 @@
 
 struct Proposal : public Layer
 {
-public:
     Proposal();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     // param
     int feat_stride;
     int base_size;

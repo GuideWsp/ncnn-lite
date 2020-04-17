@@ -19,7 +19,6 @@
 
 struct SPP : public Layer
 {
-public:
     SPP();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     enum PoolMethod { PoolMethod_MAX = 0, PoolMethod_AVE = 1 };
 
-public:
     // param
     int pooling_type;
     int pyramid_height;

@@ -19,7 +19,6 @@
 
 struct LRN : public Layer
 {
-public:
     LRN();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     enum NormRegionType { NormRegion_ACROSS_CHANNELS = 0, NormRegion_WITHIN_CHANNEL = 1 };
 
-public:
     // param
     int region_type;
     int local_size;

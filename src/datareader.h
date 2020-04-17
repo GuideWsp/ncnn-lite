@@ -21,7 +21,6 @@
 // data read wrapper
 struct DataReader
 {
-public:
     virtual ~DataReader();
 
 #if NCNN_STRING
@@ -38,7 +37,6 @@ public:
 #if NCNN_STDIO
 struct DataReaderFromStdio : public DataReader
 {
-public:
     DataReaderFromStdio(FILE* fp);
 
 #if NCNN_STRING
@@ -46,14 +44,12 @@ public:
 #endif // NCNN_STRING
     virtual size_t read(void* buf, size_t size) const;
 
-protected:
     FILE* fp;
 };
 #endif // NCNN_STDIO
 
 struct DataReaderFromMemory : public DataReader
 {
-public:
     DataReaderFromMemory(const unsigned char*& mem);
 
 #if NCNN_STRING
@@ -61,7 +57,6 @@ public:
 #endif // NCNN_STRING
     virtual size_t read(void* buf, size_t size) const;
 
-protected:
     const unsigned char*& mem;
 };
 

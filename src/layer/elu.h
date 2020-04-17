@@ -19,14 +19,12 @@
 
 struct ELU : public Layer
 {
-public:
     ELU();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     float alpha;
 };
 

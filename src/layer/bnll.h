@@ -19,12 +19,9 @@
 
 struct BNLL : public Layer
 {
-public:
     BNLL();
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
-public:
 };
 
 #endif // LAYER_BNLL_H

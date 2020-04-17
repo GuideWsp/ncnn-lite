@@ -19,7 +19,6 @@
 
 struct InnerProduct : public Layer
 {
-public:
     InnerProduct();
 
     virtual int load_param(const ParamDict& pd);
@@ -31,7 +30,6 @@ public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
     virtual int forward_int8(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     // param
     int num_output;
     int bias_term;

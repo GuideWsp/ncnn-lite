@@ -19,7 +19,6 @@
 
 struct Clip_mips : virtual public Clip
 {
-public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
 

@@ -19,7 +19,6 @@
 
 struct UnaryOp_arm : virtual public UnaryOp
 {
-public:
     UnaryOp_arm();
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

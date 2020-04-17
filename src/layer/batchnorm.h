@@ -19,7 +19,6 @@
 
 struct BatchNorm : public Layer
 {
-public:
     BatchNorm();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     // param
     int channels;
     float eps;

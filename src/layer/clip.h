@@ -19,7 +19,6 @@
 
 struct Clip : public Layer
 {
-public:
     Clip();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
     
     virtual int forward_inplace_int8(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     float min;
     float max;
 };

@@ -19,7 +19,6 @@
 
 struct Convolution_arm : virtual public Convolution
 {
-public:
     Convolution_arm();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,14 +26,12 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-protected:
     int create_pipeline_bf16s(const Option& opt);
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
     int create_pipeline_int8_arm(const Option& opt);
     int forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
     int forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     Layer* activation;
     bool use_winograd3x3;
     bool use_sgemm1x1;

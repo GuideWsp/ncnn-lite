@@ -19,12 +19,10 @@
 
 struct ShuffleChannel_arm : virtual public ShuffleChannel
 {
-public:
     ShuffleChannel_arm();
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
 

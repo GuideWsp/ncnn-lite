@@ -19,7 +19,6 @@
 
 struct Reshape_arm : virtual public Reshape
 {
-public:
     Reshape_arm();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,7 +26,6 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     Layer* flatten;
 };
 

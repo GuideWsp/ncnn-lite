@@ -19,7 +19,6 @@
 
 struct BinaryOp : public Layer
 {
-public:
     BinaryOp();
 
     virtual int load_param(const ParamDict& pd);
@@ -42,7 +41,6 @@ public:
         Operation_RDIV  = 8
     };
 
-public:
     // param
     int op_type;
     int with_scalar;

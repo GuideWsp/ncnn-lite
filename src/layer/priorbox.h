@@ -19,14 +19,12 @@
 
 struct PriorBox : public Layer
 {
-public:
     PriorBox();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     Mat min_sizes;
     Mat max_sizes;
     Mat aspect_ratios;

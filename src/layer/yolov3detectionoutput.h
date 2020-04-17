@@ -19,7 +19,6 @@
 
 struct Yolov3DetectionOutput : public Layer
 {
-public:
 	Yolov3DetectionOutput();
     ~Yolov3DetectionOutput();
 
@@ -27,7 +26,6 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     int num_class;
     int num_box;
     float confidence_threshold;

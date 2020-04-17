@@ -19,7 +19,6 @@
 
 struct Scale : public Layer
 {
-public:
     Scale();
 
     virtual int load_param(const ParamDict& pd);
@@ -29,7 +28,6 @@ public:
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     // param
     int scale_data_size;
     int bias_term;

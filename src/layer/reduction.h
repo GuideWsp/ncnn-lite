@@ -19,7 +19,6 @@
 
 struct Reduction : public Layer
 {
-public:
     Reduction();
 
     virtual int load_param(const ParamDict& pd);
@@ -40,7 +39,6 @@ public:
         ReductionOp_LogSumExp = 10
     };
 
-public:
     // param
     int operation;
     int reduce_all;

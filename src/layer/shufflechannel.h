@@ -19,14 +19,12 @@
 
 struct ShuffleChannel : public Layer
 {
-public:
     ShuffleChannel();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     int group;
 };
 

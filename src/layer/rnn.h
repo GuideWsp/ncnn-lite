@@ -19,7 +19,6 @@
 
 struct RNN : public Layer
 {
-public:
     RNN();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     // param
     int num_output;
     int weight_data_size;

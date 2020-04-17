@@ -19,7 +19,6 @@
 
 struct YoloDetectionOutput : public Layer
 {
-public:
     YoloDetectionOutput();
 
     virtual int load_param(const ParamDict& pd);
@@ -29,7 +28,6 @@ public:
 
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
 
-public:
     int num_class;
     int num_box;
     float confidence_threshold;

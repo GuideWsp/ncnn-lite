@@ -19,7 +19,6 @@
 
 struct Eltwise : public Layer
 {
-public:
     Eltwise();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     enum OperationType { Operation_PROD = 0, Operation_SUM = 1, Operation_MAX = 2 };
 
-public:
     // param
     int op_type;
     Mat coeffs;

@@ -19,7 +19,6 @@
 
 struct DeconvolutionDepthWise : public Layer
 {
-public:
     DeconvolutionDepthWise();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     // param
     int num_output;
     int kernel_w;

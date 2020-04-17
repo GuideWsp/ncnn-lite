@@ -19,7 +19,6 @@
 
 struct Padding : public Layer
 {
-public:
     Padding();
 
     virtual int load_param(const ParamDict& pd);
@@ -30,7 +29,6 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     // -233 = dynamic offset from reference blob
     int top;
     int bottom;

@@ -19,7 +19,6 @@
 
 struct MemoryData : public Layer
 {
-public:
     MemoryData();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     int w;
     int h;
     int c;

@@ -19,7 +19,6 @@
 
 struct ConvolutionDepthWise_arm : virtual public ConvolutionDepthWise
 {
-public:
     ConvolutionDepthWise_arm();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,11 +26,9 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
     int forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     Layer* activation;
     std::vector<Layer*> group_ops;
 

@@ -22,11 +22,9 @@
 
 struct Blob
 {
-public:
     // empty
     Blob();
 
-public:
 #if NCNN_STRING
     // blob name
     std::string name;

@@ -19,14 +19,12 @@
 
 struct Squeeze : public Layer
 {
-public:
     Squeeze();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     int squeeze_w;
     int squeeze_h;
     int squeeze_c;

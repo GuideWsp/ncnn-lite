@@ -27,13 +27,11 @@ struct DataReader;
 struct Extractor;
 struct Net
 {
-public:
     // empty init
     Net();
     // clear and destroy
     ~Net();
 
-public:
     // option can be changed before loading
     Option opt;
 
@@ -106,7 +104,6 @@ public:
     // construct an Extractor from network
     Extractor create_extractor() const;
 
-protected:
     // parse the structure of network
     // fuse int8 op dequantize and quantize by requantize
     int fuse_network();
@@ -121,7 +118,6 @@ protected:
     Layer* create_custom_layer(int index);
     int forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const;
 
-protected:
     std::vector<Blob> blobs;
     std::vector<Layer*> layers;
 
@@ -130,7 +126,6 @@ protected:
 
 struct Extractor
 {
-public:
     ~Extractor();
 
     // enable light mode
@@ -167,11 +162,9 @@ public:
     // return 0 if success
     int extract(int blob_index, Mat& feat);
 
-protected:
     friend Extractor Net::create_extractor() const;
     Extractor(const Net* net, size_t blob_count);
 
-private:
     const Net* net;
     std::vector<Mat> blob_mats;
     Option opt;

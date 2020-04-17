@@ -102,7 +102,6 @@ static inline int NCNN_XADD(int* addr, int delta) { int tmp = *addr; *addr += de
 
 struct Allocator
 {
-public:
     virtual ~Allocator();
     virtual void* fastMalloc(size_t size) = 0;
     virtual void fastFree(void* ptr) = 0;
@@ -110,7 +109,6 @@ public:
 
 struct PoolAllocator : public Allocator
 {
-public:
     PoolAllocator();
     ~PoolAllocator();
 
@@ -124,7 +122,6 @@ public:
     virtual void* fastMalloc(size_t size);
     virtual void fastFree(void* ptr);
 
-private:
     Mutex budgets_lock;
     Mutex payouts_lock;
     unsigned int size_compare_ratio;// 0~256
@@ -134,7 +131,6 @@ private:
 
 struct UnlockedPoolAllocator : public Allocator
 {
-public:
     UnlockedPoolAllocator();
     ~UnlockedPoolAllocator();
 
@@ -148,7 +144,6 @@ public:
     virtual void* fastMalloc(size_t size);
     virtual void fastFree(void* ptr);
 
-private:
     unsigned int size_compare_ratio;// 0~256
     std::list< std::pair<size_t, void*> > budgets;
     std::list< std::pair<size_t, void*> > payouts;

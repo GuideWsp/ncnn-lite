@@ -28,7 +28,6 @@
 // the three dimension matrix
 struct Mat
 {
-public:
     // empty
     Mat();
     // vec

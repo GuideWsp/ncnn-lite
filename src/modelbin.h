@@ -20,7 +20,6 @@
 struct DataReader;
 struct ModelBin
 {
-public:
     virtual ~ModelBin();
     // element type
     // 0 = auto
@@ -37,24 +36,20 @@ public:
 
 struct ModelBinFromDataReader : public ModelBin
 {
-public:
     ModelBinFromDataReader(const DataReader& dr);
 
     virtual Mat load(int w, int type) const;
 
-protected:
     const DataReader& dr;
 };
 
 struct ModelBinFromMatArray : public ModelBin
 {
-public:
     // construct from weight blob array
     ModelBinFromMatArray(const Mat* weights);
 
     virtual Mat load(int w, int type) const;
 
-protected:
     mutable const Mat* weights;
 };
 

@@ -19,7 +19,6 @@
 
 struct Interp_arm : virtual public Interp
 {
-public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
 

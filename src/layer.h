@@ -27,7 +27,6 @@
 
 struct Layer
 {
-public:
     // empty
     Layer();
     // virtual destructor
@@ -49,7 +48,6 @@ public:
     // return 0 if success
     virtual int destroy_pipeline(const Option& opt);
 
-public:
     // one input and one output blob
     bool one_blob_only;
 
@@ -62,7 +60,6 @@ public:
     // accept bf16
     bool support_bf16_storage;
 
-public:
     // implement inference
     // return 0 if success
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
@@ -73,7 +70,6 @@ public:
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     // layer type index
     int typeindex;
 #if NCNN_STRING

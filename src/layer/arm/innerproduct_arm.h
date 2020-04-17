@@ -19,7 +19,6 @@
 
 struct InnerProduct_arm : virtual public InnerProduct
 {
-public:
     InnerProduct_arm();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,10 +26,8 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     Layer* flatten;
 
     // bf16

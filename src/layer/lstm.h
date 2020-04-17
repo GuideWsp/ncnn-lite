@@ -19,7 +19,6 @@
 
 struct LSTM : public Layer
 {
-public:
     LSTM();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     int num_output;
     int weight_data_size;
     int direction;// 0=forward 1=reverse 2=bidirectional

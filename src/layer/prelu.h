@@ -19,7 +19,6 @@
 
 struct PReLU : public Layer
 {
-public:
     PReLU();
 
     virtual int load_param(const ParamDict& pd);
@@ -28,7 +27,6 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 
-public:
     int num_slope;
     Mat slope_data;
 };

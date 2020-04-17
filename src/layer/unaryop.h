@@ -19,7 +19,6 @@
 
 struct UnaryOp : public Layer
 {
-public:
     UnaryOp();
 
     virtual int load_param(const ParamDict& pd);
@@ -46,7 +45,6 @@ public:
         Operation_TANH = 16
     };
 
-public:
     // param
     int op_type;
 };

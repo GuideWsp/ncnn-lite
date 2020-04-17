@@ -19,14 +19,12 @@
 
 struct Cast : public Layer
 {
-public:
     Cast();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     // element type
     // 0 = auto
     // 1 = float32

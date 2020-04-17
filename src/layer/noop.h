@@ -19,7 +19,6 @@
 
 struct Noop : public Layer
 {
-public:
     Noop();
 
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;

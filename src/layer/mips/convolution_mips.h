@@ -19,7 +19,6 @@
 
 struct Convolution_mips : virtual public Convolution
 {
-public:
     Convolution_mips();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,7 +26,6 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     Layer* activation;
     bool use_winograd3x3;
     Mat weight_3x3_winograd64_data;

@@ -19,7 +19,6 @@
 
 struct Slice_arm : virtual public Slice
 {
-public:
     Slice_arm();
 
     virtual int create_pipeline(const Option& opt);
@@ -27,10 +26,8 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-protected:
     int forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     Layer* packing_pack1;
 };
 

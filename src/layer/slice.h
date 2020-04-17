@@ -19,14 +19,12 @@
 
 struct Slice : public Layer
 {
-public:
     Slice();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
-public:
     Mat slices;
     int axis;
 };

@@ -19,14 +19,12 @@
 
 struct ExpandDims : public Layer
 {
-public:
     ExpandDims();
 
     virtual int load_param(const ParamDict& pd);
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
-public:
     int expand_w;
     int expand_h;
     int expand_c;

@@ -24,7 +24,6 @@ struct DataReader;
 struct Net;
 struct ParamDict
 {
-public:
     // empty
     ParamDict();
 
@@ -42,7 +41,6 @@ public:
     // set array
     void set(int id, const Mat& v);
 
-protected:
     friend struct Net;
 
     void clear();
@@ -50,7 +48,6 @@ protected:
     int load_param(const DataReader& dr);
     int load_param_bin(const DataReader& dr);
 
-protected:
     struct
     {
         // 0 = null

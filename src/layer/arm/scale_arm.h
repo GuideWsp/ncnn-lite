@@ -19,7 +19,6 @@
 
 struct Scale_arm : virtual public Scale
 {
-public:
     Scale_arm();
 
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;

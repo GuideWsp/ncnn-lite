@@ -19,7 +19,6 @@
 
 struct PReLU_arm : virtual public PReLU
 {
-public:
     PReLU_arm();
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
