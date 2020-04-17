@@ -16,8 +16,6 @@
 #include <math.h>
 #include <functional>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(UnaryOp)
 
 UnaryOp::UnaryOp()
@@ -189,5 +187,3 @@ int UnaryOp::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

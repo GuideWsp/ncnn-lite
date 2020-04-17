@@ -15,8 +15,6 @@
 #include "concat.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Concat)
 
 Concat::Concat()
@@ -259,5 +257,3 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
 
     return 0;
 }
-
-} // namespace ncnn

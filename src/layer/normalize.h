@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Normalize : public Layer
 {
 public:
@@ -45,7 +43,5 @@ public:
 
     Mat scale_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_NORMALIZE_H

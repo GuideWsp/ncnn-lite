@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Packing_arm)
 
 Packing_arm::Packing_arm()
@@ -590,5 +588,3 @@ int Packing_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return 0;
 }
-
-} // namespace ncnn

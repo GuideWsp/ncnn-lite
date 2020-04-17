@@ -14,8 +14,6 @@
 
 #include "memorydata.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(MemoryData)
 
 MemoryData::MemoryData()
@@ -67,5 +65,3 @@ int MemoryData::forward(const std::vector<Mat>& /*bottom_blobs*/, std::vector<Ma
 
     return 0;
 }
-
-} // namespace ncnn

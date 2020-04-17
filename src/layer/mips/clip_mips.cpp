@@ -19,8 +19,6 @@
 #include "mips_common.h"
 #endif // __MIPS_MSA
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Clip_mips)
 
 int Clip_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -43,8 +41,8 @@ int Clip_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 #endif // __MIPS_MSA
 
 #if __MIPS_MSA
-        ncnn::FloatInt fi_max = { .f = max };
-        ncnn::FloatInt fi_min = { .f = min };
+        FloatInt fi_max = { .f = max };
+        FloatInt fi_min = { .f = min };
 
         v4f32 _max = (v4f32)__msa_fill_w(fi_max.i);
         v4f32 _min = (v4f32)__msa_fill_w(fi_min.i);
@@ -73,5 +71,3 @@ int Clip_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

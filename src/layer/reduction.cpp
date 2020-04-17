@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <functional>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Reduction)
 
 Reduction::Reduction()
@@ -888,5 +886,3 @@ int Reduction::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 
     return 0;
 }
-
-} // namespace ncnn

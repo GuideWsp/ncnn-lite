@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Convolution : public Layer
 {
 public:
@@ -74,7 +72,5 @@ public:
     // implementation type, 0 means do not use auto pack model 
     int impl_type;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONVOLUTION_H

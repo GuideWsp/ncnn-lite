@@ -22,8 +22,6 @@
 #include <vector>
 #include "platform.h"
 
-namespace ncnn {
-
 // the alignment of all the allocated buffers
 #define MALLOC_ALIGN    16
 
@@ -155,7 +153,5 @@ private:
     std::list< std::pair<size_t, void*> > budgets;
     std::list< std::pair<size_t, void*> > payouts;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_ALLOCATOR_H

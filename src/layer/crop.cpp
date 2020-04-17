@@ -15,8 +15,6 @@
 #include "crop.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Crop)
 
 Crop::Crop()
@@ -516,5 +514,3 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, const int* param_data, int& 
         _outc = param_data[5];
     }
 }
-
-} // namespace ncnn

@@ -16,8 +16,6 @@
 #include <algorithm>
 #include <functional>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ArgMax)
 
 ArgMax::ArgMax()
@@ -78,5 +76,3 @@ int ArgMax::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) co
 
     return 0;
 }
-
-} // namespace ncnn

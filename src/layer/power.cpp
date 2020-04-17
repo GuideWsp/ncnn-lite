@@ -15,8 +15,6 @@
 #include "power.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Power)
 
 Power::Power()
@@ -54,5 +52,3 @@ int Power::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

@@ -17,14 +17,10 @@
 
 #include "quantize.h"
 
-namespace ncnn {
-
 class Quantize_arm : virtual public Quantize
 {
 public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_QUANTIZE_ARM_H

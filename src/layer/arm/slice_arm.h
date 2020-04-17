@@ -17,8 +17,6 @@
 
 #include "slice.h"
 
-namespace ncnn {
-
 class Slice_arm : virtual public Slice
 {
 public:
@@ -33,9 +31,7 @@ protected:
     int forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
 public:
-    ncnn::Layer* packing_pack1;
+    Layer* packing_pack1;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SLICE_ARM_H

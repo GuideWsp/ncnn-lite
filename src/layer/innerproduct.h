@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class InnerProduct : public Layer
 {
 public:
@@ -53,7 +51,5 @@ public:
     Mat weight_data_int8_scales;
     float bottom_blob_int8_scale;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INNERPRODUCT_H

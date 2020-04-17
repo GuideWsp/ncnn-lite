@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class InstanceNorm : public Layer
 {
 public:
@@ -39,7 +37,5 @@ public:
     Mat gamma_data;
     Mat beta_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INSTANCENORM_H

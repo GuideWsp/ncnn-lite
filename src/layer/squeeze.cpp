@@ -14,8 +14,6 @@
 
 #include "squeeze.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Squeeze)
 
 Squeeze::Squeeze()
@@ -150,5 +148,3 @@ int Squeeze::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
     return 0;
 }
-
-} // namespace ncnn

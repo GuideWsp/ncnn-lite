@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Flatten : public Layer
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_FLATTEN_H

@@ -25,8 +25,6 @@
 #include "allocator.h"
 #include "option.h"
 
-namespace ncnn {
-
 // the three dimension matrix
 class Mat
 {
@@ -1011,7 +1009,5 @@ inline const float& Mat::operator[](size_t i) const
 {
     return ((const float*)data)[i];
 }
-
-} // namespace ncnn
 
 #endif // NCNN_MAT_H

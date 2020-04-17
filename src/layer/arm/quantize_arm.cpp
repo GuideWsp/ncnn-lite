@@ -17,8 +17,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Quantize_arm)
 
 static inline signed char float2int8(float v)
@@ -187,5 +185,3 @@ int Quantize_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& o
 
     return 0;
 }
-
-} // namespace ncnn

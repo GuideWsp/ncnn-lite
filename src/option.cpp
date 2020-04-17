@@ -15,8 +15,6 @@
 #include "option.h"
 #include "cpu.h"
 
-namespace ncnn {
-
 Option::Option()
 {
     lightmode = true;
@@ -38,5 +36,3 @@ Option::Option()
 
     use_bf16_storage = false;
 }
-
-} // namespace ncnn

@@ -21,8 +21,6 @@
 #include "neon_activation.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(DeconvolutionDepthWise_arm)
 
 DeconvolutionDepthWise_arm::DeconvolutionDepthWise_arm()
@@ -95,10 +93,10 @@ int DeconvolutionDepthWise_arm::create_pipeline(const Option& opt)
             if (bias_term)
                 bias_data_g = bias_data.range(num_output_g * g, num_output_g);
 
-            ncnn::Layer* op = ncnn::create_layer(ncnn::LayerType::Deconvolution);
+            Layer* op = create_layer(LayerType::Deconvolution);
 
             // set param
-            ncnn::ParamDict pd;
+            ParamDict pd;
             pd.set(0, num_output_g);// num_output
             pd.set(1, kernel_w);
             pd.set(11, kernel_h);
@@ -118,7 +116,7 @@ int DeconvolutionDepthWise_arm::create_pipeline(const Option& opt)
             // set weights
             if (bias_term)
             {
-                ncnn::Mat weights[2];
+                Mat weights[2];
                 weights[0] = weight_data_g;
                 weights[1] = bias_data_g;
 
@@ -126,7 +124,7 @@ int DeconvolutionDepthWise_arm::create_pipeline(const Option& opt)
             }
             else
             {
-                ncnn::Mat weights[1];
+                Mat weights[1];
                 weights[0] = weight_data_g;
 
                 op->load_model(ModelBinFromMatArray(weights));
@@ -368,7 +366,7 @@ int DeconvolutionDepthWise_arm::forward(const Mat& bottom_blob, Mat& top_blob, c
             const Mat bottom_blob_g = bottom_blob_unpacked.channel_range(channels_g * g / g_elempack, channels_g / g_elempack);
             Mat top_blob_bordered_g = top_blob_bordered_unpacked.channel_range(num_output_g * g / out_g_elempack, num_output_g / out_g_elempack);
 
-            const ncnn::Layer* op = group_ops[g];
+            const Layer* op = group_ops[g];
 
             Option opt_g = opt;
             opt_g.blob_allocator = top_blob_bordered_unpacked.allocator;
@@ -454,5 +452,3 @@ int DeconvolutionDepthWise_arm::forward(const Mat& bottom_blob, Mat& top_blob, c
 
     return 0;
 }
-
-} // namespace ncnn

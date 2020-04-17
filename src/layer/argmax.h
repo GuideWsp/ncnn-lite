@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ArgMax : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
     int out_max_val;
     int topk;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ARGMAX_H

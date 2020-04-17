@@ -17,8 +17,6 @@
 
 #include "packing.h"
 
-namespace ncnn {
-
 class Packing_arm : virtual public Packing
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PACKING_ARM_H

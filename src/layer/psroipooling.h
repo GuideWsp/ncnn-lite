@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class PSROIPooling : public Layer
 {
 public:
@@ -34,7 +32,5 @@ public:
     float spatial_scale;
     int output_dim;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PSROIPOOLING_H

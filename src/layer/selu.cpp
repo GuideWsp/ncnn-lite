@@ -15,8 +15,6 @@
 #include "selu.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(SELU)
 
 SELU::SELU()
@@ -57,5 +55,3 @@ int SELU::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

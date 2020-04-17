@@ -17,14 +17,10 @@
 
 #include "bias.h"
 
-namespace ncnn {
-
 class Bias_mips : virtual public Bias
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BIAS_MIPS_H

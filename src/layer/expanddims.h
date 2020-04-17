@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ExpandDims : public Layer
 {
 public:
@@ -34,7 +32,5 @@ public:
     int expand_c;
     Mat axes;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_EXPANDDIMS_H

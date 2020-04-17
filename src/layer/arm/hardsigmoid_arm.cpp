@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(HardSigmoid_arm)
 
 HardSigmoid_arm::HardSigmoid_arm()
@@ -189,5 +187,3 @@ int HardSigmoid_arm::forward_inplace_bf16s(Mat& bottom_top_blob, const Option& o
 
     return 0;
 }
-
-} // namespace ncnn

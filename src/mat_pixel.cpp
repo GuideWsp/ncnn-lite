@@ -21,8 +21,6 @@
 #endif // __ARM_NEON
 #include "platform.h"
 
-namespace ncnn {
-
 #if NCNN_PIXEL
 static int from_rgb(const unsigned char* rgb, int w, int h, int stride, Mat& m, Allocator* allocator)
 {
@@ -2426,5 +2424,3 @@ void Mat::to_pixels_resize(unsigned char* pixels, int type, int target_width, in
     }
 }
 #endif // NCNN_PIXEL
-
-} // namespace ncnn

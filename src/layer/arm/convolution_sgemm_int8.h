@@ -71,7 +71,7 @@ static void conv_im2col_sgemm_int8_neon(const Mat &bottom_blob, Mat &top_blob, c
     const int n = outw * outh;
     const int k = inch * kernel_w * kernel_h;
 
-    ncnn::Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
+    Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
     {
         const int8_t *pData = bottom_im2col;
         int8_t *pReorder = bottom_tm;

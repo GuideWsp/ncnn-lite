@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Cast : public Layer
 {
 public:
@@ -38,7 +36,5 @@ public:
     int type_from;
     int type_to;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CAST_H

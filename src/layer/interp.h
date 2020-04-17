@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Interp : public Layer
 {
 public:
@@ -36,7 +34,5 @@ public:
     int output_width;
     int output_height;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INTERP_H

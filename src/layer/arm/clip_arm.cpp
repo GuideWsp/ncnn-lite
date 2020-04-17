@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Clip_arm)
 
 Clip_arm::Clip_arm()
@@ -210,5 +208,3 @@ int Clip_arm::forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) con
 
     return 0;
 }
-
-} // namespace ncnn

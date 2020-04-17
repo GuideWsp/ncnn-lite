@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Dropout : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     float scale;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DROPOUT_H

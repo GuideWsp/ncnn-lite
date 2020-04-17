@@ -14,8 +14,6 @@
 
 #include "packing.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Packing)
 
 Packing::Packing()
@@ -176,5 +174,3 @@ int Packing::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
     return 0;
 }
-
-} // namespace ncnn

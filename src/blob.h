@@ -20,8 +20,6 @@
 #include "platform.h"
 #include "mat.h"
 
-namespace ncnn {
-
 class Blob
 {
 public:
@@ -40,7 +38,5 @@ public:
     // shape hint
     Mat shape;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_BLOB_H

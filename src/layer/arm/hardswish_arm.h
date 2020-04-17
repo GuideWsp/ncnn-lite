@@ -17,8 +17,6 @@
 
 #include "hardswish.h"
 
-namespace ncnn {
-
 class HardSwish_arm : virtual public HardSwish
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_HARDSWISH_ARM_H

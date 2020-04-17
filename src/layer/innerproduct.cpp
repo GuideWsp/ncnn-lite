@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(InnerProduct)
 
 InnerProduct::InnerProduct()
@@ -217,5 +215,3 @@ int InnerProduct::forward_int8(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return 0;
 }
-
-} // namespace ncnn

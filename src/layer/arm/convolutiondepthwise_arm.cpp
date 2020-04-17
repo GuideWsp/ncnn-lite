@@ -22,8 +22,6 @@
 #include "neon_activation.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 #include "convolutiondepthwise_3x3.h"
 #include "convolutiondepthwise_5x5.h"
 
@@ -54,33 +52,33 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
 {
     if (activation_type == 1)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
     else if (activation_type == 2)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// slope
         activation->load_param(pd);
     }
     else if (activation_type == 3)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Clip);
+        activation = create_layer(LayerType::Clip);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// min
         pd.set(1, activation_params[1]);// max
         activation->load_param(pd);
     }
     else if (activation_type == 4)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Sigmoid);
+        activation = create_layer(LayerType::Sigmoid);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
 
@@ -123,7 +121,7 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
                 Mat weight_data_r2 = weight_data.reshape(maxk, group);
                 convert_packing(weight_data_r2, weight_data_pack4, 4);
 
-                ncnn::cast_float32_to_bfloat16(weight_data_pack4, weight_data_pack4_bf16, opt);
+                cast_float32_to_bfloat16(weight_data_pack4, weight_data_pack4_bf16, opt);
 
                 return 0;
             }
@@ -131,7 +129,7 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
 
             if (elempack == 1)
             {
-                ncnn::cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
+                cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
 
                 if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
                 {
@@ -171,10 +169,10 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
         if (bias_term)
             bias_data_g = bias_data.range(num_output_g * g, num_output_g);
 
-        ncnn::Layer* op = ncnn::create_layer(ncnn::LayerType::Convolution);
+        Layer* op = create_layer(LayerType::Convolution);
 
         // set param
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, num_output_g);// num_output
         pd.set(1, kernel_w);
         pd.set(11, kernel_h);
@@ -195,7 +193,7 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
         // set weights
         if (bias_term)
         {
-            ncnn::Mat weights[4];
+            Mat weights[4];
             weights[0] = weight_data_g;
             weights[1] = bias_data_g;
 
@@ -209,7 +207,7 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
         }
         else
         {
-            ncnn::Mat weights[3];
+            Mat weights[3];
             weights[0] = weight_data_g;
 
             if (int8_scale_term)
@@ -481,7 +479,7 @@ int ConvolutionDepthWise_arm::forward(const Mat& bottom_blob, Mat& top_blob, con
         const Mat bottom_blob_bordered_g = bottom_blob_bordered_unpacked.channel_range(channels_g * g / g_elempack, channels_g / g_elempack);
         Mat top_blob_g = top_blob_unpacked.channel_range(num_output_g * g / out_g_elempack, num_output_g / out_g_elempack);
 
-        const ncnn::Layer* op = group_ops[g];
+        const Layer* op = group_ops[g];
 
         Option opt_g = opt;
         opt_g.blob_allocator = top_blob_unpacked.allocator;
@@ -795,7 +793,7 @@ int ConvolutionDepthWise_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blo
         const Mat bottom_blob_bordered_g = bottom_blob_bordered_unpacked.channel_range(channels_g * g / g_elempack, channels_g / g_elempack);
         Mat top_blob_g = top_blob_unpacked.channel_range(num_output_g * g / out_g_elempack, num_output_g / out_g_elempack);
 
-        const ncnn::Layer* op = group_ops[g];
+        const Layer* op = group_ops[g];
 
         Option opt_g = opt;
         opt_g.blob_allocator = top_blob_unpacked.allocator;
@@ -996,7 +994,7 @@ int ConvolutionDepthWise_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_
         const Mat bottom_blob_bordered_g = bottom_blob_bordered.channel_range(channels_g * g, channels_g);
         Mat top_blob_g = top_blob.channel_range(num_output_g * g, num_output_g);
 
-        const ncnn::Layer* op = group_ops[g];
+        const Layer* op = group_ops[g];
 
         Option opt_g = opt;
         opt_g.blob_allocator = top_blob.allocator;
@@ -1007,5 +1005,3 @@ int ConvolutionDepthWise_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_
 
     return 0;
 }
-
-} // namespace ncnn

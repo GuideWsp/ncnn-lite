@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class PReLU : public Layer
 {
 public:
@@ -34,7 +32,5 @@ public:
     int num_slope;
     Mat slope_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PRELU_H

@@ -14,8 +14,6 @@
 
 #include "padding.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Padding)
 
 Padding::Padding()
@@ -461,5 +459,3 @@ int Padding::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
 
     return 0;
 }
-
-} // namespace ncnn

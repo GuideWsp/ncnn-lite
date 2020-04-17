@@ -22,8 +22,6 @@
 #include "neon_mathfun.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(BinaryOp_arm)
 
 BinaryOp_arm::BinaryOp_arm()
@@ -1897,5 +1895,3 @@ int BinaryOp_arm::forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt)
 
     return 0;
 }
-
-} // namespace ncnn

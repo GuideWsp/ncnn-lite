@@ -17,8 +17,6 @@
 
 #include "convolutiondepthwise.h"
 
-namespace ncnn {
-
 class ConvolutionDepthWise_arm : virtual public ConvolutionDepthWise
 {
 public:
@@ -35,7 +33,7 @@ protected:
 
 public:
     Layer* activation;
-    std::vector<ncnn::Layer*> group_ops;
+    std::vector<Layer*> group_ops;
 
     // packing
     Mat weight_data_pack4;
@@ -44,7 +42,5 @@ public:
     Mat weight_data_bf16;
     Mat weight_data_pack4_bf16;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONVOLUTIONDEPTHWISE_ARM_H

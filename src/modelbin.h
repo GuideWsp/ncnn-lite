@@ -17,8 +17,6 @@
 
 #include "mat.h"
 
-namespace ncnn {
-
 class DataReader;
 class ModelBin
 {
@@ -59,7 +57,5 @@ public:
 protected:
     mutable const Mat* weights;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_MODELBIN_H

@@ -18,8 +18,6 @@
 #include <math.h>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Yolov3DetectionOutput)
 
 Yolov3DetectionOutput::Yolov3DetectionOutput()
@@ -27,10 +25,10 @@ Yolov3DetectionOutput::Yolov3DetectionOutput()
     one_blob_only = false;
     support_inplace = false;
     
-    //softmax = ncnn::create_layer(ncnn::LayerType::Softmax);
+    //softmax = create_layer(LayerType::Softmax);
 
     // set param
-    ncnn::ParamDict pd;
+    ParamDict pd;
     pd.set(0, 0);// axis
 
     //softmax->load_param(pd);
@@ -323,5 +321,3 @@ int Yolov3DetectionOutput::forward(const std::vector<Mat>& bottom_blobs, std::ve
 
     return 0;
 }
-
-} // namespace ncnn

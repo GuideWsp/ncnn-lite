@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Slice : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
     Mat slices;
     int axis;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SLICE_H

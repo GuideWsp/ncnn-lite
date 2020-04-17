@@ -20,8 +20,6 @@
 // at most 32 parameters
 #define NCNN_MAX_PARAM_COUNT 32
 
-namespace ncnn {
-
 class DataReader;
 class Net;
 class ParamDict
@@ -67,7 +65,5 @@ protected:
         Mat v;
     } params[NCNN_MAX_PARAM_COUNT];
 };
-
-} // namespace ncnn
 
 #endif // NCNN_PARAMDICT_H

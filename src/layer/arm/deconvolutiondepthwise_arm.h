@@ -17,8 +17,6 @@
 
 #include "deconvolutiondepthwise.h"
 
-namespace ncnn {
-
 class DeconvolutionDepthWise_arm : virtual public DeconvolutionDepthWise
 {
 public:
@@ -30,13 +28,11 @@ public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
 public:
-    std::vector<ncnn::Layer*> group_ops;
+    std::vector<Layer*> group_ops;
 
     // packing
     Mat weight_data_pack4;
     Mat weight_data_pack1;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DECONVOLUTIONDEPTHWISE_ARM_H

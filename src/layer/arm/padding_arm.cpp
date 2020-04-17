@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 #if __ARM_NEON
 #include "padding_pack4.h"
 #include "padding_pack4_bf16s.h"
@@ -42,7 +40,7 @@ int Padding_arm::create_pipeline(const Option& opt)
     {
         value_bf16 = float32_to_bfloat16(value);
 
-        ncnn::cast_float32_to_bfloat16(per_channel_pad_data, per_channel_pad_data_bf16, opt);
+        cast_float32_to_bfloat16(per_channel_pad_data, per_channel_pad_data_bf16, opt);
     }
 
     return 0;
@@ -221,5 +219,3 @@ int Padding_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return Padding::forward(bottom_blob, top_blob, opt);
 }
-
-} // namespace ncnn

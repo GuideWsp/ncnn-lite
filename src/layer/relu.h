@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ReLU : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
 public:
     float slope;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_RELU_H

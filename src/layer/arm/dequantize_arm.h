@@ -17,14 +17,10 @@
 
 #include "dequantize.h"
 
-namespace ncnn {
-
 class Dequantize_arm : virtual public Dequantize
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DEQUANTIZE_ARM_H

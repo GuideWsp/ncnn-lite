@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Exp : public Layer
 {
 public:
@@ -33,7 +31,5 @@ public:
     float scale;
     float shift;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_EXP_H

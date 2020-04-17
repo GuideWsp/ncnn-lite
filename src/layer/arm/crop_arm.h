@@ -17,8 +17,6 @@
 
 #include "crop.h"
 
-namespace ncnn {
-
 class Crop_arm : virtual public Crop
 {
 public:
@@ -28,7 +26,5 @@ public:
 
     virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CROP_ARM_H

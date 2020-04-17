@@ -14,8 +14,6 @@
 
 #include "scale.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Scale)
 
 Scale::Scale()
@@ -172,5 +170,3 @@ int Scale::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return forward_inplace(bottom_top_blobs, opt);
 }
-
-} // namespace ncnn

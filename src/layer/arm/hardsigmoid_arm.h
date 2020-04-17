@@ -17,8 +17,6 @@
 
 #include "hardsigmoid.h"
 
-namespace ncnn {
-
 class HardSigmoid_arm : virtual public HardSigmoid
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_HARDSIGMOID_ARM_H

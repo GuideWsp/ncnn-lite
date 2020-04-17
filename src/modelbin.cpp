@@ -19,8 +19,6 @@
 #include <vector>
 #include "datareader.h"
 
-namespace ncnn {
-
 ModelBin::~ModelBin()
 {
 }
@@ -209,5 +207,3 @@ Mat ModelBinFromMatArray::load(int /*w*/, int /*type*/) const
     weights++;
     return m;
 }
-
-} // namespace ncnn

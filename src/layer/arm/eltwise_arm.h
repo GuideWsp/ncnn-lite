@@ -17,8 +17,6 @@
 
 #include "eltwise.h"
 
-namespace ncnn {
-
 class Eltwise_arm : virtual public Eltwise
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ELTWISE_ARM_H

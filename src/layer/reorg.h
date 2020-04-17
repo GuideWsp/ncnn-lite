@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Reorg : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     int stride;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_REORG_H

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Proposal : public Layer
 {
 public:
@@ -42,7 +40,5 @@ public:
 
     Mat anchors;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PROPOSAL_H

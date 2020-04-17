@@ -17,8 +17,6 @@
 
 #include "cast.h"
 
-namespace ncnn {
-
 class Cast_arm : virtual public Cast
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CAST_ARM_H

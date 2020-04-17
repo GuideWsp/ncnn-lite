@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class DetectionOutput : public Layer
 {
 public:
@@ -36,7 +34,5 @@ public:
     float confidence_threshold;
     float variances[4];
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DETECTIONOUTPUT_H

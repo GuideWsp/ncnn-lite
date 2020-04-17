@@ -15,8 +15,6 @@
 #include "mvn.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(MVN)
 
 MVN::MVN()
@@ -174,5 +172,3 @@ int MVN::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

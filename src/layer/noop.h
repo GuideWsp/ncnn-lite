@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Noop : public Layer
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_NOOP_H

@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ConvolutionDepthWise)
 
 ConvolutionDepthWise::ConvolutionDepthWise()
@@ -626,5 +624,3 @@ int ConvolutionDepthWise::forward_int8(const Mat& bottom_blob, Mat& top_blob, co
 
     return 0;
 }
-
-} // namespace ncnn

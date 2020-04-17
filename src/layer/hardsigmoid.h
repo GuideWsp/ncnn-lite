@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class HardSigmoid : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     float alpha, beta, lower, upper;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_HARDSIGMOID_H

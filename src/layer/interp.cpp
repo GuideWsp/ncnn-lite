@@ -15,8 +15,6 @@
 #include "interp.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Interp);
 
 Interp::Interp()
@@ -511,5 +509,3 @@ int Interp::forward(const Mat &bottom_blob, Mat &top_blob, const Option& opt) co
         return -233;
     }
 }
-
-} // namespace ncnn

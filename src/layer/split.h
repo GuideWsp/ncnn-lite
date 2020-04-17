@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Split : public Layer
 {
 public:
@@ -28,7 +26,5 @@ public:
 
 public:
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SPLIT_H

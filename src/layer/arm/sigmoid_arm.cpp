@@ -21,8 +21,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Sigmoid_arm)
 
 Sigmoid_arm::Sigmoid_arm()
@@ -188,5 +186,3 @@ int Sigmoid_arm::forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) 
 
     return 0;
 }
-
-} // namespace ncnn

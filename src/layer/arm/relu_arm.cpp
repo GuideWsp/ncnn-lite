@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ReLU_arm)
 
 ReLU_arm::ReLU_arm()
@@ -722,5 +720,3 @@ int ReLU_arm::forward_inplace_int8_neon(Mat& bottom_top_blob, const Option& opt)
 
     return 0;
 }
-
-} // namespace ncnn

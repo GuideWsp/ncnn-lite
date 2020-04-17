@@ -19,8 +19,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 #include "pooling_2x2.h"
 #include "pooling_3x3.h"
 
@@ -744,5 +742,3 @@ int Pooling_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return 0;
 }
-
-} // namespace ncnn

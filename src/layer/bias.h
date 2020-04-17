@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Bias : public Layer
 {
 public:
@@ -37,7 +35,5 @@ public:
     // model
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BIAS_H

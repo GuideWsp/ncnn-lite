@@ -24,8 +24,6 @@ static inline signed char float2int8(float v)
     return (signed char)int32;
 }
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Clip)
 
 Clip::Clip()
@@ -97,5 +95,3 @@ int Clip::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

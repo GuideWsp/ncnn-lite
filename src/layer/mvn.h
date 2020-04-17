@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class MVN : public Layer
 {
 public:
@@ -33,7 +31,5 @@ public:
     int across_channels;
     float eps;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_MVN_H

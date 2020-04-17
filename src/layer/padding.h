@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Padding : public Layer
 {
 public:
@@ -45,7 +43,5 @@ public:
     int per_channel_pad_data_size;
     Mat per_channel_pad_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PADDING_H

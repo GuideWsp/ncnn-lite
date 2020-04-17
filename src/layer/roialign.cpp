@@ -16,8 +16,6 @@
 #include <math.h>
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ROIAlign)
 
 ROIAlign::ROIAlign()
@@ -149,5 +147,3 @@ int ROIAlign::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
 
     return 0;
 }
-
-} // namespace ncnn

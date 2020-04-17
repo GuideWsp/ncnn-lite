@@ -17,8 +17,6 @@
 #include <stdio.h>
 #include <algorithm>
 
-namespace ncnn {
-
 Allocator::~Allocator() 
 {
 
@@ -53,7 +51,7 @@ void PoolAllocator::clear()
     for (; it != budgets.end(); it++)
     {
         void* ptr = it->second;
-        ncnn::fastFree(ptr);
+        fastFree(ptr);
     }
     budgets.clear();
 
@@ -103,7 +101,7 @@ void* PoolAllocator::fastMalloc(size_t size)
     budgets_lock.unlock();
 
     // new
-    void* ptr = ncnn::fastMalloc(size);
+    void* ptr = fastMalloc(size);
 
     payouts_lock.lock();
 
@@ -143,7 +141,7 @@ void PoolAllocator::fastFree(void* ptr)
     payouts_lock.unlock();
 
     fprintf(stderr, "FATAL ERROR! pool allocator get wild %p\n", ptr);
-    ncnn::fastFree(ptr);
+    fastFree(ptr);
 }
 
 UnlockedPoolAllocator::UnlockedPoolAllocator()
@@ -173,7 +171,7 @@ void UnlockedPoolAllocator::clear()
     for (; it != budgets.end(); it++)
     {
         void* ptr = it->second;
-        ncnn::fastFree(ptr);
+        fastFree(ptr);
     }
     budgets.clear();
 }
@@ -211,7 +209,7 @@ void* UnlockedPoolAllocator::fastMalloc(size_t size)
     }
 
     // new
-    void* ptr = ncnn::fastMalloc(size);
+    void* ptr = fastMalloc(size);
 
     payouts.push_back(std::make_pair(size, ptr));
 
@@ -237,7 +235,5 @@ void UnlockedPoolAllocator::fastFree(void* ptr)
     }
 
     fprintf(stderr, "FATAL ERROR! unlocked pool allocator get wild %p\n", ptr);
-    ncnn::fastFree(ptr);
+    fastFree(ptr);
 }
-
-} // namespace ncnn

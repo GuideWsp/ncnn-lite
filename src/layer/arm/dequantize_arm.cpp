@@ -15,8 +15,6 @@
 
 #include "dequantize_arm.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Dequantize_arm)
 
 int Dequantize_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -284,6 +282,4 @@ int Dequantize_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) con
 
     return 0;
 }
-
-} // namespace ncnn
 

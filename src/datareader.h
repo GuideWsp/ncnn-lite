@@ -18,8 +18,6 @@
 #include <stdio.h>
 #include "platform.h"
 
-namespace ncnn {
-
 // data read wrapper
 class DataReader
 {
@@ -66,7 +64,5 @@ public:
 protected:
     const unsigned char*& mem;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_DATAREADER_H

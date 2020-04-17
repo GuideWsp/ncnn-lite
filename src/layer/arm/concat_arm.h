@@ -17,8 +17,6 @@
 
 #include "concat.h"
 
-namespace ncnn {
-
 class Concat_arm : virtual public Concat
 {
 public:
@@ -33,9 +31,7 @@ protected:
     int forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
 
 public:
-    ncnn::Layer* packing_pack4;
+    Layer* packing_pack4;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONCAT_ARM_H

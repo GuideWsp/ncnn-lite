@@ -29,8 +29,6 @@
 #include <stdint.h>
 #endif
 
-namespace ncnn {
-
 #ifdef __ANDROID__
 
 // extract the ELF HW capabilities bitmap from /proc/self/auxv
@@ -482,5 +480,3 @@ int get_omp_thread_num()
     return 0;
 #endif
 }
-
-} // namespace ncnn

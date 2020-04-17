@@ -14,8 +14,6 @@
 
 #include "deepcopy.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(DeepCopy)
 
 DeepCopy::DeepCopy()
@@ -33,5 +31,3 @@ int DeepCopy::forward(const Mat& bottom_blob, Mat& top_blob, const Option& /*opt
 
     return 0;
 }
-
-} // namespace ncnn

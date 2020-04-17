@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class BinaryOp : public Layer
 {
 public:
@@ -50,7 +48,5 @@ public:
     int with_scalar;
     float b;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BINARYOP_H

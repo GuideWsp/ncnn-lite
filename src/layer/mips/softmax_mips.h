@@ -17,14 +17,10 @@
 
 #include "softmax.h"
 
-namespace ncnn {
-
 class Softmax_mips : virtual public Softmax
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SOFTMAX_MIPS_H

@@ -31,9 +31,6 @@
 #endif
 
 // minimal opencv style data structure implementation
-namespace cv
-{
-
 struct Size
 {
     Size() : width(0), height(0) {}
@@ -179,7 +176,7 @@ struct Mat
         {
             // refcount address must be aligned, so we expand totalsize here
             size_t totalsize = (total() + 3) >> 2 << 2;
-            data = (unsigned char*)ncnn::fastMalloc(totalsize + (int)sizeof(*refcount));
+            data = (unsigned char*)fastMalloc(totalsize + (int)sizeof(*refcount));
             refcount = (int*)(((unsigned char*)data) + totalsize);
             *refcount = 1;
         }
@@ -188,7 +185,7 @@ struct Mat
     void release()
     {
         if (refcount && NCNN_XADD(refcount, -1) == 1)
-            ncnn::fastFree(data);
+            fastFree(data);
 
         data = 0;
 
@@ -265,8 +262,6 @@ void imwrite(const std::string& path, const Mat& m);
 #if NCNN_PIXEL
 void resize(const Mat& src, Mat& dst, const Size& size, float sw = 0.f, float sh = 0.f, int flags = 0);
 #endif // NCNN_PIXEL
-
-} // namespace cv
 
 #if defined(_MSC_VER) || defined(__GNUC__)
 #pragma pop_macro("min")

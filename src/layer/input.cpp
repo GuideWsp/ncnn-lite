@@ -14,8 +14,6 @@
 
 #include "input.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Input)
 
 Input::Input()
@@ -37,5 +35,3 @@ int Input::forward_inplace(Mat& /*bottom_top_blob*/, const Option& /*opt*/) cons
 {
     return 0;
 }
-
-} // namespace ncnn

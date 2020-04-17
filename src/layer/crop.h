@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Crop : public Layer
 {
 public:
@@ -58,7 +56,5 @@ public:
     Mat ends;
     Mat axes;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CROP_H

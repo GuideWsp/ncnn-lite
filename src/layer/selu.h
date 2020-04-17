@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class SELU : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
     float alpha;
     float lambda;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SELU_H

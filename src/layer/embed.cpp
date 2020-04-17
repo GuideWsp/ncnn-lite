@@ -15,8 +15,6 @@
 #include "embed.h"
 #include <string.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Embed)
 
 Embed::Embed()
@@ -87,5 +85,3 @@ int Embed::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) con
 
     return 0;
 }
-
-} // namespace ncnn

@@ -17,8 +17,6 @@
 
 #include "scale.h"
 
-namespace ncnn {
-
 class Scale_arm : virtual public Scale
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SCALE_ARM_H

@@ -17,8 +17,6 @@
 
 #include "platform.h"
 
-namespace ncnn {
-
 class Allocator;
 class Option
 {
@@ -73,7 +71,5 @@ public:
     // enable options for cpu inference
     bool use_bf16_storage;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_OPTION_H

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class MemoryData : public Layer
 {
 public:
@@ -37,7 +35,5 @@ public:
 
     Mat data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_MEMORYDATA_H

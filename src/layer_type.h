@@ -15,8 +15,6 @@
 #ifndef NCNN_LAYER_TYPE_H
 #define NCNN_LAYER_TYPE_H
 
-namespace ncnn {
-
 namespace LayerType {
 enum LayerType
 {
@@ -24,7 +22,5 @@ enum LayerType
     CustomBit = (1<<8),
 };
 } // namespace LayerType
-
-} // namespace ncnn
 
 #endif // NCNN_LAYER_TYPE_H

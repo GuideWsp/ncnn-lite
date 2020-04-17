@@ -17,8 +17,6 @@
 
 #include "clip.h"
 
-namespace ncnn {
-
 class Clip_arm : virtual public Clip
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CLIP_ARM_H

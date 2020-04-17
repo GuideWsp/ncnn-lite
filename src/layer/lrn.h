@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class LRN : public Layer
 {
 public:
@@ -38,7 +36,5 @@ public:
     float beta;
     float bias;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_LRN_H

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Scale : public Layer
 {
 public:
@@ -40,7 +38,5 @@ public:
     Mat scale_data;
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SCALE_H

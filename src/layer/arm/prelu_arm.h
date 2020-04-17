@@ -17,8 +17,6 @@
 
 #include "prelu.h"
 
-namespace ncnn {
-
 class PReLU_arm : virtual public PReLU
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PRELU_ARM_H

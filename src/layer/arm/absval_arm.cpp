@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(AbsVal_arm)
 
 AbsVal_arm::AbsVal_arm()
@@ -124,5 +122,3 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

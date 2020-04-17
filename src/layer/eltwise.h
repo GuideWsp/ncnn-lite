@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Eltwise : public Layer
 {
 public:
@@ -35,7 +33,5 @@ public:
     int op_type;
     Mat coeffs;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ELTWISE_H

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Dequantize : public Layer
 {
 public:
@@ -37,7 +35,5 @@ public:
 
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DEQUANTIZE_H

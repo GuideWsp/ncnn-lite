@@ -21,8 +21,6 @@
 #include "neon_mathfun.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(UnaryOp_arm)
 
 UnaryOp_arm::UnaryOp_arm()
@@ -294,5 +292,3 @@ int UnaryOp_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return UnaryOp::forward_inplace(bottom_top_blob, opt);
 }
-
-} // namespace ncnn

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Permute : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     int order_type;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PERMUTE_H

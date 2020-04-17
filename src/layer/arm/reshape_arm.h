@@ -17,8 +17,6 @@
 
 #include "reshape.h"
 
-namespace ncnn {
-
 class Reshape_arm : virtual public Reshape
 {
 public:
@@ -30,9 +28,7 @@ public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
 public:
-    ncnn::Layer* flatten;
+    Layer* flatten;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_RESHAPE_ARM_H

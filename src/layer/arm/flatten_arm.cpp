@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Flatten_arm)
 
 Flatten_arm::Flatten_arm()
@@ -339,5 +337,3 @@ int Flatten_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return Flatten::forward(bottom_blob, top_blob, opt);
 }
-
-} // namespace ncnn

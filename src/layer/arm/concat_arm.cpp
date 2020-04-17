@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Concat_arm)
 
 Concat_arm::Concat_arm()
@@ -38,9 +36,9 @@ int Concat_arm::create_pipeline(const Option& opt)
     {
 
     {
-        packing_pack4 = ncnn::create_layer(ncnn::LayerType::Packing);
+        packing_pack4 = create_layer(LayerType::Packing);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, 4);
 
         packing_pack4->load_param(pd);
@@ -755,5 +753,3 @@ int Concat_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<
 
     return Concat::forward(bottom_blobs, top_blobs, opt);
 }
-
-} // namespace ncnn

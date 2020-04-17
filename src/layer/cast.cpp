@@ -14,8 +14,6 @@
 
 #include "cast.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Cast)
 
 Cast::Cast()
@@ -181,5 +179,3 @@ int Cast::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) cons
 
     return 0;
 }
-
-} // namespace ncnn

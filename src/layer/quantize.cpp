@@ -16,8 +16,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Quantize)
 
 Quantize::Quantize()
@@ -109,5 +107,3 @@ int Quantize::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) 
 
     return 0;
 }
-
-} // namespace ncnn

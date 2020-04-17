@@ -25,8 +25,6 @@
 #include "option.h"
 #include "paramdict.h"
 
-namespace ncnn {
-
 class Layer
 {
 public:
@@ -116,8 +114,6 @@ Layer* create_layer(const char* type);
 Layer* create_layer(int index);
 
 #define DEFINE_LAYER_CREATOR(name) \
-    ::ncnn::Layer* name##_layer_creator() { return new name; }
-
-} // namespace ncnn
+    ::Layer* name##_layer_creator() { return new name; }
 
 #endif // NCNN_LAYER_H

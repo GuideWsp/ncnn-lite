@@ -17,8 +17,6 @@
 
 #include "convolution.h"
 
-namespace ncnn {
-
 class Convolution_arm : virtual public Convolution
 {
 public:
@@ -67,7 +65,5 @@ public:
     Mat weight_sgemm_data_int8;
     std::vector<Mat> weight_3x3_winograd23_data_int8;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONVOLUTION_ARM_H

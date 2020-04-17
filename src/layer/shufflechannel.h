@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ShuffleChannel : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     int group;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SHUFFLECHANNEL_H

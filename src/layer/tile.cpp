@@ -14,8 +14,6 @@
 
 #include "tile.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Tile)
 
 Tile::Tile()
@@ -115,5 +113,3 @@ int Tile::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) cons
 
     return 0;
 }
-
-} // namespace ncnn

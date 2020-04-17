@@ -14,8 +14,6 @@
 
 #include "shufflechannel.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ShuffleChannel)
 
 ShuffleChannel::ShuffleChannel()
@@ -61,5 +59,3 @@ int ShuffleChannel::forward(const Mat& bottom_blob, Mat& top_blob, const Option&
     }
     return 0;
 }
-
-} // namespace ncnn

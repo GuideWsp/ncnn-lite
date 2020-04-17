@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Packing : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
     int out_elempack;
     int use_padding;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PACKING_H

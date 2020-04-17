@@ -14,8 +14,6 @@
 
 #include "pixelshuffle.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(PixelShuffle)
 
 PixelShuffle::PixelShuffle()
@@ -74,5 +72,3 @@ int PixelShuffle::forward(const Mat& bottom_blob, Mat& top_blob, const Option& o
 
     return 0;
 }
-
-} // namespace ncnn

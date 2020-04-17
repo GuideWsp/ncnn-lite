@@ -17,14 +17,10 @@
 
 #include "selu.h"
 
-namespace ncnn {
-
 class SELU_arm : virtual public SELU
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SELU_ARM_H

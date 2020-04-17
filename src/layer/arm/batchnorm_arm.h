@@ -17,8 +17,6 @@
 
 #include "batchnorm.h"
 
-namespace ncnn {
-
 class BatchNorm_arm : virtual public BatchNorm
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BATCHNORM_ARM_H

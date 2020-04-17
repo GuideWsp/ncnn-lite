@@ -17,8 +17,6 @@
 
 #include "innerproduct.h"
 
-namespace ncnn {
-
 class InnerProduct_arm : virtual public InnerProduct
 {
 public:
@@ -33,12 +31,10 @@ protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 
 public:
-    ncnn::Layer* flatten;
+    Layer* flatten;
 
     // bf16
     Mat weight_data_bf16;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INNERPRODUCT_ARM_H

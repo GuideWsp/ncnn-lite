@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Reshape : public Layer
 {
 public:
@@ -39,7 +37,5 @@ public:
     int permute;
     int ndim;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_RESHAPE_H

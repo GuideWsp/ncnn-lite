@@ -20,8 +20,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ShuffleChannel_arm)
 
 ShuffleChannel_arm::ShuffleChannel_arm()
@@ -392,5 +390,3 @@ int ShuffleChannel_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, con
 
     return ShuffleChannel::forward(bottom_blob, top_blob, opt);
 }
-
-} // namespace ncnn

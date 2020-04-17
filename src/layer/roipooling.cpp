@@ -16,8 +16,6 @@
 #include <math.h>
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ROIPooling)
 
 ROIPooling::ROIPooling()
@@ -107,5 +105,3 @@ int ROIPooling::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& 
 
     return 0;
 }
-
-} // namespace ncnn

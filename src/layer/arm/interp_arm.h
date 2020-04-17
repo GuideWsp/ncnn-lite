@@ -17,14 +17,10 @@
 
 #include "interp.h"
 
-namespace ncnn {
-
 class Interp_arm : virtual public Interp
 {
 public:
     virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INTERP_ARM_H

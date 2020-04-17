@@ -17,8 +17,6 @@
 
 #include "convolution.h"
 
-namespace ncnn {
-
 class Convolution_mips : virtual public Convolution
 {
 public:
@@ -34,7 +32,5 @@ public:
     bool use_winograd3x3;
     Mat weight_3x3_winograd64_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONVOLUTION_MIPS_H

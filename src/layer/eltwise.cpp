@@ -15,8 +15,6 @@
 #include "eltwise.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Eltwise)
 
 Eltwise::Eltwise()
@@ -188,5 +186,3 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
 
     return 0;
 }
-
-} // namespace ncnn

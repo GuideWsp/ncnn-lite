@@ -21,8 +21,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(TanH_arm)
 
 TanH_arm::TanH_arm()
@@ -158,5 +156,3 @@ int TanH_arm::forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) con
 
     return 0;
 }
-
-} // namespace ncnn

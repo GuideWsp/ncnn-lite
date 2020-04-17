@@ -17,8 +17,6 @@
 
 #include "deconvolution.h"
 
-namespace ncnn {
-
 class Deconvolution_arm : virtual public Deconvolution
 {
 public:
@@ -38,7 +36,5 @@ public:
     Mat weight_data_pack4to1;
     Mat weight_data_pack1;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DECONVOLUTION_ARM_H

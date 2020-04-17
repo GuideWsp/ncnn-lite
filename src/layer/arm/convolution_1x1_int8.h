@@ -40,7 +40,7 @@ static void conv1x1s1_sgemm_int8_neon(const Mat& bottom_blob, Mat& top_blob, con
     const size_t k = bottom_blob.c;
     const size_t m = top_blob.c;
 
-    ncnn::Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
+    Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
     {
         const int8_t* pData = bottom_blob;
         int8_t *pReorder = bottom_tm;
@@ -63,8 +63,8 @@ static void conv1x1s1_sgemm_int8_requant_neon(const Mat &bottom_blob, Mat &top_b
     const size_t k = bottom_blob.c;
     const size_t m = top_blob.c;
 
-    ncnn::Mat scales_tm(m);
-    ncnn::Mat bias_tm(m);
+    Mat scales_tm(m);
+    Mat bias_tm(m);
     float* scales  = scales_tm;
     const float* bias = _bias;
 
@@ -85,7 +85,7 @@ static void conv1x1s1_sgemm_int8_requant_neon(const Mat &bottom_blob, Mat &top_b
         bias = bias_tm;
     }
 
-    ncnn::Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
+    Mat bottom_tm(k * n, (size_t)1u, opt.workspace_allocator);
     {
         const int8_t *pData = bottom_blob;
         int8_t *pReorder = bottom_tm;
@@ -193,7 +193,7 @@ static void conv1x1s1_sgemm_int8_neon(const Mat& bottom_blob, Mat& top_blob, con
     const int size = w * h;
 
     // bottom_tm memory packed 4 x 4
-    ncnn::Mat bottom_tm(4, inch, size/4 + size%4, (size_t)1u, opt.workspace_allocator);
+    Mat bottom_tm(4, inch, size/4 + size%4, (size_t)1u, opt.workspace_allocator);
     {
         int nn_size = size >> 2;
         int remain_size_start = nn_size << 2;
@@ -780,7 +780,7 @@ static void conv1x1s1_sgemm_int8_requant_neon(const Mat &bottom_blob, Mat &top_b
     const float* bias = _bias;
 
     // bottom_tm memory packed 4 x 4
-    ncnn::Mat bottom_tm(4, inch, size/4 + size%4, (size_t)1u, opt.workspace_allocator);
+    Mat bottom_tm(4, inch, size/4 + size%4, (size_t)1u, opt.workspace_allocator);
     {
         int nn_size = size >> 2;
         int remain_size_start = nn_size << 2;

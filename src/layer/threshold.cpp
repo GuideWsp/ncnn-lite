@@ -14,8 +14,6 @@
 
 #include "threshold.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Threshold)
 
 Threshold::Threshold()
@@ -51,5 +49,3 @@ int Threshold::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

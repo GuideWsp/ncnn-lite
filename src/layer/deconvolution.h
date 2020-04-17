@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Deconvolution : public Layer
 {
 public:
@@ -59,7 +57,5 @@ public:
     Mat weight_data;
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_DECONVOLUTION_H

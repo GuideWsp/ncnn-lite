@@ -17,8 +17,6 @@
 
 #include "sigmoid.h"
 
-namespace ncnn {
-
 class Sigmoid_arm : virtual public Sigmoid
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SIGMOID_ARM_H

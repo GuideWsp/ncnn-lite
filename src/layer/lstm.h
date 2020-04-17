@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class LSTM : public Layer
 {
 public:
@@ -39,7 +37,5 @@ public:
     Mat weight_xc_data;
     Mat bias_c_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_LSTM_H

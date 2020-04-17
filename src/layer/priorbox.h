@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class PriorBox : public Layer
 {
 public:
@@ -43,7 +41,5 @@ public:
     bool step_mmdetection;
     bool center_mmdetection;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PRIORBOX_H

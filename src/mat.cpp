@@ -24,8 +24,6 @@
 #include "layer_type.h"
 #include "layer.h"
 
-namespace ncnn {
-
 void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_vals)
 {
     Layer* op;
@@ -557,5 +555,3 @@ void requantize_int8_to_int8(const Mat& src, Mat& dst, float scale_in, float sca
 
     delete requantize;
 }
-
-} // namespace ncnn

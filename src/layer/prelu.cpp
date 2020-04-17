@@ -14,8 +14,6 @@
 
 #include "prelu.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(PReLU)
 
 PReLU::PReLU()
@@ -114,5 +112,3 @@ int PReLU::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

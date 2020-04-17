@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class UnaryOp : public Layer
 {
 public:
@@ -52,7 +50,5 @@ public:
     // param
     int op_type;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_UNARYOP_H

@@ -20,8 +20,6 @@
 
 #include "cpu.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Cast_arm)
 
 Cast_arm::Cast_arm()
@@ -317,5 +315,3 @@ int Cast_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) 
 
     return Cast::forward(bottom_blob, top_blob, opt);
 }
-
-} // namespace ncnn

@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(DeconvolutionDepthWise)
 
 DeconvolutionDepthWise::DeconvolutionDepthWise()
@@ -360,5 +358,3 @@ int DeconvolutionDepthWise::forward(const Mat& bottom_blob, Mat& top_blob, const
 
     return 0;
 }
-
-} // namespace ncnn

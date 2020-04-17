@@ -17,8 +17,6 @@
 
 #include "unaryop.h"
 
-namespace ncnn {
-
 class UnaryOp_arm : virtual public UnaryOp
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_UNARYOP_ARM_H

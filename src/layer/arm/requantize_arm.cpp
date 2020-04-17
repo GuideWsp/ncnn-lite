@@ -20,8 +20,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Requantize_arm)
 
 static inline signed char float2int8(float v)
@@ -369,5 +367,3 @@ int Requantize_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option&
 
     return 0;
 }
-
-} // namespace ncnn

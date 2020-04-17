@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class YoloDetectionOutput : public Layer
 {
 public:
@@ -38,9 +36,7 @@ public:
     float nms_threshold;
     Mat biases;
 
-    ncnn::Layer* softmax;
+    Layer* softmax;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_YOLODETECTIONOUTPUT_H

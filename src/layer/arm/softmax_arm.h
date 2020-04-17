@@ -17,8 +17,6 @@
 
 #include "softmax.h"
 
-namespace ncnn {
-
 class Softmax_arm : virtual public Softmax
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SOFTMAX_ARM_H

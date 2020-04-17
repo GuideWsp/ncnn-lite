@@ -17,14 +17,10 @@
 
 #include "sigmoid.h"
 
-namespace ncnn {
-
 class Sigmoid_mips : virtual public Sigmoid
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SIGMOID_MIPS_H

@@ -16,8 +16,6 @@
 #include <algorithm>
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(DetectionOutput)
 
 DetectionOutput::DetectionOutput()
@@ -296,5 +294,3 @@ int DetectionOutput::forward(const std::vector<Mat>& bottom_blobs, std::vector<M
 
     return 0;
 }
-
-} // namespace ncnn

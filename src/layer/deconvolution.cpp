@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Deconvolution)
 
 Deconvolution::Deconvolution()
@@ -268,5 +266,3 @@ int Deconvolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& 
 
     return 0;
 }
-
-} // namespace ncnn

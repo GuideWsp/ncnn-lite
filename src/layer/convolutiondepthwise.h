@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ConvolutionDepthWise : public Layer
 {
 public:
@@ -72,7 +70,5 @@ public:
 
     bool use_int8_requantize;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CONVOLUTIONDEPTHWISE_H

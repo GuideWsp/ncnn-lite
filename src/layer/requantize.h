@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Requantize : public Layer
 {
 public:
@@ -40,7 +38,5 @@ public:
 
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_REQUANTIZE_H

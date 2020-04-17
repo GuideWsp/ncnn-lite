@@ -17,14 +17,10 @@
 
 #include "lrn.h"
 
-namespace ncnn {
-
 class LRN_arm : virtual public LRN
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_LRN_ARM_H

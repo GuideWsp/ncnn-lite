@@ -15,8 +15,6 @@
 #include "relu.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(ReLU)
 
 ReLU::ReLU()
@@ -113,5 +111,3 @@ int ReLU::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Squeeze : public Layer
 {
 public:
@@ -34,7 +32,5 @@ public:
     int squeeze_c;
     Mat axes;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SQUEEZE_H

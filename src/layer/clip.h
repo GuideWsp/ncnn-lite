@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Clip : public Layer
 {
 public:
@@ -34,7 +32,5 @@ public:
     float min;
     float max;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_CLIP_H

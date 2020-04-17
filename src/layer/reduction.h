@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Reduction : public Layer
 {
 public:
@@ -50,7 +48,5 @@ public:
     Mat axes;
     int keepdims;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_REDUCTION_H

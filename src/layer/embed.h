@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Embed : public Layer
 {
 public:
@@ -42,7 +40,5 @@ public:
     Mat weight_data;
     Mat bias_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_EMBED_H

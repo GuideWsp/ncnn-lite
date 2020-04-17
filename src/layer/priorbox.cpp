@@ -16,8 +16,6 @@
 #include <algorithm>
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(PriorBox)
 
 PriorBox::PriorBox()
@@ -264,5 +262,3 @@ int PriorBox::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
 
     return 0;
 }
-
-} // namespace ncnn

@@ -30,8 +30,6 @@
 #include "benchmark.h"
 #endif // NCNN_BENCHMARK
 
-namespace ncnn {
-
 Net::Net()
 {
 }
@@ -1089,5 +1087,3 @@ int Extractor::extract(int blob_index, Mat& feat)
 
     return ret;
 }
-
-} // namespace ncnn

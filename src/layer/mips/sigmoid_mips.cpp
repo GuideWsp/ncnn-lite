@@ -22,8 +22,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Sigmoid_mips)
 
 int Sigmoid_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -69,5 +67,3 @@ int Sigmoid_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

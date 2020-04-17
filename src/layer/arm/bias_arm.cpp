@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Bias_arm)
 
 int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -66,5 +64,3 @@ int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

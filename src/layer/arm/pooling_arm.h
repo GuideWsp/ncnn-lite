@@ -17,8 +17,6 @@
 
 #include "pooling.h"
 
-namespace ncnn {
-
 class Pooling_arm : virtual public Pooling
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_POOLING_ARM_H

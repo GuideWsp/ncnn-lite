@@ -22,8 +22,6 @@
 #endif // __ARM_NEON
 #include "neon_activation.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(InnerProduct_arm)
 
 InnerProduct_arm::InnerProduct_arm()
@@ -42,9 +40,9 @@ int InnerProduct_arm::create_pipeline(const Option& opt)
 #if __ARM_NEON
     if (opt.use_packing_layout)
     {
-        flatten = ncnn::create_layer(ncnn::LayerType::Flatten);
+        flatten = create_layer(LayerType::Flatten);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
 
         flatten->load_param(pd);
 
@@ -54,7 +52,7 @@ int InnerProduct_arm::create_pipeline(const Option& opt)
 
     if (opt.use_bf16_storage)
     {
-        ncnn::cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
+        cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
     }
 
     return 0;
@@ -603,5 +601,3 @@ int InnerProduct_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const
 
     return 0;
 }
-
-} // namespace ncnn

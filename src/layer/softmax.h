@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Softmax : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     int axis;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SOFTMAX_H

@@ -24,8 +24,6 @@
 #include "neon_activation.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 #include "convolution_1x1.h"
 #include "convolution_2x2.h"
 #include "convolution_3x3.h"
@@ -76,33 +74,33 @@ int Convolution_arm::create_pipeline(const Option& opt)
 {
     if (activation_type == 1)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
     else if (activation_type == 2)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// slope
         activation->load_param(pd);
     }
     else if (activation_type == 3)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Clip);
+        activation = create_layer(LayerType::Clip);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// min
         pd.set(1, activation_params[1]);// max
         activation->load_param(pd);
     }
     else if (activation_type == 4)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Sigmoid);
+        activation = create_layer(LayerType::Sigmoid);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
 
@@ -125,10 +123,10 @@ int Convolution_arm::create_pipeline(const Option& opt)
 
     if (opt.use_packing_layout == false && kernel_w == kernel_h && dilation_w != 1 && dilation_h == dilation_w && stride_w == 1 && stride_h == 1)
     {
-        convolution_dilation1 = ncnn::create_layer(ncnn::LayerType::Convolution);
+        convolution_dilation1 = create_layer(LayerType::Convolution);
 
         // set param
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, num_output);// num_output
         pd.set(1, kernel_w);
         pd.set(11, kernel_h);
@@ -146,7 +144,7 @@ int Convolution_arm::create_pipeline(const Option& opt)
         // set weights
         if (bias_term)
         {
-            ncnn::Mat weights[2];
+            Mat weights[2];
             weights[0] = weight_data;
             weights[1] = bias_data;
 
@@ -154,7 +152,7 @@ int Convolution_arm::create_pipeline(const Option& opt)
         }
         else
         {
-            ncnn::Mat weights[1];
+            Mat weights[1];
             weights[0] = weight_data;
 
             convolution_dilation1->load_model(ModelBinFromMatArray(weights));
@@ -1200,7 +1198,7 @@ int Convolution_arm::create_pipeline_bf16s(const Option& opt)
         }
         else
         {
-            ncnn::cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
+            cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
         }
     }
 
@@ -1911,5 +1909,3 @@ int Convolution_arm::forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, 
 
     return 0;
 }
-
-} // namespace ncnn

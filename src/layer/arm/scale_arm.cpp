@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Scale_arm)
 
 Scale_arm::Scale_arm()
@@ -262,5 +260,3 @@ int Scale_arm::forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option&
 
     return 0;
 }
-
-} // namespace ncnn

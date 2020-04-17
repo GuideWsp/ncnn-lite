@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class SPP : public Layer
 {
 public:
@@ -35,7 +33,5 @@ public:
     int pooling_type;
     int pyramid_height;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_SPP_H

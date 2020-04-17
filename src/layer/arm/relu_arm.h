@@ -17,8 +17,6 @@
 
 #include "relu.h"
 
-namespace ncnn {
-
 class ReLU_arm : virtual public ReLU
 {
 public:
@@ -30,7 +28,5 @@ protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
     int forward_inplace_int8_neon(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_RELU_ARM_H

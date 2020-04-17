@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Threshold : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     float threshold;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_THRESHOLD_H

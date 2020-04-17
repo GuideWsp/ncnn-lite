@@ -20,8 +20,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Reshape_arm)
 
 Reshape_arm::Reshape_arm()
@@ -38,9 +36,9 @@ int Reshape_arm::create_pipeline(const Option& opt)
 #if __ARM_NEON
     if (opt.use_packing_layout)
     {
-        flatten = ncnn::create_layer(ncnn::LayerType::Flatten);
+        flatten = create_layer(LayerType::Flatten);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
 
         flatten->load_param(pd);
 
@@ -299,5 +297,3 @@ int Reshape_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
 
     return Reshape::forward(bottom_blob, top_blob, opt);
 }
-
-} // namespace ncnn

@@ -24,8 +24,6 @@
 #include "layer/deconvolutiondepthwise.h"
 #endif // NCNN_BENCHMARK
 
-namespace ncnn {
-
 double get_current_time()
 {
     struct timeval tv;
@@ -87,5 +85,3 @@ void benchmark(const Layer* layer, const Mat& bottom_blob, Mat& top_blob, double
 }
 
 #endif // NCNN_BENCHMARK
-
-} // namespace ncnn

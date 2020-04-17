@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Eltwise_arm)
 
 Eltwise_arm::Eltwise_arm()
@@ -1645,5 +1643,3 @@ int Eltwise_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector
 
     return 0;
 }
-
-} // namespace ncnn

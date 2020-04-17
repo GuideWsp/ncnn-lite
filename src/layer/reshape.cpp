@@ -14,8 +14,6 @@
 
 #include "reshape.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Reshape)
 
 Reshape::Reshape()
@@ -127,5 +125,3 @@ int Reshape::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
     return 0;
 }
-
-} // namespace ncnn

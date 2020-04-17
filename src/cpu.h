@@ -17,8 +17,6 @@
 
 #include <stddef.h>
 
-namespace ncnn {
-
 // test optional cpu features
 // neon = armv7 neon or aarch64 asimd
 int cpu_support_arm_neon();
@@ -55,7 +53,5 @@ int get_omp_dynamic();
 void set_omp_dynamic(int dynamic);
 
 int get_omp_thread_num();
-
-} // namespace ncnn
 
 #endif // NCNN_CPU_H

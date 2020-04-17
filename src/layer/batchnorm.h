@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class BatchNorm : public Layer
 {
 public:
@@ -44,7 +42,5 @@ public:
     Mat a_data;
     Mat b_data;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BATCHNORM_H

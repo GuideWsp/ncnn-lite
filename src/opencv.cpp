@@ -18,8 +18,6 @@
 
 #include <stdio.h>
 
-namespace cv {
-
 Mat imread(const std::string& path, int flags)
 {
     (void)flags;
@@ -108,16 +106,14 @@ void resize(const Mat& src, Mat& dst, const Size& size, float sw, float sh, int 
         return;
 
     if (src.c == 1)
-        ncnn::resize_bilinear_c1(src.data, srcw, srch, tmp.data, w, h);
+        resize_bilinear_c1(src.data, srcw, srch, tmp.data, w, h);
     else if (src.c == 3)
-        ncnn::resize_bilinear_c3(src.data, srcw, srch, tmp.data, w, h);
+        resize_bilinear_c3(src.data, srcw, srch, tmp.data, w, h);
     else if (src.c == 4)
-        ncnn::resize_bilinear_c4(src.data, srcw, srch, tmp.data, w, h);
+        resize_bilinear_c4(src.data, srcw, srch, tmp.data, w, h);
 
     dst = tmp;
 }
 #endif // NCNN_PIXEL
-
-} // namespace cv
 
 #endif // NCNN_OPENCV

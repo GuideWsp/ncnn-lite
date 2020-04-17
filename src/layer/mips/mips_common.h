@@ -18,8 +18,6 @@
 #include <stdint.h>
 #include <msa.h>
 
-namespace ncnn {
-
 typedef union {
     int32_t i;
     float f;
@@ -27,14 +25,12 @@ typedef union {
 
 /* declare some mips constants with union */
 #define _MIPS_FLOAT_CONST(Name, Val) \
-    static const ncnn::FloatInt Name = { .f = Val }
-
-} // namespace ncnn
+    static const FloatInt Name = { .f = Val }
 
 /* float type data load instructions */
 inline v4f32 __msa_fill_w_f32(float val)
 {
-    ncnn::FloatInt fi_tmpval = { .f = val };
+    FloatInt fi_tmpval = { .f = val };
     return (v4f32)__msa_fill_w(fi_tmpval.i);
 }
 

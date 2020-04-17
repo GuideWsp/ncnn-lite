@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Quantize : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     float scale;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_QUANTIZE_H

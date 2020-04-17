@@ -14,8 +14,6 @@
 
 #include "noop.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Noop)
 
 Noop::Noop()
@@ -28,5 +26,3 @@ int Noop::forward_inplace(std::vector<Mat>& /*bottom_top_blobs*/, const Option& 
 {
     return 0;
 }
-
-} // namespace ncnn

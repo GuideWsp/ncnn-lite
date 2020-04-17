@@ -18,8 +18,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(BatchNorm_arm)
 
 BatchNorm_arm::BatchNorm_arm()
@@ -196,5 +194,3 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
 
     return 0;
 }
-
-} // namespace ncnn

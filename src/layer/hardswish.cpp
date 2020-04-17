@@ -15,8 +15,6 @@
 #include "hardswish.h"
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(HardSwish)
 
 HardSwish::HardSwish()
@@ -59,5 +57,3 @@ int HardSwish::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

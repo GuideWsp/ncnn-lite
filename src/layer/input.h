@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Input : public Layer
 {
 public:
@@ -33,7 +31,5 @@ public:
     int h;
     int c;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_INPUT_H

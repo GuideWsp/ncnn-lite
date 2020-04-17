@@ -16,8 +16,6 @@
 #include <math.h>
 #include <algorithm>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(PSROIPooling)
 
 PSROIPooling::PSROIPooling()
@@ -114,5 +112,3 @@ int PSROIPooling::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>
 
     return 0;
 }
-
-} // namespace ncnn

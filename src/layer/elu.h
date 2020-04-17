@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ELU : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     float alpha;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ELU_H

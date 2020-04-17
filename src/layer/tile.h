@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Tile : public Layer
 {
 public:
@@ -32,7 +30,5 @@ public:
     int dim;
     int tiles;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_TILE_H

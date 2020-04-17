@@ -29,8 +29,6 @@
 #pragma clang diagnostic pop
 #endif
 
-namespace ncnn {
-
 Layer::Layer()
 {
     one_blob_only = false;
@@ -144,5 +142,3 @@ Layer* create_layer(int index)
     layer->typeindex = index;
     return layer;
 }
-
-} // namespace ncnn

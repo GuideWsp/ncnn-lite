@@ -19,8 +19,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Crop_arm)
 
 Crop_arm::Crop_arm()
@@ -352,5 +350,3 @@ int Crop_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
 
     return Crop::forward(bottom_blobs_unpacked, top_blobs, opt);
 }
-
-} // namespace ncnn

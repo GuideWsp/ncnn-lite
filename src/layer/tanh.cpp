@@ -15,8 +15,6 @@
 #include "tanh.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(TanH)
 
 TanH::TanH()
@@ -45,5 +43,3 @@ int TanH::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

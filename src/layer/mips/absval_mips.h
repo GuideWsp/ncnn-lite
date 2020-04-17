@@ -17,14 +17,10 @@
 
 #include "absval.h"
 
-namespace ncnn {
-
 class AbsVal_mips : virtual public AbsVal
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ABSVAL_MIPS_H

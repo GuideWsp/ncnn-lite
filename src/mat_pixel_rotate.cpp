@@ -18,8 +18,6 @@
 #endif // __ARM_NEON
 #include "platform.h"
 
-namespace ncnn {
-
 #if NCNN_PIXEL_ROTATE
 // should be a kanna ascii art here in my local branch
 // but we shall ask the original art author for permission first ...
@@ -6153,5 +6151,3 @@ void kanna_rotate_yuv420sp(const unsigned char* src, int srcw, int srch, unsigne
     kanna_rotate_c2(srcUV, srcw/2, srch/2, dstUV, w/2, h/2, type);
 }
 #endif // NCNN_PIXEL_ROTATE
-
-} // namespace ncnn

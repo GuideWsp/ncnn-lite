@@ -20,8 +20,6 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Slice_arm)
 
 Slice_arm::Slice_arm()
@@ -42,9 +40,9 @@ int Slice_arm::create_pipeline(const Option& opt)
     {
 
     {
-        packing_pack1 = ncnn::create_layer(ncnn::LayerType::Packing);
+        packing_pack1 = create_layer(LayerType::Packing);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, 1);
 
         packing_pack1->load_param(pd);
@@ -781,5 +779,3 @@ int Slice_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<M
 
     return Slice::forward(bottom_blobs, top_blobs, opt);
 }
-
-} // namespace ncnn

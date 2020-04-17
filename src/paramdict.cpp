@@ -17,8 +17,6 @@
 #include "datareader.h"
 #include "platform.h"
 
-namespace ncnn {
-
 ParamDict::ParamDict()
 {
     clear();
@@ -250,5 +248,3 @@ int ParamDict::load_param_bin(const DataReader& dr)
 
     return 0;
 }
-
-} // namespace ncnn

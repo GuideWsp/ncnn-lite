@@ -18,8 +18,6 @@
 #include <msa.h>
 #endif // __MIPS_MSA
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(AbsVal_mips)
 
 int AbsVal_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -61,5 +59,3 @@ int AbsVal_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

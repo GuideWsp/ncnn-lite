@@ -15,8 +15,6 @@
 #include "lstm.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(LSTM)
 
 LSTM::LSTM()
@@ -238,5 +236,3 @@ int LSTM::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) cons
 
     return 0;
 }
-
-} // namespace ncnn

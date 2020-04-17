@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Pooling : public Layer
 {
 public:
@@ -48,7 +46,5 @@ public:
     int pad_mode;// 0=full 1=valid 2=SAME_UPPER 3=SAME_LOWER
     int avgpool_count_include_pad;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_POOLING_H

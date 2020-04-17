@@ -14,8 +14,6 @@
 
 #include "absval.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(AbsVal)
 
 AbsVal::AbsVal()
@@ -45,5 +43,3 @@ int AbsVal::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

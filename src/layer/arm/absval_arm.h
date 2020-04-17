@@ -17,8 +17,6 @@
 
 #include "absval.h"
 
-namespace ncnn {
-
 class AbsVal_arm : virtual public AbsVal
 {
 public:
@@ -26,7 +24,5 @@ public:
 
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ABSVAL_ARM_H

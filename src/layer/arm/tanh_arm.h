@@ -17,8 +17,6 @@
 
 #include "tanh.h"
 
-namespace ncnn {
-
 class TanH_arm : virtual public TanH
 {
 public:
@@ -29,7 +27,5 @@ public:
 protected:
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_TANH_ARM_H

@@ -14,8 +14,6 @@
 
 #include "slice.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Slice)
 
 Slice::Slice()
@@ -240,5 +238,3 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
 
     return 0;
 }
-
-} // namespace ncnn

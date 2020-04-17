@@ -14,8 +14,6 @@
 
 #include "split.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Split)
 
 Split::Split()
@@ -36,5 +34,3 @@ int Split::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
 
     return 0;
 }
-
-} // namespace ncnn

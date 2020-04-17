@@ -15,8 +15,6 @@
 #include "interp_arm.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Interp_arm)
 
 static void linear_coeffs(int w, int outw, int* xofs, float* alpha)
@@ -275,5 +273,3 @@ int Interp_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt
 
     return 0;
 }
-
-} // namespace ncnn

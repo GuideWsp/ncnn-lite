@@ -21,8 +21,6 @@
 #endif // __ARM_NEON
 #include "platform.h"
 
-namespace ncnn {
-
 #if NCNN_PIXEL
 void resize_bilinear_c1(const unsigned char* src, int srcw, int srch, unsigned char* dst, int w, int h)
 {
@@ -1247,5 +1245,3 @@ void resize_bilinear_yuv420sp(const unsigned char* src, int srcw, int srch, unsi
     resize_bilinear_c2(srcUV, srcw / 2, srch / 2, dstUV, w / 2, h / 2);
 }
 #endif // NCNN_PIXEL
-
-} // namespace ncnn

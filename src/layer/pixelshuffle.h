@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class PixelShuffle : public Layer
 {
 public:
@@ -31,7 +29,5 @@ public:
 public:
     int upscale_factor;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PIXELSHUFFLE_H

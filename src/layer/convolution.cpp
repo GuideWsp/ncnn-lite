@@ -16,8 +16,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Convolution)
 
 Convolution::Convolution()
@@ -118,10 +116,10 @@ int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
         if (bottom_blob.w == num_input)
         {
             // call InnerProduct
-            ncnn::Layer* op = ncnn::create_layer(ncnn::LayerType::InnerProduct);
+            Layer* op = create_layer(LayerType::InnerProduct);
 
             // set param
-            ncnn::ParamDict pd;
+            ParamDict pd;
             pd.set(0, num_output);
             pd.set(1, bias_term);
             pd.set(2, weight_data_size);
@@ -130,7 +128,7 @@ int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
             op->load_param(pd);
 
             // set weights
-            ncnn::Mat weights[4];
+            Mat weights[4];
             weights[0] = weight_data;
             weights[1] = bias_data;
 
@@ -458,5 +456,3 @@ int Convolution::forward_int8(const Mat& bottom_blob, Mat& top_blob, const Optio
 
     return 0;
 }
-
-} // namespace ncnn

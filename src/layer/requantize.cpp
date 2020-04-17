@@ -16,8 +16,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Requantize)
 
 Requantize::Requantize()
@@ -191,5 +189,3 @@ int Requantize::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt
 
     return 0;
 }
-
-} // namespace ncnn

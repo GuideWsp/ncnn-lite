@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class Yolov3DetectionOutput : public Layer
 {
 public:
@@ -38,9 +36,7 @@ public:
 	Mat mask;
 	Mat anchors_scale;
 	int mask_group_num;
-    ncnn::Layer* softmax;
+    Layer* softmax;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_YOLODETECTIONOUTPUT_H

@@ -15,8 +15,6 @@
 #include "datareader.h"
 #include <string.h>
 
-namespace ncnn {
-
 DataReader::~DataReader()
 {
 }
@@ -79,5 +77,3 @@ size_t DataReaderFromMemory::read(void* buf, size_t size) const
     mem += size;
     return size;
 }
-
-} // namespace ncnn

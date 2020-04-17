@@ -15,8 +15,6 @@
 #include "rnn.h"
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(RNN)
 
 RNN::RNN()
@@ -135,5 +133,3 @@ int RNN::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blo
 
     return 0;
 }
-
-} // namespace ncnn

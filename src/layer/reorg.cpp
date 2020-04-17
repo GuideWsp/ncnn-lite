@@ -14,8 +14,6 @@
 
 #include "reorg.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Reorg)
 
 Reorg::Reorg()
@@ -74,5 +72,3 @@ int Reorg::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) con
 
     return 0;
 }
-
-} // namespace ncnn

@@ -17,8 +17,6 @@
 #include <math.h>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(YoloDetectionOutput)
 
 YoloDetectionOutput::YoloDetectionOutput()
@@ -41,9 +39,9 @@ int YoloDetectionOutput::load_param(const ParamDict& pd)
 int YoloDetectionOutput::create_pipeline(const Option& opt)
 {
     {
-        softmax = ncnn::create_layer(ncnn::LayerType::Softmax);
+        softmax = create_layer(LayerType::Softmax);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, 0);// axis
 
         softmax->load_param(pd);
@@ -324,5 +322,3 @@ int YoloDetectionOutput::forward_inplace(std::vector<Mat>& bottom_top_blobs, con
 
     return 0;
 }
-
-} // namespace ncnn

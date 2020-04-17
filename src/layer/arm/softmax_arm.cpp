@@ -21,8 +21,6 @@
 #include "neon_mathfun.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Softmax_arm)
 
 Softmax_arm::Softmax_arm()
@@ -575,5 +573,3 @@ int Softmax_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

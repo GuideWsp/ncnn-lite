@@ -17,8 +17,6 @@
 
 #include "layer.h"
 
-namespace ncnn {
-
 class ROIPooling : public Layer
 {
 public:
@@ -33,7 +31,5 @@ public:
     int pooled_height;
     float spatial_scale;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_ROIPOOLING_H

@@ -23,8 +23,6 @@
 #include "mat.h"
 #include "option.h"
 
-namespace ncnn {
-
 class DataReader;
 class Extractor;
 class Net
@@ -178,7 +176,5 @@ private:
     std::vector<Mat> blob_mats;
     Option opt;
 };
-
-} // namespace ncnn
 
 #endif // NCNN_NET_H

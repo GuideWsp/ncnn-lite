@@ -21,8 +21,6 @@
 
 #include <math.h>
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(TanH_mips)
 
 int TanH_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
@@ -62,5 +60,3 @@ int TanH_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
-
-} // namespace ncnn

@@ -21,8 +21,6 @@
 #include "neon_activation.h"
 #endif // __ARM_NEON
 
-namespace ncnn {
-
 #include "deconvolution_4x4.h"
 #include "deconvolution_3x3.h"
 
@@ -41,33 +39,33 @@ int Deconvolution_arm::create_pipeline(const Option& opt)
 {
     if (activation_type == 1)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
     else if (activation_type == 2)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::ReLU);
+        activation = create_layer(LayerType::ReLU);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// slope
         activation->load_param(pd);
     }
     else if (activation_type == 3)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Clip);
+        activation = create_layer(LayerType::Clip);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         pd.set(0, activation_params[0]);// min
         pd.set(1, activation_params[1]);// max
         activation->load_param(pd);
     }
     else if (activation_type == 4)
     {
-        activation = ncnn::create_layer(ncnn::LayerType::Sigmoid);
+        activation = create_layer(LayerType::Sigmoid);
 
-        ncnn::ParamDict pd;
+        ParamDict pd;
         activation->load_param(pd);
     }
 
@@ -742,5 +740,3 @@ int Deconvolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Opti
 
     return 0;
 }
-
-} // namespace ncnn

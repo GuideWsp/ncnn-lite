@@ -17,8 +17,6 @@
 
 #include "padding.h"
 
-namespace ncnn {
-
 class Padding_arm : virtual public Padding
 {
 public:
@@ -37,7 +35,5 @@ public:
     unsigned short value_bf16;
     Mat per_channel_pad_data_bf16;
 };
-
-} // namespace ncnn
 
 #endif // LAYER_PADDING_ARM_H

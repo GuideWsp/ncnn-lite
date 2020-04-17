@@ -17,8 +17,6 @@
 #include <algorithm>
 #include "layer_type.h"
 
-namespace ncnn {
-
 DEFINE_LAYER_CREATOR(Pooling)
 
 Pooling::Pooling()
@@ -325,5 +323,3 @@ void Pooling::make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, co
         }
     }
 }
-
-} // namespace ncnn

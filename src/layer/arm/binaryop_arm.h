@@ -17,8 +17,6 @@
 
 #include "binaryop.h"
 
-namespace ncnn {
-
 class BinaryOp_arm : virtual public BinaryOp
 {
 public:
@@ -31,9 +29,6 @@ public:
 protected:
     int forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
     int forward_inplace_bf16s(Mat& bottom_top_blob, const Option& opt) const;
-
 };
-
-} // namespace ncnn
 
 #endif // LAYER_BINARYOP_ARM_H
