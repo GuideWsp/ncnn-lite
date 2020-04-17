@@ -28,19 +28,6 @@
 #include "datareader.h"
 #include "net.h"
 
-#if NCNN_VULKAN
-#include "gpu.h"
-
-class GlobalGpuInstance
-{
-public:
-    GlobalGpuInstance() { ncnn::create_gpu_instance(); }
-    ~GlobalGpuInstance() { ncnn::destroy_gpu_instance(); }
-};
-// initialize vulkan runtime before main()
-GlobalGpuInstance g_global_gpu_instance;
-#endif // NCNN_VULKAN
-
 class DataReaderFromEmpty : public ncnn::DataReader
 {
 public:
@@ -55,12 +42,6 @@ static bool g_enable_cooling_down = true;
 static ncnn::UnlockedPoolAllocator g_blob_pool_allocator;
 static ncnn::PoolAllocator g_workspace_pool_allocator;
 
-#if NCNN_VULKAN
-static ncnn::VulkanDevice* g_vkdev = 0;
-static ncnn::VkAllocator* g_blob_vkallocator = 0;
-static ncnn::VkAllocator* g_staging_vkallocator = 0;
-#endif // NCNN_VULKAN
-
 void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& opt)
 {
     ncnn::Mat in = _in;
@@ -69,13 +50,6 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
     ncnn::Net net;
 
     net.opt = opt;
-
-#if NCNN_VULKAN
-    if (net.opt.use_vulkan_compute)
-    {
-        net.set_vulkan_device(g_vkdev);
-    }
-#endif // NCNN_VULKAN
 
     char parampath[256];
     sprintf(parampath, "%s.param", comment);
@@ -86,14 +60,6 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
 
     g_blob_pool_allocator.clear();
     g_workspace_pool_allocator.clear();
-
-#if NCNN_VULKAN
-    if (net.opt.use_vulkan_compute)
-    {
-        g_blob_vkallocator->clear();
-        g_staging_vkallocator->clear();
-    }
-#endif // NCNN_VULKAN
 
     if (g_enable_cooling_down)
     {
@@ -148,7 +114,6 @@ int main(int argc, char** argv)
     int loop_count = 4;
     int num_threads = ncnn::get_cpu_count();
     int powersave = 0;
-    int gpu_device = -1;
     int cooling_down = 1;
 
     if (argc >= 2)
@@ -165,14 +130,8 @@ int main(int argc, char** argv)
     }
     if (argc >= 5)
     {
-        gpu_device = atoi(argv[4]);
-    }
-    if (argc >= 6)
-    {
         cooling_down = atoi(argv[5]);
     }
-
-    bool use_vulkan_compute = gpu_device != -1;
 
     g_enable_cooling_down = cooling_down != 0;
 
@@ -181,33 +140,15 @@ int main(int argc, char** argv)
     g_blob_pool_allocator.set_size_compare_ratio(0.0f);
     g_workspace_pool_allocator.set_size_compare_ratio(0.5f);
 
-#if NCNN_VULKAN
-    if (use_vulkan_compute)
-    {
-        g_warmup_loop_count = 10;
-
-        g_vkdev = ncnn::get_gpu_device(gpu_device);
-
-        g_blob_vkallocator = new ncnn::VkBlobBufferAllocator(g_vkdev);
-        g_staging_vkallocator = new ncnn::VkStagingBufferAllocator(g_vkdev);
-    }
-#endif // NCNN_VULKAN
-
     // default option
     ncnn::Option opt;
     opt.lightmode = true;
     opt.num_threads = num_threads;
     opt.blob_allocator = &g_blob_pool_allocator;
     opt.workspace_allocator = &g_workspace_pool_allocator;
-#if NCNN_VULKAN
-    opt.blob_vkallocator = g_blob_vkallocator;
-    opt.workspace_vkallocator = g_blob_vkallocator;
-    opt.staging_vkallocator = g_staging_vkallocator;
-#endif // NCNN_VULKAN
     opt.use_winograd_convolution = true;
     opt.use_sgemm_convolution = true;
     opt.use_int8_inference = true;
-    opt.use_vulkan_compute = use_vulkan_compute;
     opt.use_fp16_packed = true;
     opt.use_fp16_storage = true;
     opt.use_fp16_arithmetic = true;
@@ -223,34 +164,20 @@ int main(int argc, char** argv)
     fprintf(stderr, "loop_count = %d\n", g_loop_count);
     fprintf(stderr, "num_threads = %d\n", num_threads);
     fprintf(stderr, "powersave = %d\n", ncnn::get_cpu_powersave());
-    fprintf(stderr, "gpu_device = %d\n", gpu_device);
     fprintf(stderr, "cooling_down = %d\n", (int)g_enable_cooling_down);
 
     // run
     benchmark("squeezenet", ncnn::Mat(227, 227, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("squeezenet_int8", ncnn::Mat(227, 227, 3), opt);
-    }
 
     benchmark("mobilenet", ncnn::Mat(224, 224, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("mobilenet_int8", ncnn::Mat(224, 224, 3), opt);
-    }
 
     benchmark("mobilenet_v2", ncnn::Mat(224, 224, 3), opt);
 
-// #if NCNN_VULKAN
-//     if (!use_vulkan_compute)
-// #endif // NCNN_VULKAN
-//     benchmark("mobilenet_v2_int8", ncnn::Mat(224, 224, 3), opt);
+    // benchmark("mobilenet_v2_int8", ncnn::Mat(224, 224, 3), opt);
 
     benchmark("mobilenet_v3", ncnn::Mat(224, 224, 3), opt);
 
@@ -264,68 +191,33 @@ int main(int argc, char** argv)
 
     benchmark("googlenet", ncnn::Mat(224, 224, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("googlenet_int8", ncnn::Mat(224, 224, 3), opt);
-    }
 
     benchmark("resnet18", ncnn::Mat(224, 224, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("resnet18_int8", ncnn::Mat(224, 224, 3), opt);
-    }
 
     benchmark("alexnet", ncnn::Mat(227, 227, 3), opt);
 
     benchmark("vgg16", ncnn::Mat(224, 224, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("vgg16_int8", ncnn::Mat(224, 224, 3), opt);
-    }
 
     benchmark("resnet50", ncnn::Mat(224, 224, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("resnet50_int8", ncnn::Mat(224, 224, 3), opt);
-    }
 
     benchmark("squeezenet_ssd", ncnn::Mat(300, 300, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("squeezenet_ssd_int8", ncnn::Mat(300, 300, 3), opt);
-    }
 
     benchmark("mobilenet_ssd", ncnn::Mat(300, 300, 3), opt);
 
-#if NCNN_VULKAN
-    if (!use_vulkan_compute)
-#endif // NCNN_VULKAN
-    {
     benchmark("mobilenet_ssd_int8", ncnn::Mat(300, 300, 3), opt);
-    }
 
     benchmark("mobilenet_yolo", ncnn::Mat(416, 416, 3), opt);
 
     benchmark("mobilenetv2_yolov3", ncnn::Mat(352, 352, 3), opt);
-
-#if NCNN_VULKAN
-    delete g_blob_vkallocator;
-    delete g_staging_vkallocator;
-#endif // NCNN_VULKAN
 
     return 0;
 }

@@ -19,10 +19,6 @@
 
 namespace ncnn {
 
-#if NCNN_VULKAN
-class VkAllocator;
-#endif // NCNN_VULKAN
-
 class Allocator;
 class Option
 {
@@ -46,17 +42,6 @@ public:
     // workspace memory allocator
     Allocator* workspace_allocator;
 
-#if NCNN_VULKAN
-    // blob memory allocator
-    VkAllocator* blob_vkallocator;
-
-    // workspace memory allocator
-    VkAllocator* workspace_vkallocator;
-
-    // staging memory allocator
-    VkAllocator* staging_vkallocator;
-#endif // NCNN_VULKAN
-
     // enable winograd convolution optimization
     // improve convolution 3x3 stride1 performace, may consume more memory
     // changes should be applied before loading network structure and weight
@@ -75,9 +60,6 @@ public:
     // enabled by default
     bool use_int8_inference;
 
-    // enable vulkan compute
-    bool use_vulkan_compute;
-
     // enable options for gpu inference
     bool use_fp16_packed;
     bool use_fp16_storage;
@@ -87,8 +69,6 @@ public:
 
     //
     bool use_packing_layout;
-
-    bool use_shader_pack8;
 
     // enable options for cpu inference
     bool use_bf16_storage;

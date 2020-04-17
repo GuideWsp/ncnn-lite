@@ -25,12 +25,6 @@
 #include "option.h"
 #include "paramdict.h"
 
-#if NCNN_VULKAN
-#include <vulkan/vulkan.h>
-#include "command.h"
-#include "pipeline.h"
-#endif // NCNN_VULKAN
-
 namespace ncnn {
 
 class Layer
@@ -64,9 +58,6 @@ public:
     // support inplace inference
     bool support_inplace;
 
-    // support vulkan compute
-    bool support_vulkan;
-
     // accept input blob with packed storage
     bool support_packing;
 
@@ -83,27 +74,6 @@ public:
     // return 0 if success
     virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
-#if NCNN_VULKAN
-public:
-    // upload weight blob from host to device
-    virtual int upload_model(VkTransfer& cmd, const Option& opt);
-
-public:
-    // implement inference
-    // return 0 if success
-    virtual int forward(const std::vector<VkMat>& bottom_blobs, std::vector<VkMat>& top_blobs, VkCompute& cmd, const Option& opt) const;
-    virtual int forward(const VkMat& bottom_blob, VkMat& top_blob, VkCompute& cmd, const Option& opt) const;
-
-    // implement inplace inference
-    // return 0 if success
-    virtual int forward_inplace(std::vector<VkMat>& bottom_top_blobs, VkCompute& cmd, const Option& opt) const;
-    virtual int forward_inplace(VkMat& bottom_top_blob, VkCompute& cmd, const Option& opt) const;
-
-public:
-    // assigned immediately after creating this layer
-    const VulkanDevice* vkdev;
-#endif // NCNN_VULKAN
 
 public:
     // layer type index

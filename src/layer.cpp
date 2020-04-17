@@ -35,14 +35,9 @@ Layer::Layer()
 {
     one_blob_only = false;
     support_inplace = false;
-    support_vulkan = false;
     support_packing = false;
 
     support_bf16_storage = false;
-
-#if NCNN_VULKAN
-    vkdev = 0;
-#endif // NCNN_VULKAN
 }
 
 Layer::~Layer()
@@ -106,47 +101,6 @@ int Layer::forward_inplace(Mat& /*bottom_top_blob*/, const Option& /*opt*/) cons
 {
     return -1;
 }
-
-#if NCNN_VULKAN
-int Layer::upload_model(VkTransfer& /*cmd*/, const Option& /*opt*/)
-{
-    return 0;
-}
-
-int Layer::forward(const std::vector<VkMat>& bottom_blobs, std::vector<VkMat>& top_blobs, VkCompute& cmd, const Option& opt) const
-{
-    if (!support_inplace)
-        return -1;
-
-    top_blobs.resize(bottom_blobs.size());
-    for (int i = 0; i < (int)top_blobs.size(); i++)
-    {
-        cmd.record_clone(bottom_blobs[i], top_blobs[i], opt);
-    }
-
-    return forward_inplace(top_blobs, cmd, opt);
-}
-
-int Layer::forward(const VkMat& bottom_blob, VkMat& top_blob, VkCompute& cmd, const Option& opt) const
-{
-    if (!support_inplace)
-        return -1;
-
-    cmd.record_clone(bottom_blob, top_blob, opt);
-
-    return forward_inplace(top_blob, cmd, opt);
-}
-
-int Layer::forward_inplace(std::vector<VkMat>& /*bottom_top_blobs*/, VkCompute& /*cmd*/, const Option& /*opt*/) const
-{
-    return -1;
-}
-
-int Layer::forward_inplace(VkMat& /*bottom_top_blob*/, VkCompute& /*cmd*/, const Option& /*opt*/) const
-{
-    return -1;
-}
-#endif // NCNN_VULKAN
 
 static const layer_registry_entry layer_registry[] =
 {

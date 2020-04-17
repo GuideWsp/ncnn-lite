@@ -167,7 +167,6 @@ ncnn::ParamDict pd;
 pd.set(0, outch);
 pd.set(1, ksize);
 pd.set(6, outch*inch*ksize*ksize);
-pd.use_vulkan_compute = 1;
 
 convolution->load_param(pd);
 }

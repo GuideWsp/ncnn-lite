@@ -24,12 +24,6 @@
 #include "layer_type.h"
 #include "layer.h"
 
-#if NCNN_VULKAN
-#if __ANDROID_API__ >= 26
-#include <android/hardware_buffer.h>
-#endif // __ANDROID_API__ >= 26
-#endif // NCNN_VULKAN
-
 namespace ncnn {
 
 void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_vals)
@@ -180,18 +174,6 @@ Mat Mat::from_float16(const unsigned short* data, int size)
 
     return m;
 }
-
-#if NCNN_VULKAN
-#if __ANDROID_API__ >= 26
-VkImageMat VkImageMat::from_android_hardware_buffer(VkAndroidHardwareBufferImageAllocator* allocator)
-{
-    int width = allocator->width();
-    int height = allocator->height();
-
-    return VkImageMat(width, height, VK_FORMAT_UNDEFINED, allocator);
-}
-#endif // __ANDROID_API__ >= 26
-#endif // NCNN_VULKAN
 
 unsigned short float32_to_float16(float value)
 {
