@@ -16,6 +16,8 @@
 
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #include "neon_mathfun.h"
@@ -222,10 +224,10 @@ int InnerProduct_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Optio
 
         if (activation_type == 1)
         {
-            sum0 = std::max(sum0, 0.f);
-            sum1 = std::max(sum1, 0.f);
-            sum2 = std::max(sum2, 0.f);
-            sum3 = std::max(sum3, 0.f);
+            sum0 = max(sum0, 0.f);
+            sum1 = max(sum1, 0.f);
+            sum2 = max(sum2, 0.f);
+            sum3 = max(sum3, 0.f);
         }
         else if (activation_type == 2)
         {
@@ -504,10 +506,10 @@ int InnerProduct_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const
 
         if (activation_type == 1)
         {
-            sum0 = std::max(sum0, 0.f);
-            sum1 = std::max(sum1, 0.f);
-            sum2 = std::max(sum2, 0.f);
-            sum3 = std::max(sum3, 0.f);
+            sum0 = max(sum0, 0.f);
+            sum1 = max(sum1, 0.f);
+            sum2 = max(sum2, 0.f);
+            sum3 = max(sum3, 0.f);
         }
         else if (activation_type == 2)
         {

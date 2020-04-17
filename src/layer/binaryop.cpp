@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(BinaryOp)
 
 BinaryOp::BinaryOp()
@@ -487,12 +489,12 @@ static int binary_op_scalar_inplace(Mat& a, float b, const Option& opt)
 
 template<typename T>
 struct binary_op_max {
-    T operator() (const T& x, const T& y) const { return std::max(x, y); }
+    T operator() (const T& x, const T& y) const { return max(x, y); }
 };
 
 template<typename T>
 struct binary_op_min {
-    T operator() (const T& x, const T& y) const { return std::min(x, y); }
+    T operator() (const T& x, const T& y) const { return min(x, y); }
 };
 
 template<typename T>

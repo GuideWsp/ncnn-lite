@@ -17,6 +17,8 @@
 #include <algorithm>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Pooling)
 
 Pooling::Pooling()
@@ -72,7 +74,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
                 float max = ptr[0];
                 for (int i=0; i<size; i++)
                 {
-                    max = std::max(max, ptr[i]);
+                    max = max(max, ptr[i]);
                 }
 
                 top_blob[q] = max;
@@ -153,7 +155,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
                     for (int k = 0; k < maxk; k++)
                     {
                         float val = sptr[ space_ofs[k] ];
-                        max = std::max(max, val);
+                        max = max(max, val);
                     }
 
                     outptr[j] = max;

@@ -16,6 +16,8 @@
 #include <algorithm>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(InnerProduct)
 
 InnerProduct::InnerProduct()
@@ -125,7 +127,7 @@ int InnerProduct::forward(const Mat& bottom_blob, Mat& top_blob, const Option& o
 
         if (activation_type == 1)
         {
-            sum = std::max(sum, 0.f);
+            sum = max(sum, 0.f);
         }
         else if (activation_type == 2)
         {
@@ -207,7 +209,7 @@ int InnerProduct::forward_int8(const Mat& bottom_blob, Mat& top_blob, const Opti
 
         if (activation_type == 1)
         {
-            sumfp32 = std::max(sumfp32, 0.f);
+            sumfp32 = max(sumfp32, 0.f);
         }
 
         outptr[p] = sumfp32;

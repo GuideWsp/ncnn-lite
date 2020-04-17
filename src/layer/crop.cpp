@@ -15,6 +15,8 @@
 #include "crop.h"
 #include <algorithm>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Crop)
 
 Crop::Crop()
@@ -333,19 +335,19 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
             if (dims == 1) // axis == 0
             {
                 _woffset = start >= 0 ? start : w + start;
-                _outw = std::min(w, end > 0 ? end : w + end) - _woffset;
+                _outw = min(w, end > 0 ? end : w + end) - _woffset;
             }
             if (dims == 2)
             {
                 if (axis == 0)
                 {
                     _hoffset = start >= 0 ? start : h + start;
-                    _outh = std::min(h, end > 0 ? end : h + end) - _woffset;
+                    _outh = min(h, end > 0 ? end : h + end) - _woffset;
                 }
                 if (axis == 1)
                 {
                     _woffset = start >= 0 ? start : w + start;
-                    _outw = std::min(w, end > 0 ? end : w + end) - _woffset;
+                    _outw = min(w, end > 0 ? end : w + end) - _woffset;
                 }
             }
             if (dims == 3)
@@ -353,17 +355,17 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
                 if (axis == 0)
                 {
                     _coffset = start >= 0 ? start : channels + start;
-                    _outc = std::min(channels, end > 0 ? end : channels + end) - _coffset;
+                    _outc = min(channels, end > 0 ? end : channels + end) - _coffset;
                 }
                 if (axis == 1)
                 {
                     _hoffset = start >= 0 ? start : h + start;
-                    _outh = std::min(h, end > 0 ? end : h + end) - _woffset;
+                    _outh = min(h, end > 0 ? end : h + end) - _woffset;
                 }
                 if (axis == 2)
                 {
                     _woffset = start >= 0 ? start : w + start;
-                    _outw = std::min(w, end > 0 ? end : w + end) - _woffset;
+                    _outw = min(w, end > 0 ? end : w + end) - _woffset;
                 }
             }
         }
@@ -381,7 +383,7 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
         {
             _outw = w - woffset - woffset2;
             if (outw != -233)
-                _outw = std::min(outw, _outw);
+                _outw = min(outw, _outw);
         }
         if (dims == 2)
         {
@@ -393,17 +395,17 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
                 _outw = w;
                 _outh = h - woffset - woffset2;
                 if (outw != -233)
-                    _outh = std::min(outw, _outh);
+                    _outh = min(outw, _outh);
             }
             else
             {
                 _outw = w - woffset - woffset2;
                 if (outw != -233)
-                    _outw = std::min(outw, _outw);
+                    _outw = min(outw, _outw);
 
                 _outh = h - hoffset - hoffset2;
                 if (outh != -233)
-                    _outh = std::min(outh, _outh);
+                    _outh = min(outh, _outh);
             }
         }
         if (dims == 3)
@@ -417,7 +419,7 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
                 _outh = h;
                 _outc = channels - woffset - woffset2;
                 if (outw != -233)
-                    _outc = std::min(outw, _outc);
+                    _outc = min(outw, _outc);
             }
             else if (coffset == -233)
             {
@@ -426,25 +428,25 @@ void Crop::resolve_crop_roi(const Mat& bottom_blob, int& _woffset, int& _hoffset
                 _outw = w;
                 _outh = h - woffset - woffset2;
                 if (outw != -233)
-                    _outh = std::min(outw, _outh);
+                    _outh = min(outw, _outh);
 
                 _outc = channels - hoffset - hoffset2;
                 if (outh != -233)
-                    _outc = std::min(outh, _outc);
+                    _outc = min(outh, _outc);
             }
             else
             {
                 _outw = w - woffset - woffset2;
                 if (outw != -233)
-                    _outw = std::min(outw, _outw);
+                    _outw = min(outw, _outw);
 
                 _outh = h - hoffset - hoffset2;
                 if (outh != -233)
-                    _outh = std::min(outh, _outh);
+                    _outh = min(outh, _outh);
 
                 _outc = channels - coffset2 - coffset2;
                 if (outc != -233)
-                    _outc = std::min(outc, _outc);
+                    _outc = min(outc, _outc);
             }
         }
     }

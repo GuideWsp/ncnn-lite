@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <math.h>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(PriorBox)
 
 PriorBox::PriorBox()
@@ -119,7 +121,7 @@ int PriorBox::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
             float* box = top_blob;
             for (int i = 0; i < top_blob.w; i++)
             {
-                box[i] = std::min(std::max(box[i], 0.f), 1.f);
+                box[i] = min(max(box[i], 0.f), 1.f);
             }
         }
 
@@ -244,7 +246,7 @@ int PriorBox::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
         float* box = top_blob;
         for (int i = 0; i < top_blob.w; i++)
         {
-            box[i] = std::min(std::max(box[i], 0.f), 1.f);
+            box[i] = min(max(box[i], 0.f), 1.f);
         }
     }
 

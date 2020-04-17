@@ -16,6 +16,8 @@
 
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
@@ -151,8 +153,8 @@ int Slice_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& t
         int out_elempack = top_blobs[0].elempack;
         for (size_t i=0; i<top_blobs.size(); i++)
         {
-            out_elemsize = std::min(out_elemsize, top_blobs[i].elemsize);
-            out_elempack = std::min(out_elempack, top_blobs[i].elempack);
+            out_elemsize = min(out_elemsize, top_blobs[i].elemsize);
+            out_elempack = min(out_elempack, top_blobs[i].elempack);
         }
 
         Mat bottom_blob_unpacked = bottom_blob;
@@ -276,8 +278,8 @@ int Slice_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& t
         int out_elempack = top_blobs[0].elempack;
         for (size_t i=0; i<top_blobs.size(); i++)
         {
-            out_elemsize = std::min(out_elemsize, top_blobs[i].elemsize);
-            out_elempack = std::min(out_elempack, top_blobs[i].elempack);
+            out_elemsize = min(out_elemsize, top_blobs[i].elemsize);
+            out_elempack = min(out_elempack, top_blobs[i].elempack);
         }
 
         Mat bottom_blob_unpacked = bottom_blob;
@@ -502,8 +504,8 @@ int Slice_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<M
         int out_elempack = top_blobs[0].elempack;
         for (size_t i=0; i<top_blobs.size(); i++)
         {
-            out_elemsize = std::min(out_elemsize, top_blobs[i].elemsize);
-            out_elempack = std::min(out_elempack, top_blobs[i].elempack);
+            out_elemsize = min(out_elemsize, top_blobs[i].elemsize);
+            out_elempack = min(out_elempack, top_blobs[i].elempack);
         }
 
         Mat bottom_blob_unpacked = bottom_blob;
@@ -627,8 +629,8 @@ int Slice_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<M
         int out_elempack = top_blobs[0].elempack;
         for (size_t i=0; i<top_blobs.size(); i++)
         {
-            out_elemsize = std::min(out_elemsize, top_blobs[i].elemsize);
-            out_elempack = std::min(out_elempack, top_blobs[i].elempack);
+            out_elemsize = min(out_elemsize, top_blobs[i].elemsize);
+            out_elempack = min(out_elempack, top_blobs[i].elempack);
         }
 
         Mat bottom_blob_unpacked = bottom_blob;

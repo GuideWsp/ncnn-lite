@@ -17,6 +17,8 @@
 #include <math.h>
 #include <algorithm>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Softmax)
 
 Softmax::Softmax()
@@ -59,7 +61,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         float max = -FLT_MAX;
         for (int i=0; i<w; i++)
         {
-            max = std::max(max, ptr[i]);
+            max = max(max, ptr[i]);
         }
 
         float sum = 0.f;
@@ -93,7 +95,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
             const float* ptr = bottom_top_blob.row(i);
             for (int j=0; j<w; j++)
             {
-                max[j] = std::max(max[j], ptr[j]);
+                max[j] = max(max[j], ptr[j]);
             }
         }
 
@@ -136,7 +138,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
             float m = -FLT_MAX;
             for (int j=0; j<w; j++)
             {
-                m = std::max(m, ptr[j]);
+                m = max(m, ptr[j]);
             }
 
             float s = 0.f;
@@ -173,7 +175,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
             for (int i=0; i<size; i++)
             {
-                max[i] = std::max(max[i], ptr[i]);
+                max[i] = max(max[i], ptr[i]);
             }
         }
 
@@ -228,7 +230,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
             {
                 for (int j=0; j<w; j++)
                 {
-                    maxptr[j] = std::max(maxptr[j], ptr[j]);
+                    maxptr[j] = max(maxptr[j], ptr[j]);
                 }
 
                 ptr += w;
@@ -295,7 +297,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
                 float max = -FLT_MAX;
                 for (int j=0; j<w; j++)
                 {
-                    max = std::max(max, ptr[j]);
+                    max = max(max, ptr[j]);
                 }
 
                 float sum = 0.f;

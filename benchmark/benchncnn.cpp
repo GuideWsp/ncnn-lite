@@ -23,6 +23,8 @@
 #include "datareader.h"
 #include "net.h"
 
+#include "cstl/utils.h"
+
 struct DataReaderFromEmpty : public DataReader
 {
     virtual int scan(const char* format, void* p) const { return 0; }
@@ -89,8 +91,8 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
 
         double time = end - start;
 
-        time_min = std::min(time_min, time);
-        time_max = std::max(time_max, time);
+        time_min = min(time_min, time);
+        time_max = max(time_max, time);
         time_avg += time;
     }
 

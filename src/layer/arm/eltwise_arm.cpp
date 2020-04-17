@@ -14,6 +14,8 @@
 
 #include "eltwise_arm.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
@@ -790,7 +792,7 @@ int Eltwise_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>&
 #endif // __ARM_NEON
             for (; remain>0; remain--)
             {
-                *outptr = std::max(*ptr, *ptr1);
+                *outptr = max(*ptr, *ptr1);
 
                 ptr++;
                 ptr1++;
@@ -863,7 +865,7 @@ int Eltwise_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>&
 #endif // __ARM_NEON
                 for (; remain>0; remain--)
                 {
-                    *outptr = std::max(*ptr, *outptr);
+                    *outptr = max(*ptr, *outptr);
 
                     ptr++;
                     outptr++;
@@ -1077,7 +1079,7 @@ int Eltwise_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector
 
                 for (int i=0; i<size; i++)
                 {
-                    *outptr = float32_to_bfloat16(std::max(bfloat16_to_float32(*ptr), bfloat16_to_float32(*ptr1)));
+                    *outptr = float32_to_bfloat16(max(bfloat16_to_float32(*ptr), bfloat16_to_float32(*ptr1)));
 
                     ptr++;
                     ptr1++;
@@ -1592,7 +1594,7 @@ int Eltwise_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector
 
             for (int i=0; i<size; i++)
             {
-                *outptr = std::max(bfloat16_to_float32(*ptr), bfloat16_to_float32(*ptr1));
+                *outptr = max(bfloat16_to_float32(*ptr), bfloat16_to_float32(*ptr1));
 
                 ptr++;
                 ptr1++;
@@ -1612,7 +1614,7 @@ int Eltwise_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector
 
                 for (int i=0; i<size; i++)
                 {
-                    *outptr = std::max(bfloat16_to_float32(*ptr), *outptr);
+                    *outptr = max(bfloat16_to_float32(*ptr), *outptr);
 
                     ptr++;
                     outptr++;
@@ -1631,7 +1633,7 @@ int Eltwise_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector
 
                 for (int i=0; i<size; i++)
                 {
-                    *outptr = float32_to_bfloat16(std::max(bfloat16_to_float32(*ptr), *ptr0));
+                    *outptr = float32_to_bfloat16(max(bfloat16_to_float32(*ptr), *ptr0));
 
                     ptr++;
                     ptr0++;

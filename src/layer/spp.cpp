@@ -16,6 +16,8 @@
 #include <math.h>
 #include <algorithm>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(SPP)
 
 SPP::SPP()
@@ -120,7 +122,7 @@ int SPP::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
                         for (int k = 0; k < maxk; k++)
                         {
                             float val = sptr[ space_ofs[k] ];
-                            max = std::max(max, val);
+                            max = max(max, val);
                         }
 
                         outptr[j] = max;

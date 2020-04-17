@@ -12,6 +12,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
@@ -20,7 +22,7 @@ static inline float activation_ss(float v, int activation_type, const Mat& activ
 {
     if (activation_type == 1)
     {
-        v = std::max(v, 0.f);
+        v = max(v, 0.f);
     }
     else if (activation_type == 2)
     {

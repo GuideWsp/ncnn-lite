@@ -14,6 +14,8 @@
 
 #include "relu_arm.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
@@ -262,7 +264,7 @@ int ReLU_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 #endif // __ARM_NEON
             for (; remain>0; remain--)
             {
-                *ptr = std::max(*ptr, 0.f);
+                *ptr = max(*ptr, 0.f);
 
                 ptr++;
             }

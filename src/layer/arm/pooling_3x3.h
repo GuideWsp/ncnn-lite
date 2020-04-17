@@ -12,6 +12,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+#include "cstl/utils.h"
+
 static void pooling3x3s2_max_neon(const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
     int w = bottom_blob.w;
@@ -173,11 +175,11 @@ static void pooling3x3s2_max_neon(const Mat& bottom_blob, Mat& top_blob, const O
 #endif // __ARM_NEON
             for (; remain>0; remain--)
             {
-                float max0 = std::max(std::max(r0[0], r0[1]), r0[2]);
-                float max1 = std::max(std::max(r1[0], r1[1]), r1[2]);
-                float max2 = std::max(std::max(r2[0], r2[1]), r2[2]);
+                float max0 = max(max(r0[0], r0[1]), r0[2]);
+                float max1 = max(max(r1[0], r1[1]), r1[2]);
+                float max2 = max(max(r2[0], r2[1]), r2[2]);
 
-                *outptr = std::max(std::max(max0, max1), max2);
+                *outptr = max(max(max0, max1), max2);
 
                 r0 += 2;
                 r1 += 2;

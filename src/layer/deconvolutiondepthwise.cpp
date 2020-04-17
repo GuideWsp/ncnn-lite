@@ -16,6 +16,8 @@
 #include <algorithm>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(DeconvolutionDepthWise)
 
 DeconvolutionDepthWise::DeconvolutionDepthWise()
@@ -159,7 +161,7 @@ int DeconvolutionDepthWise::forward(const Mat& bottom_blob, Mat& top_blob, const
 
                 for (int i = 0; i < size; i++)
                 {
-                    outptr[i] = std::max(outptr[i], 0.f);
+                    outptr[i] = max(outptr[i], 0.f);
                 }
             }
             else if (activation_type == 2)
@@ -249,7 +251,7 @@ int DeconvolutionDepthWise::forward(const Mat& bottom_blob, Mat& top_blob, const
 
                     for (int i = 0; i < size; i++)
                     {
-                        outptr[i] = std::max(outptr[i], 0.f);
+                        outptr[i] = max(outptr[i], 0.f);
                     }
                 }
                 else if (activation_type == 2)

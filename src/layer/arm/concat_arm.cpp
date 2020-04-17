@@ -16,6 +16,8 @@
 #include <algorithm>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Concat_arm)
 
 Concat_arm::Concat_arm()
@@ -129,8 +131,8 @@ int Concat_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& 
         for (size_t b=0; b<bottom_blobs.size(); b++)
         {
             const Mat& bottom_blob = bottom_blobs[b];
-            elemsize = std::min(elemsize, bottom_blob.elemsize);
-            elempack = std::min(elempack, bottom_blob.elempack);
+            elemsize = min(elemsize, bottom_blob.elemsize);
+            elempack = min(elempack, bottom_blob.elempack);
             top_h += bottom_blob.h * bottom_blob.elempack;
         }
 
@@ -250,8 +252,8 @@ int Concat_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& 
         for (size_t b=0; b<bottom_blobs.size(); b++)
         {
             const Mat& bottom_blob = bottom_blobs[b];
-            elemsize = std::min(elemsize, bottom_blob.elemsize);
-            elempack = std::min(elempack, bottom_blob.elempack);
+            elemsize = min(elemsize, bottom_blob.elemsize);
+            elempack = min(elempack, bottom_blob.elempack);
             top_channels += bottom_blob.c * bottom_blob.elempack;
         }
 
@@ -469,8 +471,8 @@ int Concat_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<
         for (size_t b=0; b<bottom_blobs.size(); b++)
         {
             const Mat& bottom_blob = bottom_blobs[b];
-            elemsize = std::min(elemsize, bottom_blob.elemsize);
-            elempack = std::min(elempack, bottom_blob.elempack);
+            elemsize = min(elemsize, bottom_blob.elemsize);
+            elempack = min(elempack, bottom_blob.elempack);
             top_h += bottom_blob.h * bottom_blob.elempack;
         }
 
@@ -590,8 +592,8 @@ int Concat_arm::forward_bf16s(const std::vector<Mat>& bottom_blobs, std::vector<
         for (size_t b=0; b<bottom_blobs.size(); b++)
         {
             const Mat& bottom_blob = bottom_blobs[b];
-            elemsize = std::min(elemsize, bottom_blob.elemsize);
-            elempack = std::min(elempack, bottom_blob.elempack);
+            elemsize = min(elemsize, bottom_blob.elemsize);
+            elempack = min(elempack, bottom_blob.elempack);
             top_channels += bottom_blob.c * bottom_blob.elempack;
         }
 

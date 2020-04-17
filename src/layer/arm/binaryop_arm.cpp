@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #include "neon_mathfun.h"
@@ -1733,11 +1735,11 @@ static int binary_op_scalar_inplace_bf16s(Mat& a, float b, const Option& opt)
 }
 
 struct binary_op_max {
-    float operator() (const float& x, const float& y) const { return std::max(x, y); }
+    float operator() (const float& x, const float& y) const { return max(x, y); }
 };
 
 struct binary_op_min {
-    float operator() (const float& x, const float& y) const { return std::min(x, y); }
+    float operator() (const float& x, const float& y) const { return min(x, y); }
 };
 
 struct binary_op_pow {

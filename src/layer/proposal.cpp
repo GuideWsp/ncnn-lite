@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Proposal)
 
 Proposal::Proposal()
@@ -106,8 +108,8 @@ static inline float intersection_area(const Rect& a, const Rect& b)
         return 0.f;
     }
 
-    float inter_width = std::min(a.x2, b.x2) - std::max(a.x1, b.x1);
-    float inter_height = std::min(a.y2, b.y2) - std::max(a.y1, b.y1);
+    float inter_width = min(a.x2, b.x2) - max(a.x1, b.x1);
+    float inter_height = min(a.y2, b.y2) - max(a.y1, b.y1);
 
     return inter_width * inter_height;
 }
@@ -130,8 +132,8 @@ static void qsort_descent_inplace(std::vector<T>& datas, std::vector<float>& sco
         if (i <= j)
         {
             // swap
-            std::swap(datas[i], datas[j]);
-            std::swap(scores[i], scores[j]);
+            swap(datas[i], datas[j]);
+            swap(scores[i], scores[j]);
 
             i++;
             j--;
@@ -280,10 +282,10 @@ int Proposal::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
             float* pb = pbs.row(i);
 
             // clip box
-            pb[0] = std::max(std::min(pb[0], im_w - 1), 0.f);
-            pb[1] = std::max(std::min(pb[1], im_h - 1), 0.f);
-            pb[2] = std::max(std::min(pb[2], im_w - 1), 0.f);
-            pb[3] = std::max(std::min(pb[3], im_h - 1), 0.f);
+            pb[0] = max(min(pb[0], im_w - 1), 0.f);
+            pb[1] = max(min(pb[1], im_h - 1), 0.f);
+            pb[2] = max(min(pb[2], im_w - 1), 0.f);
+            pb[3] = max(min(pb[3], im_h - 1), 0.f);
         }
     }
 
@@ -330,7 +332,7 @@ int Proposal::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& to
     nms_sorted_bboxes(proposal_boxes, picked, nms_thresh);
 
     // take after_nms_topN
-    int picked_count = std::min((int)picked.size(), after_nms_topN);
+    int picked_count = min((int)picked.size(), after_nms_topN);
 
     // return the top proposals
     Mat& roi_blob = top_blobs[0];

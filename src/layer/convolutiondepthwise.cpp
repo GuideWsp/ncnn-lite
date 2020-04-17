@@ -16,6 +16,8 @@
 #include <algorithm>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(ConvolutionDepthWise)
 
 ConvolutionDepthWise::ConvolutionDepthWise()
@@ -216,7 +218,7 @@ int ConvolutionDepthWise::forward(const Mat& bottom_blob, Mat& top_blob, const O
 
                     if (activation_type == 1)
                     {
-                        sum = std::max(sum, 0.f);
+                        sum = max(sum, 0.f);
                     }
                     else if (activation_type == 2)
                     {
@@ -287,7 +289,7 @@ int ConvolutionDepthWise::forward(const Mat& bottom_blob, Mat& top_blob, const O
 
                         if (activation_type == 1)
                         {
-                            sum = std::max(sum, 0.f);
+                            sum = max(sum, 0.f);
                         }
                         else if (activation_type == 2)
                         {
@@ -498,7 +500,7 @@ int ConvolutionDepthWise::forward_int8(const Mat& bottom_blob, Mat& top_blob, co
 
                         if (activation_type == 1)
                         {
-                            sums8 = std::max(sums8, (signed char)0);
+                            sums8 = max(sums8, (signed char)0);
                         }
 
                         outptr[0] = sums8;
@@ -520,7 +522,7 @@ int ConvolutionDepthWise::forward_int8(const Mat& bottom_blob, Mat& top_blob, co
 
                         if (activation_type == 1)
                         {
-                            sumfp32 = std::max(sumfp32, 0.f);
+                            sumfp32 = max(sumfp32, 0.f);
                         }
 
                         ((float*)outptr)[0] = sumfp32;
@@ -588,7 +590,7 @@ int ConvolutionDepthWise::forward_int8(const Mat& bottom_blob, Mat& top_blob, co
 
                             if (activation_type == 1)
                             {
-                                sums8 = std::max(sums8, (signed char)0);
+                                sums8 = max(sums8, (signed char)0);
                             }
 
                             outptr[0] = sums8;
@@ -610,7 +612,7 @@ int ConvolutionDepthWise::forward_int8(const Mat& bottom_blob, Mat& top_blob, co
 
                             if (activation_type == 1)
                             {
-                                sumfp32 = std::max(sumfp32, 0.f);
+                                sumfp32 = max(sumfp32, 0.f);
                             }
 
                             ((float*)outptr)[0] = sumfp32;

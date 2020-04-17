@@ -16,6 +16,8 @@
 #include <float.h>
 #include <math.h>
 
+#include "cstl/utils.h"
+
 #if __MIPS_MSA
 #include <msa.h>
 #include "mips_mathfun.h"
@@ -52,7 +54,7 @@ int Softmax_mips::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
         for (int i=0; i<size; i++)
         {
-            maxptr[i] = std::max(maxptr[i], ptr[i]);
+            maxptr[i] = max(maxptr[i], ptr[i]);
         }
     }
 

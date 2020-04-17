@@ -16,6 +16,8 @@
 
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #include "neon_mathfun.h"
@@ -731,7 +733,7 @@ int ConvolutionDepthWise_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blo
 
                             if (activation_type == 1)
                             {
-                                sum = std::max(sum, 0.f);
+                                sum = max(sum, 0.f);
                             }
                             else if (activation_type == 2)
                             {

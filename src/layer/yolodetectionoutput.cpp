@@ -17,6 +17,8 @@
 #include <math.h>
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(YoloDetectionOutput)
 
 YoloDetectionOutput::YoloDetectionOutput()
@@ -81,8 +83,8 @@ static inline float intersection_area(const BBoxRect& a, const BBoxRect& b)
         return 0.f;
     }
 
-    float inter_width = std::min(a.xmax, b.xmax) - std::max(a.xmin, b.xmin);
-    float inter_height = std::min(a.ymax, b.ymax) - std::max(a.ymin, b.ymin);
+    float inter_width = min(a.xmax, b.xmax) - max(a.xmin, b.xmin);
+    float inter_height = min(a.ymax, b.ymax) - max(a.ymin, b.ymin);
 
     return inter_width * inter_height;
 }
@@ -105,8 +107,8 @@ static void qsort_descent_inplace(std::vector<T>& datas, std::vector<float>& sco
         if (i <= j)
         {
             // swap
-            std::swap(datas[i], datas[j]);
-            std::swap(scores[i], scores[j]);
+            swap(datas[i], datas[j]);
+            swap(scores[i], scores[j]);
 
             i++;
             j--;

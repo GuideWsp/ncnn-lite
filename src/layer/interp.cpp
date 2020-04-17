@@ -15,6 +15,8 @@
 #include "interp.h"
 #include <algorithm>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Interp);
 
 Interp::Interp()
@@ -440,10 +442,10 @@ int Interp::forward(const Mat &bottom_blob, Mat &top_blob, const Option& opt) co
             float* outptr = top_blob.channel(q);
             for (int y = 0; y < oh; y++)
             {
-                int in_y = std::min((int) (y * hs), (h - 1));
+                int in_y = min((int) (y * hs), (h - 1));
                 for (int x = 0; x < ow; x++)
                 {
-                    int in_x = std::min((int) (x * ws), (w - 1));
+                    int in_x = min((int) (x * ws), (w - 1));
                     *outptr++ = ptr[in_y * w + in_x];
                 }
             }

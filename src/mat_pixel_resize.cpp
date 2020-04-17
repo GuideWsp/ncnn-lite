@@ -21,6 +21,8 @@
 #endif // __ARM_NEON
 #include "platform.h"
 
+#include "cstl/utils.h"
+
 #if NCNN_PIXEL
 void resize_bilinear_c1(const unsigned char* src, int srcw, int srch, unsigned char* dst, int w, int h)
 {
@@ -64,7 +66,7 @@ void resize_bilinear_c1(const unsigned char* src, int srcw, int srch, int srcstr
     int sx;
     int sy;
 
-#define SATURATE_CAST_SHORT(X) (short)::std::min(::std::max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
+#define SATURATE_CAST_SHORT(X) (short)min(max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
 
     for (int dx = 0; dx < w; dx++)
     {
@@ -319,7 +321,7 @@ void resize_bilinear_c2(const unsigned char* src, int srcw, int srch, int srcstr
     int sx;
     int sy;
 
-#define SATURATE_CAST_SHORT(X) (short)::std::min(::std::max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
+#define SATURATE_CAST_SHORT(X) (short)min(max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
 
     for (int dx = 0; dx < w; dx++)
     {
@@ -629,7 +631,7 @@ void resize_bilinear_c3(const unsigned char* src, int srcw, int srch, int srcstr
     int sx;
     int sy;
 
-#define SATURATE_CAST_SHORT(X) (short)::std::min(::std::max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
+#define SATURATE_CAST_SHORT(X) (short)min(max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
 
     for (int dx = 0; dx < w; dx++)
     {
@@ -950,7 +952,7 @@ void resize_bilinear_c4(const unsigned char* src, int srcw, int srch, int srcstr
     int sx;
     int sy;
 
-#define SATURATE_CAST_SHORT(X) (short)::std::min(::std::max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
+#define SATURATE_CAST_SHORT(X) (short)min(max((int)(X + (X >= 0.f ? 0.5f : -0.5f)), SHRT_MIN), SHRT_MAX);
 
     for (int dx = 0; dx < w; dx++)
     {

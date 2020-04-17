@@ -21,6 +21,8 @@
 #endif // __ARM_NEON
 #include "platform.h"
 
+#include "cstl/utils.h"
+
 #if NCNN_PIXEL
 static int from_rgb(const unsigned char* rgb, int w, int h, int stride, Mat& m, Allocator* allocator)
 {
@@ -154,7 +156,7 @@ static void to_rgb(const Mat& m, unsigned char* rgb, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -314,7 +316,7 @@ static void to_gray(const Mat& m, unsigned char* gray, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -502,7 +504,7 @@ static void to_rgba(const Mat& m, unsigned char* rgba, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -694,7 +696,7 @@ static void to_bgr2rgb(const Mat& m, unsigned char* rgb, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -882,7 +884,7 @@ static void to_rgb2rgba(const Mat& m, unsigned char* rgba, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -1073,7 +1075,7 @@ static void to_bgr2rgba(const Mat& m, unsigned char* rgba, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -1277,7 +1279,7 @@ static void to_gray2rgba(const Mat& m, unsigned char* rgba, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -1806,7 +1808,7 @@ static void to_rgba2bgra(const Mat& m, unsigned char* bgra, int stride)
 
     for (int y=0; y<h; y++)
     {
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
 
 #if __ARM_NEON
         int nn = w >> 3;
@@ -2101,7 +2103,7 @@ void yuv420sp2rgb(const unsigned char* yuv420sp, int w, int h, unsigned char* rg
 #endif // __aarch64__
 #endif // __ARM_NEON
 
-#define SATURATE_CAST_UCHAR(X) (unsigned char)::std::min(::std::max((int)(X), 0), 255);
+#define SATURATE_CAST_UCHAR(X) (unsigned char)min(max((int)(X), 0), 255);
         for (; remain>0; remain-=2)
         {
             // R = 1.164 * yy + 1.596 * vv

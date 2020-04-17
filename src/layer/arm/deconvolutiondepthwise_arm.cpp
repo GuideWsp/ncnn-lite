@@ -15,6 +15,8 @@
 #include "deconvolutiondepthwise_arm.h"
 #include "layer_type.h"
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #include "neon_mathfun.h"
@@ -306,7 +308,7 @@ int DeconvolutionDepthWise_arm::forward(const Mat& bottom_blob, Mat& top_blob, c
 
                         if (activation_type == 1)
                         {
-                            sum = std::max(sum, 0.f);
+                            sum = max(sum, 0.f);
                         }
                         else if (activation_type == 2)
                         {

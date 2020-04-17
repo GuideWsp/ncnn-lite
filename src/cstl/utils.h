@@ -24,6 +24,7 @@
 #ifndef __GENERIC_UTILS_H__
 #define __GENERIC_UTILS_H__
 
+#include "defs.h"
 #include "errnum.h"
 
 /* Get the max number from two numbers */

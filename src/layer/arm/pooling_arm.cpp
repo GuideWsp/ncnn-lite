@@ -15,6 +15,8 @@
 #include "pooling_arm.h"
 #include <float.h>
 
+#include "cstl/utils.h"
+
 #if __ARM_NEON
 #include <arm_neon.h>
 #endif // __ARM_NEON
@@ -388,7 +390,7 @@ int Pooling_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
                     float max = -FLT_MAX;
                     for (int i=0; i<size; i++)
                     {
-                        max = std::max(max, bfloat16_to_float32(ptr[i]));
+                        max = max(max, bfloat16_to_float32(ptr[i]));
                     }
 
                     unsigned short* outptr = top_blob;
@@ -535,7 +537,7 @@ int Pooling_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Opti
                         for (int k = 0; k < maxk; k++)
                         {
                             float val = bfloat16_to_float32(sptr[ space_ofs[k] ]);
-                            max = std::max(max, val);
+                            max = max(max, val);
                         }
 
                         outptr[j] = float32_to_bfloat16(max);

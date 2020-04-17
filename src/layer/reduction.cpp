@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "cstl/utils.h"
+
 DEFINE_LAYER_CREATOR(Reduction)
 
 Reduction::Reduction()
@@ -776,12 +778,12 @@ struct reduction_op_sumsexp {
 
 template<typename T>
 struct reduction_op_max {
-    T operator() (const T& x, const T& y) const { return std::max(x, y); }
+    T operator() (const T& x, const T& y) const { return max(x, y); }
 };
 
 template<typename T>
 struct reduction_op_min {
-    T operator() (const T& x, const T& y) const { return std::min(x, y); }
+    T operator() (const T& x, const T& y) const { return min(x, y); }
 };
 
 
