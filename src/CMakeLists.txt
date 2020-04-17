@@ -192,7 +192,8 @@ target_include_directories(ncnn
         $<INSTALL_INTERFACE:include/ncnn>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/layer>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/layer>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cstl>)
 
 if(NCNN_OPENMP)
     find_package(OpenMP)
