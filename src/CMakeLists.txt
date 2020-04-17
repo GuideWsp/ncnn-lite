@@ -62,8 +62,6 @@ macro(ncnn_add_layer class)
             set(arch arm)
         elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips)")
             set(arch mips)
-        else()
-            set(arch x86)
         endif()
 
         set(LAYER_ARCH_SRC ${CMAKE_CURRENT_SOURCE_DIR}/layer/${arch}/${name}_${arch}.cpp)
@@ -262,16 +260,6 @@ endif()
 if(ANDROID OR IOS)
     # disable shared library on android and xcode ios
     set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
-elseif(NCNN_AVX2)
-    #set up according to your own system environment
-    #Windows
-    if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
-        OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_SIMULATE_ID MATCHES "MSVC"))
-        target_compile_options(ncnn PRIVATE /arch:AVX2 /DAVX2)
-    #Linux
-    else()
-        target_compile_options(ncnn PRIVATE -mfma -mf16c)
-    endif()
 endif()
 
 if(NCNN_OPENMP AND (OpenMP_CXX_FOUND OR OPENMP_FOUND))
