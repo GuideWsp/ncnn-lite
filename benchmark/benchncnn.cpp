@@ -25,11 +25,16 @@
 
 #include "cstl/utils.h"
 
-struct DataReaderFromEmpty : public DataReader
+int DataReaderFromEmpty_scan(void *handle, const char* format, void* p)
 {
-    virtual int scan(const char* format, void* p) const { return 0; }
-    virtual size_t read(void* buf, size_t size) const { memset(buf, 0, size); return size; }
-};
+    return 0;
+}
+
+size_t DataReaderFromEmpty_read(void *handle, void* buf, size_t size)
+{
+    memset(buf, 0, size);
+    return size;
+}
 
 static int g_warmup_loop_count = 8;
 static int g_loop_count = 4;
@@ -51,8 +56,8 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
     sprintf(parampath, "%s.param", comment);
     net.load_param(parampath);
 
-    DataReaderFromEmpty dr;
-    net.load_model(dr);
+    DataReader dr = { .scan = DataReaderFromEmpty_scan, .read = DataReaderFromEmpty_read };
+    net.load_model(NULL, dr);
 
     g_blob_pool_allocator.clear();
     g_workspace_pool_allocator.clear();

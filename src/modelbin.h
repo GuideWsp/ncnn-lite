@@ -36,10 +36,11 @@ struct ModelBin
 
 struct ModelBinFromDataReader : public ModelBin
 {
-    ModelBinFromDataReader(const DataReader& dr);
+    ModelBinFromDataReader(void *dr_handle, const DataReader& dr);
 
     virtual Mat load(int w, int type) const;
 
+    void *dr_handle;
     const DataReader& dr;
 };
 

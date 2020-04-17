@@ -15,65 +15,45 @@
 #include "datareader.h"
 #include <string.h>
 
-DataReader::~DataReader()
-{
-}
-
-#if NCNN_STRING
-int DataReader::scan(const char* /*format*/, void* /*p*/) const
-{
-    return 0;
-}
-#endif // NCNN_STRING
-
-size_t DataReader::read(void* /*buf*/, size_t /*size*/) const
-{
-    return 0;
-}
-
 #if NCNN_STDIO
-DataReaderFromStdio::DataReaderFromStdio(FILE* _fp) : fp(_fp)
-{
-}
-
 #if NCNN_STRING
-int DataReaderFromStdio::scan(const char* format, void* p) const
+int DataReaderFromStdio_scan(void *handle, const char* format, void* p)
 {
+    FILE *fp = (FILE *)handle;
     return fscanf(fp, format, p);
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromStdio::read(void* buf, size_t size) const
+size_t DataReaderFromStdio_read(void *handle, void* buf, size_t size)
 {
+    FILE *fp = (FILE *)handle;
     return fread(buf, 1, size, fp);
 }
 #endif // NCNN_STDIO
 
-DataReaderFromMemory::DataReaderFromMemory(const unsigned char*& _mem) : mem(_mem)
-{
-}
-
 #if NCNN_STRING
-int DataReaderFromMemory::scan(const char* format, void* p) const
+int DataReaderFromMemory_scan(void *handle, const char* format, void* p)
 {
+    char **mem_ptr = (char **)handle;
     size_t fmtlen = strlen(format);
 
-    char* format_with_n = new char[fmtlen + 3];
+    char* format_with_n = (char *)malloc(fmtlen + 3);
     sprintf(format_with_n, "%s%%n", format);
 
     int nconsumed = 0;
-    int nscan = sscanf((const char*)mem, format_with_n, p, &nconsumed);
-    mem += nconsumed;
+    int nscan = sscanf(*mem_ptr, format_with_n, p, &nconsumed);
+    *mem_ptr += nconsumed;
 
-    delete[] format_with_n;
+    free(format_with_n);
 
     return nconsumed > 0 ? nscan : 0;
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromMemory::read(void* buf, size_t size) const
+size_t DataReaderFromMemory_read(void *handle, void* buf, size_t size)
 {
-    memcpy(buf, mem, size);
-    mem += size;
+    char **mem_ptr = (char **)handle;
+    memcpy(buf, *mem_ptr, size);
+    *mem_ptr += size;
     return size;
 }

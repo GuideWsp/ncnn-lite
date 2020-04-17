@@ -43,8 +43,8 @@ struct ParamDict
 
     void clear();
 
-    int load_param(const DataReader& dr);
-    int load_param_bin(const DataReader& dr);
+    int load_param(void *dr_handle, const DataReader& dr);
+    int load_param_bin(void *dr_handle, const DataReader& dr);
 
     struct
     {

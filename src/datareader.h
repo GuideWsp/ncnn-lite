@@ -18,46 +18,40 @@
 #include <stdio.h>
 #include "platform.h"
 
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
 // data read wrapper
 struct DataReader
 {
-    virtual ~DataReader();
-
 #if NCNN_STRING
     // parse plain param text
     // return 1 if scan success
-    virtual int scan(const char* format, void* p) const;
+    int (*scan)(void *handle, const char* format, void* p);
 #endif // NCNN_STRING
 
     // read binary param and model data
     // return bytes read
-    virtual size_t read(void* buf, size_t size) const;
+    size_t (*read)(void *handle, void* buf, size_t size);
 };
 
 #if NCNN_STDIO
-struct DataReaderFromStdio : public DataReader
-{
-    DataReaderFromStdio(FILE* fp);
-
 #if NCNN_STRING
-    virtual int scan(const char* format, void* p) const;
+int DataReaderFromStdio_scan(void *handle, const char* format, void* p);
 #endif // NCNN_STRING
-    virtual size_t read(void* buf, size_t size) const;
 
-    FILE* fp;
-};
+size_t DataReaderFromStdio_read(void *handle, void* buf, size_t size);
 #endif // NCNN_STDIO
 
-struct DataReaderFromMemory : public DataReader
-{
-    DataReaderFromMemory(const unsigned char*& mem);
-
 #if NCNN_STRING
-    virtual int scan(const char* format, void* p) const;
+int DataReaderFromMemory_scan(void *handle, const char* format, void* p);
 #endif // NCNN_STRING
-    virtual size_t read(void* buf, size_t size) const;
 
-    const unsigned char*& mem;
-};
+size_t DataReaderFromMemory_read(void *handle, void* buf, size_t size);
+
+#ifdef __cplusplus 
+}
+#endif
 
 #endif // NCNN_DATAREADER_H

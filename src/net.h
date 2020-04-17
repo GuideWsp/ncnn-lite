@@ -47,12 +47,12 @@ struct Net
     int register_custom_layer(int index, layer_creator_func creator);
 
 #if NCNN_STRING
-    int load_param(const DataReader& dr);
+    int load_param(void *dr_handle, const DataReader& dr);
 #endif // NCNN_STRING
 
-    int load_param_bin(const DataReader& dr);
+    int load_param_bin(void *dr_handle, const DataReader& dr);
 
-    int load_model(const DataReader& dr);
+    int load_model(void *dr_handle, const DataReader& dr);
 
 #if NCNN_STDIO
 #if NCNN_STRING

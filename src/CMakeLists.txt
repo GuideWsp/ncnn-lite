@@ -18,7 +18,7 @@ set(ncnn_SRCS
     allocator.cpp
     blob.cpp
     cpu.c
-    datareader.cpp
+    datareader.c
     layer.cpp
     mat.cpp
     mat_pixel.cpp
