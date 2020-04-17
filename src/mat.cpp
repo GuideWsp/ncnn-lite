@@ -31,7 +31,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
     if (mean_vals && !norm_vals)
     {
         // substract mean only
-        op = create_layer(LayerType::Bias);
+        op = create_layer(LayerBias);
 
         ParamDict pd;
         pd.set(0, c);
@@ -50,7 +50,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
     else if (!mean_vals && norm_vals)
     {
         // normalize only
-        op = create_layer(LayerType::Scale);
+        op = create_layer(LayerScale);
 
         ParamDict pd;
         pd.set(0, c);
@@ -69,7 +69,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
     else if (mean_vals && norm_vals)
     {
         // substract mean and normalize
-        op = create_layer(LayerType::Scale);
+        op = create_layer(LayerScale);
 
         ParamDict pd;
         pd.set(0, c);
@@ -289,7 +289,7 @@ float float16_to_float32(unsigned short value)
 
 void copy_make_border(const Mat& src, Mat& dst, int top, int bottom, int left, int right, int type, float v, const Option& opt)
 {
-    Layer* padding = create_layer(LayerType::Padding);
+    Layer* padding = create_layer(LayerPadding);
 
     ParamDict pd;
     pd.set(0, top);
@@ -312,7 +312,7 @@ void copy_make_border(const Mat& src, Mat& dst, int top, int bottom, int left, i
 
 void copy_cut_border(const Mat& src, Mat& dst, int top, int bottom, int left, int right, const Option& opt)
 {
-    Layer* crop = create_layer(LayerType::Crop);
+    Layer* crop = create_layer(LayerCrop);
 
     ParamDict pd;
     pd.set(0, left);
@@ -335,7 +335,7 @@ void copy_cut_border(const Mat& src, Mat& dst, int top, int bottom, int left, in
 
 void resize_bilinear(const Mat& src, Mat& dst, int w, int h, const Option& opt)
 {
-    Layer* interp = create_layer(LayerType::Interp);
+    Layer* interp = create_layer(LayerInterp);
 
     ParamDict pd;
     pd.set(0, 2);
@@ -355,7 +355,7 @@ void resize_bilinear(const Mat& src, Mat& dst, int w, int h, const Option& opt)
 
 void resize_bicubic(const Mat& src, Mat& dst, int w, int h, const Option& opt)
 {
-    Layer* interp = create_layer(LayerType::Interp);
+    Layer* interp = create_layer(LayerInterp);
 
     ParamDict pd;
     pd.set(0, 3);
@@ -375,7 +375,7 @@ void resize_bicubic(const Mat& src, Mat& dst, int w, int h, const Option& opt)
 
 void convert_packing(const Mat& src, Mat& dst, int _elempack, const Option& opt)
 {
-    Layer* packing = create_layer(LayerType::Packing);
+    Layer* packing = create_layer(LayerPacking);
 
     ParamDict pd;
     pd.set(0, _elempack);
@@ -393,7 +393,7 @@ void convert_packing(const Mat& src, Mat& dst, int _elempack, const Option& opt)
 
 void cast_float32_to_float16(const Mat& src, Mat& dst, const Option& opt)
 {
-    Layer* cast = create_layer(LayerType::Cast);
+    Layer* cast = create_layer(LayerCast);
 
     ParamDict pd;
     pd.set(0, 1);
@@ -412,7 +412,7 @@ void cast_float32_to_float16(const Mat& src, Mat& dst, const Option& opt)
 
 void cast_float16_to_float32(const Mat& src, Mat& dst, const Option& opt)
 {
-    Layer* cast = create_layer(LayerType::Cast);
+    Layer* cast = create_layer(LayerCast);
 
     ParamDict pd;
     pd.set(0, 2);
@@ -431,7 +431,7 @@ void cast_float16_to_float32(const Mat& src, Mat& dst, const Option& opt)
 
 void cast_int8_to_float32(const Mat& src, Mat& dst, const Option& opt)
 {
-    Layer* cast = create_layer(LayerType::Cast);
+    Layer* cast = create_layer(LayerCast);
 
     ParamDict pd;
     pd.set(0, 3);
@@ -450,7 +450,7 @@ void cast_int8_to_float32(const Mat& src, Mat& dst, const Option& opt)
 
 void cast_float32_to_bfloat16(const Mat& src, Mat& dst, const Option& opt)
 {
-    Layer* cast = create_layer(LayerType::Cast);
+    Layer* cast = create_layer(LayerCast);
 
     ParamDict pd;
     pd.set(0, 1);
@@ -469,7 +469,7 @@ void cast_float32_to_bfloat16(const Mat& src, Mat& dst, const Option& opt)
 
 void cast_bfloat16_to_float32(const Mat& src, Mat& dst, const Option& opt)
 {
-    Layer* cast = create_layer(LayerType::Cast);
+    Layer* cast = create_layer(LayerCast);
 
     ParamDict pd;
     pd.set(0, 4);
@@ -488,7 +488,7 @@ void cast_bfloat16_to_float32(const Mat& src, Mat& dst, const Option& opt)
 
 void quantize_float32_to_int8(const Mat& src, Mat& dst, float scale, const Option& opt)
 {
-    Layer* quantize = create_layer(LayerType::Quantize);
+    Layer* quantize = create_layer(LayerQuantize);
 
     ParamDict pd;
     pd.set(0, scale);
@@ -506,7 +506,7 @@ void quantize_float32_to_int8(const Mat& src, Mat& dst, float scale, const Optio
 
 void dequantize_int32_to_float32(Mat& m, float scale, const float* bias, int bias_data_size, const Option& opt)
 {
-    Layer* dequantize = create_layer(LayerType::Dequantize);
+    Layer* dequantize = create_layer(LayerDequantize);
 
     ParamDict pd;
     pd.set(0, scale);
@@ -531,7 +531,7 @@ void dequantize_int32_to_float32(Mat& m, float scale, const float* bias, int bia
 
 void requantize_int8_to_int8(const Mat& src, Mat& dst, float scale_in, float scale_out, const float* bias, int bias_data_size, int fusion_relu, const Option& opt)
 {
-    Layer* requantize = create_layer(LayerType::Requantize);
+    Layer* requantize = create_layer(LayerRequantize);
 
     ParamDict pd;
     pd.set(0, scale_in);

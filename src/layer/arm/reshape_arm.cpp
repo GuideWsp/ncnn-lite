@@ -36,7 +36,7 @@ int Reshape_arm::create_pipeline(const Option& opt)
 #if __ARM_NEON
     if (opt.use_packing_layout)
     {
-        flatten = create_layer(LayerType::Flatten);
+        flatten = create_layer(Flatten);
 
         ParamDict pd;
 

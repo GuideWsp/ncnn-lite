@@ -39,7 +39,7 @@ int YoloDetectionOutput::load_param(const ParamDict& pd)
 int YoloDetectionOutput::create_pipeline(const Option& opt)
 {
     {
-        softmax = create_layer(LayerType::Softmax);
+        softmax = create_layer(LayerSoftmax);
 
         ParamDict pd;
         pd.set(0, 0);// axis

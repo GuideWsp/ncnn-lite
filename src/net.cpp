@@ -68,7 +68,7 @@ int Net::register_custom_layer(const char* type, layer_creator_func creator)
 
 int Net::register_custom_layer(int index, layer_creator_func creator)
 {
-    int custom_index = index & ~LayerType::CustomBit;
+    int custom_index = index & ~CustomBit;
     if (index == custom_index)
     {
         fprintf(stderr, "can not register build-in layer index %d\n", custom_index);
@@ -308,7 +308,7 @@ int Net::load_param_bin(const DataReader& dr)
         Layer* layer = create_layer(typeindex);
         if (!layer)
         {
-            int custom_index = typeindex & ~LayerType::CustomBit;
+            int custom_index = typeindex & ~CustomBit;
             layer = create_custom_layer(custom_index);
         }
         if (!layer)

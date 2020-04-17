@@ -116,7 +116,7 @@ int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
         if (bottom_blob.w == num_input)
         {
             // call InnerProduct
-            Layer* op = create_layer(LayerType::InnerProduct);
+            Layer* op = create_layer(LayerInnerProduct);
 
             // set param
             ParamDict pd;

@@ -40,7 +40,7 @@ int Slice_arm::create_pipeline(const Option& opt)
     {
 
     {
-        packing_pack1 = create_layer(LayerType::Packing);
+        packing_pack1 = create_layer(Packing);
 
         ParamDict pd;
         pd.set(0, 1);

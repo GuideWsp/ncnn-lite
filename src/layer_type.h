@@ -15,12 +15,10 @@
 #ifndef NCNN_LAYER_TYPE_H
 #define NCNN_LAYER_TYPE_H
 
-namespace LayerType {
 enum LayerType
 {
 #include "layer_type_enum.h"
     CustomBit = (1<<8),
 };
-} // namespace LayerType
 
 #endif // NCNN_LAYER_TYPE_H

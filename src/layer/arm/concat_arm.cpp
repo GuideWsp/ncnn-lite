@@ -36,7 +36,7 @@ int Concat_arm::create_pipeline(const Option& opt)
     {
 
     {
-        packing_pack4 = create_layer(LayerType::Packing);
+        packing_pack4 = create_layer(Packing);
 
         ParamDict pd;
         pd.set(0, 4);

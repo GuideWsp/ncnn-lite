@@ -25,7 +25,7 @@ Yolov3DetectionOutput::Yolov3DetectionOutput()
     one_blob_only = false;
     support_inplace = false;
     
-    //softmax = create_layer(LayerType::Softmax);
+    //softmax = create_layer(Softmax);
 
     // set param
     ParamDict pd;

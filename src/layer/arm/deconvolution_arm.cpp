@@ -39,14 +39,14 @@ int Deconvolution_arm::create_pipeline(const Option& opt)
 {
     if (activation_type == 1)
     {
-        activation = create_layer(LayerType::ReLU);
+        activation = create_layer(ReLU);
 
         ParamDict pd;
         activation->load_param(pd);
     }
     else if (activation_type == 2)
     {
-        activation = create_layer(LayerType::ReLU);
+        activation = create_layer(ReLU);
 
         ParamDict pd;
         pd.set(0, activation_params[0]);// slope
@@ -54,7 +54,7 @@ int Deconvolution_arm::create_pipeline(const Option& opt)
     }
     else if (activation_type == 3)
     {
-        activation = create_layer(LayerType::Clip);
+        activation = create_layer(Clip);
 
         ParamDict pd;
         pd.set(0, activation_params[0]);// min
@@ -63,7 +63,7 @@ int Deconvolution_arm::create_pipeline(const Option& opt)
     }
     else if (activation_type == 4)
     {
-        activation = create_layer(LayerType::Sigmoid);
+        activation = create_layer(Sigmoid);
 
         ParamDict pd;
         activation->load_param(pd);

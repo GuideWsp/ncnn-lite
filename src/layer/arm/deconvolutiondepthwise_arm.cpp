@@ -93,7 +93,7 @@ int DeconvolutionDepthWise_arm::create_pipeline(const Option& opt)
             if (bias_term)
                 bias_data_g = bias_data.range(num_output_g * g, num_output_g);
 
-            Layer* op = create_layer(LayerType::Deconvolution);
+            Layer* op = create_layer(Deconvolution);
 
             // set param
             ParamDict pd;
