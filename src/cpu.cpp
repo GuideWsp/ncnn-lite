@@ -29,16 +29,6 @@
 #include <stdint.h>
 #endif
 
-#if __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#include <mach/machine.h>
-#define __IOS__ 1
-#endif
-#endif
-
 namespace ncnn {
 
 #ifdef __ANDROID__
@@ -98,36 +88,6 @@ static unsigned int g_hwcaps = get_elf_hwcap_from_proc_self_auxv();
 
 #endif // __ANDROID__
 
-#if __IOS__
-static unsigned int get_hw_cpufamily()
-{
-    unsigned int value = 0;
-    size_t len = sizeof(value);
-    sysctlbyname("hw.cpufamily", &value, &len, NULL, 0);
-    return value;
-}
-
-static cpu_type_t get_hw_cputype()
-{
-    cpu_type_t value = 0;
-    size_t len = sizeof(value);
-    sysctlbyname("hw.cputype", &value, &len, NULL, 0);
-    return value;
-}
-
-static cpu_subtype_t get_hw_cpusubtype()
-{
-    cpu_subtype_t value = 0;
-    size_t len = sizeof(value);
-    sysctlbyname("hw.cpusubtype", &value, &len, NULL, 0);
-    return value;
-}
-
-static unsigned int g_hw_cpufamily = get_hw_cpufamily();
-static cpu_type_t g_hw_cputype = get_hw_cputype();
-static cpu_subtype_t g_hw_cpusubtype = get_hw_cpusubtype();
-#endif // __IOS__
-
 int cpu_support_arm_neon()
 {
 #ifdef __ANDROID__
@@ -135,12 +95,6 @@ int cpu_support_arm_neon()
     return g_hwcaps & HWCAP_ASIMD;
 #else
     return g_hwcaps & HWCAP_NEON;
-#endif
-#elif __IOS__
-#if __aarch64__
-    return g_hw_cputype == CPU_TYPE_ARM64;
-#else
-    return g_hw_cputype == CPU_TYPE_ARM && g_hw_cpusubtype > CPU_SUBTYPE_ARM_V7;
 #endif
 #else
     return 0;
@@ -156,12 +110,6 @@ int cpu_support_arm_vfpv4()
 #else
     return g_hwcaps & HWCAP_VFPv4;
 #endif
-#elif __IOS__
-#if __aarch64__
-    return g_hw_cputype == CPU_TYPE_ARM64;
-#else
-    return g_hw_cputype == CPU_TYPE_ARM && g_hw_cpusubtype > CPU_SUBTYPE_ARM_V7S;
-#endif
 #else
     return 0;
 #endif
@@ -172,18 +120,6 @@ int cpu_support_arm_asimdhp()
 #ifdef __ANDROID__
 #if __aarch64__
     return g_hwcaps & HWCAP_ASIMDHP;
-#else
-    return 0;
-#endif
-#elif __IOS__
-#if __aarch64__
-#ifndef CPUFAMILY_ARM_HURRICANE
-#define CPUFAMILY_ARM_HURRICANE 0x67ceee93
-#endif
-#ifndef CPUFAMILY_ARM_MONSOON_MISTRAL
-#define CPUFAMILY_ARM_MONSOON_MISTRAL 0xe81e7ef6
-#endif
-    return g_hw_cpufamily == CPUFAMILY_ARM_HURRICANE || g_hw_cpufamily == CPUFAMILY_ARM_MONSOON_MISTRAL;
 #else
     return 0;
 #endif
@@ -215,9 +151,6 @@ static int get_cpucount()
     }
 
     fclose(fp);
-#elif __IOS__
-    size_t len = sizeof(count);
-    sysctlbyname("hw.ncpu", &count, &len, NULL, 0);
 #else
 #ifdef _OPENMP
     count = omp_get_max_threads();
@@ -498,10 +431,6 @@ int set_cpu_thread_affinity(size_t thread_affinity_mask)
 #endif
 
     return 0;
-#elif __IOS__
-    // thread affinity not supported on ios
-    (void)thread_affinity_mask;
-    return -1;
 #else
     // TODO
     (void)thread_affinity_mask;

@@ -23,10 +23,6 @@
 #include "mat.h"
 #include "option.h"
 
-#if __ANDROID_API__ >= 9
-#include <android/asset_manager.h>
-#endif // __ANDROID_API__ >= 9
-
 namespace ncnn {
 
 class DataReader;

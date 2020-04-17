@@ -18,10 +18,6 @@
 #include <stdio.h>
 #include "platform.h"
 
-#if __ANDROID_API__ >= 9
-#include <android/asset_manager.h>
-#endif
-
 namespace ncnn {
 
 // data read wrapper
@@ -70,23 +66,6 @@ public:
 protected:
     const unsigned char*& mem;
 };
-
-#if __ANDROID_API__ >= 9
-class DataReaderFromAndroidAsset : public DataReader
-{
-public:
-    DataReaderFromAndroidAsset(AAsset* asset);
-
-#if NCNN_STRING
-    virtual int scan(const char* format, void* p) const;
-#endif // NCNN_STRING
-    virtual size_t read(void* buf, size_t size) const;
-
-protected:
-    AAsset* asset;
-    mutable const unsigned char* mem;
-};
-#endif // __ANDROID_API__ >= 9
 
 } // namespace ncnn
 

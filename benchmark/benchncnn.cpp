@@ -16,12 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <algorithm>
-#include <windows.h> // Sleep()
-#else
 #include <unistd.h> // sleep()
-#endif
 
 #include "benchmark.h"
 #include "cpu.h"
@@ -64,11 +59,7 @@ void benchmark(const char* comment, const ncnn::Mat& _in, const ncnn::Option& op
     if (g_enable_cooling_down)
     {
         // sleep 10 seconds for cooling down SOC  :(
-#ifdef _WIN32
-        Sleep(10 * 1000);
-#else
         sleep(10);
-#endif
     }
 
     ncnn::Mat out;

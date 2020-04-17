@@ -33,12 +33,6 @@ option(NCNN_DISABLE_PIC "disable position-independent code" OFF)
 option(NCNN_BUILD_BENCHMARK "build benchmark" ON)
 option(NCNN_DISABLE_RTTI "disable rtti" ON)
 
-if(ANDROID OR IOS OR LINUX)
-    option(NCNN_DISABLE_EXCEPTION "disable exception" ON)
-else()
-    option(NCNN_DISABLE_EXCEPTION "disable exception" OFF)
-endif()
-
 ##############################################
 
 # set cmake default folder name

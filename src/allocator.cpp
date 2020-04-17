@@ -17,10 +17,6 @@
 #include <stdio.h>
 #include <algorithm>
 
-#if __ANDROID_API__ >= 26
-#include <android/hardware_buffer.h>
-#endif // __ANDROID_API__ >= 26
-
 namespace ncnn {
 
 Allocator::~Allocator() 

@@ -34,10 +34,6 @@ set(ncnn_SRCS
 
 ncnn_src_group(ncnn_SRCS "sources")
 
-if(ANDROID)
-    list(APPEND ncnn_SRCS mat_pixel_android.cpp)
-endif()
-
 macro(ncnn_add_layer class)
     string(TOLOWER ${class} name)
 
@@ -57,8 +53,7 @@ macro(ncnn_add_layer class)
 
         # look for arch specific implementation and append source
         # optimized implementation for armv7, aarch64 or x86
-        if((IOS AND CMAKE_OSX_ARCHITECTURES MATCHES "arm")
-            OR (CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)"))
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
             set(arch arm)
         elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips)")
             set(arch mips)
@@ -207,15 +202,6 @@ if(NCNN_OPENMP)
     endif()
 endif()
 
-if(ANDROID_NDK)
-    target_link_libraries(ncnn PUBLIC android)
-endif()
-
-if(WIN32)
-    target_compile_definitions(ncnn
-        PUBLIC NOMINMAX)
-endif()
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_SIMULATE_ID MATCHES "MSVC"))
     target_compile_definitions(ncnn
@@ -257,8 +243,8 @@ if(NCNN_DISABLE_EXCEPTION)
     target_compile_options(ncnn PUBLIC -fno-exceptions)
 endif()
 
-if(ANDROID OR IOS)
-    # disable shared library on android and xcode ios
+if(ANDROID)
+    # disable shared library on android
     set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
 endif()
 

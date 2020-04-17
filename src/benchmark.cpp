@@ -12,12 +12,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#else // _WIN32
 #include <sys/time.h>
-#endif // _WIN32
 
 #include "benchmark.h"
 
@@ -31,17 +26,6 @@
 
 namespace ncnn {
 
-#ifdef _WIN32
-double get_current_time()
-{
-    LARGE_INTEGER freq;
-    LARGE_INTEGER pc;
-    QueryPerformanceFrequency(&freq);
-    QueryPerformanceCounter(&pc);
-
-    return pc.QuadPart * 1000.0 / freq.QuadPart;
-}
-#else // _WIN32
 double get_current_time()
 {
     struct timeval tv;
@@ -49,7 +33,6 @@ double get_current_time()
 
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
-#endif // _WIN32
 
 #if NCNN_BENCHMARK
 

@@ -15,21 +15,12 @@
 #ifndef NCNN_ALLOCATOR_H
 #define NCNN_ALLOCATOR_H
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#else
 #include <pthread.h>
-#endif
 
 #include <stdlib.h>
 #include <list>
 #include <vector>
 #include "platform.h"
-
-#if __ANDROID_API__ >= 26
-#include <android/hardware_buffer.h>
-#endif // __ANDROID_API__ >= 26
 
 namespace ncnn {
 
@@ -57,13 +48,11 @@ static inline void* fastMalloc(size_t size)
 {
 #if _MSC_VER
     return _aligned_malloc(size, MALLOC_ALIGN);
-#elif _POSIX_C_SOURCE >= 200112L || (__ANDROID__ && __ANDROID_API__ >= 17)
+#elif _POSIX_C_SOURCE >= 200112L
     void* ptr = 0;
     if (posix_memalign(&ptr, MALLOC_ALIGN, size))
         ptr = 0;
     return ptr;
-#elif __ANDROID__ && __ANDROID_API__ < 17
-    return memalign(MALLOC_ALIGN, size);
 #else
     unsigned char* udata = (unsigned char*)malloc(size + sizeof(void*) + MALLOC_ALIGN);
     if (!udata)
@@ -80,9 +69,7 @@ static inline void fastFree(void* ptr)
     {
 #if _MSC_VER
         _aligned_free(ptr);
-#elif _POSIX_C_SOURCE >= 200112L || (__ANDROID__ && __ANDROID_API__ >= 17)
-        free(ptr);
-#elif __ANDROID__ && __ANDROID_API__ < 17
+#elif _POSIX_C_SOURCE >= 200112L
         free(ptr);
 #else
         unsigned char* udata = ((unsigned char**)ptr)[-1];
@@ -92,10 +79,7 @@ static inline void fastFree(void* ptr)
 }
 
 // exchange-add operation for atomic operations on reference counters
-#if defined __INTEL_COMPILER && !(defined WIN32 || defined _WIN32)
-// atomic increment on the linux version of the Intel(tm) compiler
-#  define NCNN_XADD(addr, delta) (int)_InterlockedExchangeAdd(const_cast<void*>(reinterpret_cast<volatile void*>(addr)), delta)
-#elif defined __GNUC__
+#if defined __GNUC__
 #  if defined __clang__ && __clang_major__ >= 3 && !defined __ANDROID__ && !defined __EMSCRIPTEN__ && !defined(__CUDACC__)
 #    ifdef __ATOMIC_ACQ_REL
 #      define NCNN_XADD(addr, delta) __c11_atomic_fetch_add((_Atomic(int)*)(addr), delta, __ATOMIC_ACQ_REL)

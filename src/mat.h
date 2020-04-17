@@ -25,13 +25,6 @@
 #include "allocator.h"
 #include "option.h"
 
-#if NCNN_PIXEL
-#if __ANDROID_API__ >= 9
-#include <jni.h>
-#include <android/bitmap.h>
-#endif // __ANDROID_API__ >= 9
-#endif // NCNN_PIXEL
-
 namespace ncnn {
 
 // the three dimension matrix
@@ -189,15 +182,6 @@ public:
     void to_pixels_resize(unsigned char* pixels, int type, int target_width, int target_height) const;
     // convenient export to pixel data and resize to specific size with stride(bytes-per-row) parameter
     void to_pixels_resize(unsigned char* pixels, int type, int target_width, int target_height, int target_stride) const;
-
-#if __ANDROID_API__ >= 9
-    // convenient construct from android Bitmap
-    static Mat from_android_bitmap(JNIEnv* env, jobject bitmap, int type_to, Allocator* allocator = 0);
-    // convenient construct from android Bitmap and resize to specific size
-    static Mat from_android_bitmap_resize(JNIEnv* env, jobject bitmap, int type_to, int target_width, int target_height, Allocator* allocator = 0);
-    // convenient export to android Bitmap and resize to the android Bitmap size
-    void to_android_bitmap(JNIEnv* env, jobject bitmap, int type_from) const;
-#endif // __ANDROID_API__ >= 9
 #endif // NCNN_PIXEL
 
     // substract channel-wise mean values, then multiply by normalize values, pass 0 to skip
