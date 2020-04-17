@@ -25,6 +25,10 @@ Allocator::~Allocator()
 PoolAllocator::PoolAllocator()
 {
     size_compare_ratio = 192;// 0.75f * 256
+
+    // initialize mutex
+    pthread_mutex_init(&budgets_lock, 0);
+    pthread_mutex_init(&payouts_lock, 0);
 }
 
 PoolAllocator::~PoolAllocator()
@@ -41,11 +45,15 @@ PoolAllocator::~PoolAllocator()
             fprintf(stderr, "%p still in use\n", ptr);
         }
     }
+
+    // uninitialize mutex
+    pthread_mutex_destroy(&budgets_lock);
+    pthread_mutex_destroy(&payouts_lock);
 }
 
 void PoolAllocator::clear()
 {
-    budgets_lock.lock();
+    pthread_mutex_lock(&budgets_lock);
 
     std::list< std::pair<size_t, void*> >::iterator it = budgets.begin();
     for (; it != budgets.end(); it++)
@@ -55,7 +63,7 @@ void PoolAllocator::clear()
     }
     budgets.clear();
 
-    budgets_lock.unlock();
+    pthread_mutex_unlock(&budgets_lock);
 }
 
 void PoolAllocator::set_size_compare_ratio(float scr)
@@ -71,7 +79,7 @@ void PoolAllocator::set_size_compare_ratio(float scr)
 
 void* PoolAllocator::fastMalloc(size_t size)
 {
-    budgets_lock.lock();
+    pthread_mutex_lock(&budgets_lock);
 
     // find free budget
     std::list< std::pair<size_t, void*> >::iterator it = budgets.begin();
@@ -86,35 +94,35 @@ void* PoolAllocator::fastMalloc(size_t size)
 
             budgets.erase(it);
 
-            budgets_lock.unlock();
+            pthread_mutex_unlock(&budgets_lock);
 
-            payouts_lock.lock();
+            pthread_mutex_lock(&payouts_lock);
 
             payouts.push_back(std::make_pair(bs, ptr));
 
-            payouts_lock.unlock();
+            pthread_mutex_unlock(&payouts_lock);
 
             return ptr;
         }
     }
 
-    budgets_lock.unlock();
+    pthread_mutex_unlock(&budgets_lock);
 
     // new
     void* ptr = fastMalloc(size);
 
-    payouts_lock.lock();
+    pthread_mutex_lock(&payouts_lock);
 
     payouts.push_back(std::make_pair(size, ptr));
 
-    payouts_lock.unlock();
+    pthread_mutex_unlock(&payouts_lock);
 
     return ptr;
 }
 
 void PoolAllocator::fastFree(void* ptr)
 {
-    payouts_lock.lock();
+    pthread_mutex_lock(&payouts_lock);
 
     // return to budgets
     std::list< std::pair<size_t, void*> >::iterator it = payouts.begin();
@@ -126,19 +134,19 @@ void PoolAllocator::fastFree(void* ptr)
 
             payouts.erase(it);
 
-            payouts_lock.unlock();
+            pthread_mutex_unlock(&payouts_lock);
 
-            budgets_lock.lock();
+            pthread_mutex_lock(&budgets_lock);
 
             budgets.push_back(std::make_pair(size, ptr));
 
-            budgets_lock.unlock();
+            pthread_mutex_unlock(&budgets_lock);
 
             return;
         }
     }
 
-    payouts_lock.unlock();
+    pthread_mutex_unlock(&payouts_lock);
 
     fprintf(stderr, "FATAL ERROR! pool allocator get wild %p\n", ptr);
     fastFree(ptr);

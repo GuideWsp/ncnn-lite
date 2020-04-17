@@ -122,8 +122,8 @@ struct PoolAllocator : public Allocator
     virtual void* fastMalloc(size_t size);
     virtual void fastFree(void* ptr);
 
-    Mutex budgets_lock;
-    Mutex payouts_lock;
+    pthread_mutex_t budgets_lock;
+    pthread_mutex_t payouts_lock;
     unsigned int size_compare_ratio;// 0~256
     std::list< std::pair<size_t, void*> > budgets;
     std::list< std::pair<size_t, void*> > payouts;
