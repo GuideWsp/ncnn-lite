@@ -41,8 +41,6 @@ struct ParamDict
     // set array
     void set(int id, const Mat& v);
 
-    friend struct Net;
-
     void clear();
 
     int load_param(const DataReader& dr);

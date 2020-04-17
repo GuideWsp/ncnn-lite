@@ -108,7 +108,6 @@ struct Net
     // fuse int8 op dequantize and quantize by requantize
     int fuse_network();
 
-    friend struct Extractor;
 #if NCNN_STRING
     int find_blob_index_by_name(const char* name) const;
     int find_layer_index_by_name(const char* name) const;
@@ -162,7 +161,6 @@ struct Extractor
     // return 0 if success
     int extract(int blob_index, Mat& feat);
 
-    friend Extractor Net::create_extractor() const;
     Extractor(const Net* net, size_t blob_count);
 
     const Net* net;
