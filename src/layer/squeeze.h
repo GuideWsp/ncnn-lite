@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Squeeze : public Layer
+struct Squeeze : public Layer
 {
 public:
     Squeeze();

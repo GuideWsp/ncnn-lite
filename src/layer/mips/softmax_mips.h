@@ -17,7 +17,7 @@
 
 #include "softmax.h"
 
-class Softmax_mips : virtual public Softmax
+struct Softmax_mips : virtual public Softmax
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

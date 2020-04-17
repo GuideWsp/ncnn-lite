@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class PSROIPooling : public Layer
+struct PSROIPooling : public Layer
 {
 public:
     PSROIPooling();

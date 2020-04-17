@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Concat : public Layer
+struct Concat : public Layer
 {
 public:
     Concat();

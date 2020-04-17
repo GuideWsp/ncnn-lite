@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class InstanceNorm : public Layer
+struct InstanceNorm : public Layer
 {
 public:
     InstanceNorm();

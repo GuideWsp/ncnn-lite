@@ -23,9 +23,9 @@
 #include "mat.h"
 #include "option.h"
 
-class DataReader;
-class Extractor;
-class Net
+struct DataReader;
+struct Extractor;
+struct Net
 {
 public:
     // empty init
@@ -111,7 +111,7 @@ protected:
     // fuse int8 op dequantize and quantize by requantize
     int fuse_network();
 
-    friend class Extractor;
+    friend struct Extractor;
 #if NCNN_STRING
     int find_blob_index_by_name(const char* name) const;
     int find_layer_index_by_name(const char* name) const;
@@ -128,7 +128,7 @@ protected:
     std::vector<layer_registry_entry> custom_layer_registry;
 };
 
-class Extractor
+struct Extractor
 {
 public:
     ~Extractor();

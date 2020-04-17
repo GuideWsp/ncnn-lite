@@ -17,7 +17,7 @@
 
 #include "absval.h"
 
-class AbsVal_mips : virtual public AbsVal
+struct AbsVal_mips : virtual public AbsVal
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

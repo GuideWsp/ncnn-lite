@@ -17,7 +17,7 @@
 
 #include "softmax.h"
 
-class Softmax_arm : virtual public Softmax
+struct Softmax_arm : virtual public Softmax
 {
 public:
     Softmax_arm();

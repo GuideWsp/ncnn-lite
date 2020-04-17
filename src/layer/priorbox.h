@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class PriorBox : public Layer
+struct PriorBox : public Layer
 {
 public:
     PriorBox();

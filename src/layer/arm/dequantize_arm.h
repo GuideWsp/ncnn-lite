@@ -17,7 +17,7 @@
 
 #include "dequantize.h"
 
-class Dequantize_arm : virtual public Dequantize
+struct Dequantize_arm : virtual public Dequantize
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

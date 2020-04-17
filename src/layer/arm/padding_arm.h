@@ -17,7 +17,7 @@
 
 #include "padding.h"
 
-class Padding_arm : virtual public Padding
+struct Padding_arm : virtual public Padding
 {
 public:
     Padding_arm();

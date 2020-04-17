@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class DeepCopy : public Layer
+struct DeepCopy : public Layer
 {
 public:
     DeepCopy();

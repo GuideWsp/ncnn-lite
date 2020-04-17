@@ -213,7 +213,7 @@ int YoloDetectionOutput::forward_inplace(std::vector<Mat>& bottom_top_blobs, con
 
             const float* box_score_ptr = bottom_top_blob.channel(p+4);
 
-            // softmax class scores
+            // softmax struct scores
             Mat scores = bottom_top_blob.channel_range(p+5, num_class);
             softmax->forward_inplace(scores, opt);
 
@@ -235,7 +235,7 @@ int YoloDetectionOutput::forward_inplace(std::vector<Mat>& bottom_top_blobs, con
                     // box score
                     float box_score = sigmoid(box_score_ptr[0]);
 
-                    // find class index with max class score
+                    // find struct index with max struct score
                     int class_index = 0;
                     float class_score = 0.f;
                     for (int q = 0; q < num_class; q++)

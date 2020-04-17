@@ -17,7 +17,7 @@
 
 #include "prelu.h"
 
-class PReLU_arm : virtual public PReLU
+struct PReLU_arm : virtual public PReLU
 {
 public:
     PReLU_arm();

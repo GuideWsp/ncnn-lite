@@ -17,7 +17,7 @@
 
 #include "eltwise.h"
 
-class Eltwise_arm : virtual public Eltwise
+struct Eltwise_arm : virtual public Eltwise
 {
 public:
     Eltwise_arm();

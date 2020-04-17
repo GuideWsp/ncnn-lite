@@ -17,7 +17,7 @@
 
 #include "bias.h"
 
-class Bias_mips : virtual public Bias
+struct Bias_mips : virtual public Bias
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

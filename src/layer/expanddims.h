@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ExpandDims : public Layer
+struct ExpandDims : public Layer
 {
 public:
     ExpandDims();

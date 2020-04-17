@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Split : public Layer
+struct Split : public Layer
 {
 public:
     Split();

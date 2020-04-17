@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Softmax : public Layer
+struct Softmax : public Layer
 {
 public:
     Softmax();

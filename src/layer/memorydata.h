@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class MemoryData : public Layer
+struct MemoryData : public Layer
 {
 public:
     MemoryData();

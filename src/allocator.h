@@ -100,7 +100,7 @@ static inline void fastFree(void* ptr)
 static inline int NCNN_XADD(int* addr, int delta) { int tmp = *addr; *addr += delta; return tmp; }
 #endif
 
-class Allocator
+struct Allocator
 {
 public:
     virtual ~Allocator();
@@ -108,7 +108,7 @@ public:
     virtual void fastFree(void* ptr) = 0;
 };
 
-class PoolAllocator : public Allocator
+struct PoolAllocator : public Allocator
 {
 public:
     PoolAllocator();
@@ -132,7 +132,7 @@ private:
     std::list< std::pair<size_t, void*> > payouts;
 };
 
-class UnlockedPoolAllocator : public Allocator
+struct UnlockedPoolAllocator : public Allocator
 {
 public:
     UnlockedPoolAllocator();

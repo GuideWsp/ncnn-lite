@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ROIAlign : public Layer
+struct ROIAlign : public Layer
 {
 public:
     ROIAlign();

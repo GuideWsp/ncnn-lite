@@ -17,7 +17,7 @@
 
 #include "dropout.h"
 
-class Dropout_arm : virtual public Dropout
+struct Dropout_arm : virtual public Dropout
 {
 public:
     Dropout_arm();

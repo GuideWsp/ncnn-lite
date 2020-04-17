@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class DetectionOutput : public Layer
+struct DetectionOutput : public Layer
 {
 public:
     DetectionOutput();

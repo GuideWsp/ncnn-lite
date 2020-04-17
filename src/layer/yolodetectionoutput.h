@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class YoloDetectionOutput : public Layer
+struct YoloDetectionOutput : public Layer
 {
 public:
     YoloDetectionOutput();

@@ -17,7 +17,7 @@
 
 #include "tanh.h"
 
-class TanH_mips : virtual public TanH
+struct TanH_mips : virtual public TanH
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

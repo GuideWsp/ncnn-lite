@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ROIPooling : public Layer
+struct ROIPooling : public Layer
 {
 public:
     ROIPooling();

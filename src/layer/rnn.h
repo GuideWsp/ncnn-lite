@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class RNN : public Layer
+struct RNN : public Layer
 {
 public:
     RNN();

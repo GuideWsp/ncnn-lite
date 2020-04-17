@@ -26,7 +26,7 @@
 #include "option.h"
 
 // the three dimension matrix
-class Mat
+struct Mat
 {
 public:
     // empty

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Padding : public Layer
+struct Padding : public Layer
 {
 public:
     Padding();

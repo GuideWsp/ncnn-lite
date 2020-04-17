@@ -17,7 +17,7 @@
 
 #include "convolution.h"
 
-class Convolution_arm : virtual public Convolution
+struct Convolution_arm : virtual public Convolution
 {
 public:
     Convolution_arm();

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Normalize : public Layer
+struct Normalize : public Layer
 {
 public:
     Normalize();

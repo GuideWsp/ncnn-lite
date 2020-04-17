@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Slice : public Layer
+struct Slice : public Layer
 {
 public:
     Slice();

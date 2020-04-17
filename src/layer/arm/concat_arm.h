@@ -17,7 +17,7 @@
 
 #include "concat.h"
 
-class Concat_arm : virtual public Concat
+struct Concat_arm : virtual public Concat
 {
 public:
     Concat_arm();

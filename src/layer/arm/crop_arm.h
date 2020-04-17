@@ -17,7 +17,7 @@
 
 #include "crop.h"
 
-class Crop_arm : virtual public Crop
+struct Crop_arm : virtual public Crop
 {
 public:
     Crop_arm();

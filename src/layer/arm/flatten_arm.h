@@ -17,7 +17,7 @@
 
 #include "flatten.h"
 
-class Flatten_arm : virtual public Flatten
+struct Flatten_arm : virtual public Flatten
 {
 public:
     Flatten_arm();

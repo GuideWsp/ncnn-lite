@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Input : public Layer
+struct Input : public Layer
 {
 public:
     Input();

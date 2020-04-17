@@ -17,7 +17,7 @@
 
 #include "slice.h"
 
-class Slice_arm : virtual public Slice
+struct Slice_arm : virtual public Slice
 {
 public:
     Slice_arm();

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Pooling : public Layer
+struct Pooling : public Layer
 {
 public:
     Pooling();

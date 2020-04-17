@@ -19,7 +19,7 @@
 #include "platform.h"
 
 // data read wrapper
-class DataReader
+struct DataReader
 {
 public:
     virtual ~DataReader();
@@ -36,7 +36,7 @@ public:
 };
 
 #if NCNN_STDIO
-class DataReaderFromStdio : public DataReader
+struct DataReaderFromStdio : public DataReader
 {
 public:
     DataReaderFromStdio(FILE* fp);
@@ -51,7 +51,7 @@ protected:
 };
 #endif // NCNN_STDIO
 
-class DataReaderFromMemory : public DataReader
+struct DataReaderFromMemory : public DataReader
 {
 public:
     DataReaderFromMemory(const unsigned char*& mem);

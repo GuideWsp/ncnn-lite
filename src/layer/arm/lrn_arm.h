@@ -17,7 +17,7 @@
 
 #include "lrn.h"
 
-class LRN_arm : virtual public LRN
+struct LRN_arm : virtual public LRN
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

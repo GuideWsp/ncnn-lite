@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Reduction : public Layer
+struct Reduction : public Layer
 {
 public:
     Reduction();

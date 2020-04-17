@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class TanH : public Layer
+struct TanH : public Layer
 {
 public:
     TanH();

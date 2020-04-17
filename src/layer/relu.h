@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ReLU : public Layer
+struct ReLU : public Layer
 {
 public:
     ReLU();

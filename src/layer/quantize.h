@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Quantize : public Layer
+struct Quantize : public Layer
 {
 public:
     Quantize();

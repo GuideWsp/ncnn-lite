@@ -17,7 +17,7 @@
 
 #include "deconvolution.h"
 
-class Deconvolution_arm : virtual public Deconvolution
+struct Deconvolution_arm : virtual public Deconvolution
 {
 public:
     Deconvolution_arm();

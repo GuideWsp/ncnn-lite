@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class AbsVal : public Layer
+struct AbsVal : public Layer
 {
 public:
     AbsVal();

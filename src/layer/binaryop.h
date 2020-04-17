@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class BinaryOp : public Layer
+struct BinaryOp : public Layer
 {
 public:
     BinaryOp();

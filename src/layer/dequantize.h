@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Dequantize : public Layer
+struct Dequantize : public Layer
 {
 public:
     Dequantize();

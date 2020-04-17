@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Reshape : public Layer
+struct Reshape : public Layer
 {
 public:
     Reshape();

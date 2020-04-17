@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class UnaryOp : public Layer
+struct UnaryOp : public Layer
 {
 public:
     UnaryOp();

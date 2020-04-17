@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class SPP : public Layer
+struct SPP : public Layer
 {
 public:
     SPP();

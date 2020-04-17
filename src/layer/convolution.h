@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Convolution : public Layer
+struct Convolution : public Layer
 {
 public:
     Convolution();

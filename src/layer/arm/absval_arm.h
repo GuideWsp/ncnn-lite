@@ -17,7 +17,7 @@
 
 #include "absval.h"
 
-class AbsVal_arm : virtual public AbsVal
+struct AbsVal_arm : virtual public AbsVal
 {
 public:
     AbsVal_arm();

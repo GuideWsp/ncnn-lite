@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Packing : public Layer
+struct Packing : public Layer
 {
 public:
     Packing();

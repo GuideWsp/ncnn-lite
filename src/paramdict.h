@@ -20,9 +20,9 @@
 // at most 32 parameters
 #define NCNN_MAX_PARAM_COUNT 32
 
-class DataReader;
-class Net;
-class ParamDict
+struct DataReader;
+struct Net;
+struct ParamDict
 {
 public:
     // empty
@@ -43,7 +43,7 @@ public:
     void set(int id, const Mat& v);
 
 protected:
-    friend class Net;
+    friend struct Net;
 
     void clear();
 

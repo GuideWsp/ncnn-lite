@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Proposal : public Layer
+struct Proposal : public Layer
 {
 public:
     Proposal();

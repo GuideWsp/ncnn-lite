@@ -17,7 +17,7 @@
 
 #include "binaryop.h"
 
-class BinaryOp_arm : virtual public BinaryOp
+struct BinaryOp_arm : virtual public BinaryOp
 {
 public:
     BinaryOp_arm();

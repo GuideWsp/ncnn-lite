@@ -205,7 +205,7 @@ int Yolov3DetectionOutput::forward(const std::vector<Mat>& bottom_blobs, std::ve
 
             const float* box_score_ptr = bottom_top_blobs.channel(p + 4);
 
-            // softmax class scores
+            // softmax struct scores
             Mat scores = bottom_top_blobs.channel_range(p + 5, num_class);
             //softmax->forward_inplace(scores, opt);
 
@@ -218,7 +218,7 @@ int Yolov3DetectionOutput::forward(const std::vector<Mat>& bottom_blobs, std::ve
                     // box score
                     float box_score = sigmoid(box_score_ptr[0]);
 
-                    // find class index with max class score
+                    // find struct index with max struct score
                     int class_index = 0;
                     float class_score = -std::numeric_limits<float>::max();
                     for (int q = 0; q < num_class; q++)

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Eltwise : public Layer
+struct Eltwise : public Layer
 {
 public:
     Eltwise();

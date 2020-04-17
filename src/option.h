@@ -17,8 +17,8 @@
 
 #include "platform.h"
 
-class Allocator;
-class Option
+struct Allocator;
+struct Option
 {
 public:
     // default option

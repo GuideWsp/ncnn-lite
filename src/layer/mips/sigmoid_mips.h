@@ -17,7 +17,7 @@
 
 #include "sigmoid.h"
 
-class Sigmoid_mips : virtual public Sigmoid
+struct Sigmoid_mips : virtual public Sigmoid
 {
 public:
     virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;

@@ -17,7 +17,7 @@
 
 #include "scale.h"
 
-class Scale_arm : virtual public Scale
+struct Scale_arm : virtual public Scale
 {
 public:
     Scale_arm();

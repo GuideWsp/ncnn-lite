@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class HardSwish : public Layer
+struct HardSwish : public Layer
 {
 public:
     HardSwish();

@@ -17,7 +17,7 @@
 
 #include "convolution.h"
 
-class Convolution_mips : virtual public Convolution
+struct Convolution_mips : virtual public Convolution
 {
 public:
     Convolution_mips();

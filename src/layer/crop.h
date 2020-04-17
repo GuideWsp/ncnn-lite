@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Crop : public Layer
+struct Crop : public Layer
 {
 public:
     Crop();

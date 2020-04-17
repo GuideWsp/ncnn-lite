@@ -17,7 +17,7 @@
 
 #include "packing.h"
 
-class Packing_arm : virtual public Packing
+struct Packing_arm : virtual public Packing
 {
 public:
     Packing_arm();

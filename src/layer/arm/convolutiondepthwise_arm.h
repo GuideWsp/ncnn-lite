@@ -17,7 +17,7 @@
 
 #include "convolutiondepthwise.h"
 
-class ConvolutionDepthWise_arm : virtual public ConvolutionDepthWise
+struct ConvolutionDepthWise_arm : virtual public ConvolutionDepthWise
 {
 public:
     ConvolutionDepthWise_arm();

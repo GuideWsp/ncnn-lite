@@ -17,7 +17,7 @@
 
 #include "tanh.h"
 
-class TanH_arm : virtual public TanH
+struct TanH_arm : virtual public TanH
 {
 public:
     TanH_arm();

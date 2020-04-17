@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Reorg : public Layer
+struct Reorg : public Layer
 {
 public:
     Reorg();

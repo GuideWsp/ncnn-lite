@@ -17,8 +17,8 @@
 
 #include "mat.h"
 
-class DataReader;
-class ModelBin
+struct DataReader;
+struct ModelBin
 {
 public:
     virtual ~ModelBin();
@@ -35,7 +35,7 @@ public:
     virtual Mat load(int w, int h, int c, int type) const;
 };
 
-class ModelBinFromDataReader : public ModelBin
+struct ModelBinFromDataReader : public ModelBin
 {
 public:
     ModelBinFromDataReader(const DataReader& dr);
@@ -46,7 +46,7 @@ protected:
     const DataReader& dr;
 };
 
-class ModelBinFromMatArray : public ModelBin
+struct ModelBinFromMatArray : public ModelBin
 {
 public:
     // construct from weight blob array

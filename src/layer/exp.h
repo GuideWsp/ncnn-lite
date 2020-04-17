@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Exp : public Layer
+struct Exp : public Layer
 {
 public:
     Exp();

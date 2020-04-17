@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class LSTM : public Layer
+struct LSTM : public Layer
 {
 public:
     LSTM();

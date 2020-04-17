@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Interp : public Layer
+struct Interp : public Layer
 {
 public:
     Interp();

@@ -17,7 +17,7 @@
 
 #include "shufflechannel.h"
 
-class ShuffleChannel_arm : virtual public ShuffleChannel
+struct ShuffleChannel_arm : virtual public ShuffleChannel
 {
 public:
     ShuffleChannel_arm();

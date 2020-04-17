@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ConvolutionDepthWise : public Layer
+struct ConvolutionDepthWise : public Layer
 {
 public:
     ConvolutionDepthWise();

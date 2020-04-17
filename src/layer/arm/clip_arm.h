@@ -17,7 +17,7 @@
 
 #include "clip.h"
 
-class Clip_arm : virtual public Clip
+struct Clip_arm : virtual public Clip
 {
 public:
     Clip_arm();

@@ -17,7 +17,7 @@
 
 #include "cast.h"
 
-class Cast_arm : virtual public Cast
+struct Cast_arm : virtual public Cast
 {
 public:
     Cast_arm();

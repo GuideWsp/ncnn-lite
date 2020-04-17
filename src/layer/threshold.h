@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Threshold : public Layer
+struct Threshold : public Layer
 {
 public:
     Threshold();

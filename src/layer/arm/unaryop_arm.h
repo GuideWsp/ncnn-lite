@@ -17,7 +17,7 @@
 
 #include "unaryop.h"
 
-class UnaryOp_arm : virtual public UnaryOp
+struct UnaryOp_arm : virtual public UnaryOp
 {
 public:
     UnaryOp_arm();

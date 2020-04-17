@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Tile : public Layer
+struct Tile : public Layer
 {
 public:
     Tile();

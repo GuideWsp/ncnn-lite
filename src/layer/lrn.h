@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class LRN : public Layer
+struct LRN : public Layer
 {
 public:
     LRN();

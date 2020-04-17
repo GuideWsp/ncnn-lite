@@ -17,7 +17,7 @@
 
 #include "hardswish.h"
 
-class HardSwish_arm : virtual public HardSwish
+struct HardSwish_arm : virtual public HardSwish
 {
 public:
     HardSwish_arm();

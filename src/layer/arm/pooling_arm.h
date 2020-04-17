@@ -17,7 +17,7 @@
 
 #include "pooling.h"
 
-class Pooling_arm : virtual public Pooling
+struct Pooling_arm : virtual public Pooling
 {
 public:
     Pooling_arm();

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Clip : public Layer
+struct Clip : public Layer
 {
 public:
     Clip();

@@ -17,7 +17,7 @@
 
 #include "sigmoid.h"
 
-class Sigmoid_arm : virtual public Sigmoid
+struct Sigmoid_arm : virtual public Sigmoid
 {
 public:
     Sigmoid_arm();

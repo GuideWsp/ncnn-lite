@@ -25,7 +25,7 @@
 #include "option.h"
 #include "paramdict.h"
 
-class Layer
+struct Layer
 {
 public:
     // empty

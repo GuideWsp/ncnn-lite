@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Requantize : public Layer
+struct Requantize : public Layer
 {
 public:
     Requantize();

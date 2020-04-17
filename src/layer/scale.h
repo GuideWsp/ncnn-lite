@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Scale : public Layer
+struct Scale : public Layer
 {
 public:
     Scale();

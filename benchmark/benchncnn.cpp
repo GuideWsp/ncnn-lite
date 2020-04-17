@@ -23,7 +23,7 @@
 #include "datareader.h"
 #include "net.h"
 
-class DataReaderFromEmpty : public DataReader
+struct DataReaderFromEmpty : public DataReader
 {
 public:
     virtual int scan(const char* format, void* p) const { return 0; }

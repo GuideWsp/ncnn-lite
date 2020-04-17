@@ -17,7 +17,7 @@
 
 #include "batchnorm.h"
 
-class BatchNorm_arm : virtual public BatchNorm
+struct BatchNorm_arm : virtual public BatchNorm
 {
 public:
     BatchNorm_arm();

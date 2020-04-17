@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class InnerProduct : public Layer
+struct InnerProduct : public Layer
 {
 public:
     InnerProduct();

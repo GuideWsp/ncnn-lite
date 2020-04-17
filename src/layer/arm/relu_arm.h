@@ -17,7 +17,7 @@
 
 #include "relu.h"
 
-class ReLU_arm : virtual public ReLU
+struct ReLU_arm : virtual public ReLU
 {
 public:
     ReLU_arm();

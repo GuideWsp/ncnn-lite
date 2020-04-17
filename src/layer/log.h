@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Log : public Layer
+struct Log : public Layer
 {
 public:
     Log();

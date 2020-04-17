@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Noop : public Layer
+struct Noop : public Layer
 {
 public:
     Noop();

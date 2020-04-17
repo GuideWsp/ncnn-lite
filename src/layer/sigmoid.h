@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Sigmoid : public Layer
+struct Sigmoid : public Layer
 {
 public:
     Sigmoid();

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class BNLL : public Layer
+struct BNLL : public Layer
 {
 public:
     BNLL();

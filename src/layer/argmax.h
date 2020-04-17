@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ArgMax : public Layer
+struct ArgMax : public Layer
 {
 public:
     ArgMax();

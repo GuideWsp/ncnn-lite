@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Bias : public Layer
+struct Bias : public Layer
 {
 public:
     Bias();

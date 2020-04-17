@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class ShuffleChannel : public Layer
+struct ShuffleChannel : public Layer
 {
 public:
     ShuffleChannel();

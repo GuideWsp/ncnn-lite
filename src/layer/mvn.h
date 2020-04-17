@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class MVN : public Layer
+struct MVN : public Layer
 {
 public:
     MVN();

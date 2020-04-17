@@ -20,7 +20,7 @@
 #include "platform.h"
 #include "mat.h"
 
-class Blob
+struct Blob
 {
 public:
     // empty

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Permute : public Layer
+struct Permute : public Layer
 {
 public:
     Permute();

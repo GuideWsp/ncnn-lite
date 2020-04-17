@@ -17,7 +17,7 @@
 
 #include "deconvolutiondepthwise.h"
 
-class DeconvolutionDepthWise_arm : virtual public DeconvolutionDepthWise
+struct DeconvolutionDepthWise_arm : virtual public DeconvolutionDepthWise
 {
 public:
     DeconvolutionDepthWise_arm();

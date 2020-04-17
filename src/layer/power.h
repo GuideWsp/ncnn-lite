@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Power : public Layer
+struct Power : public Layer
 {
 public:
     Power();

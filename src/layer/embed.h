@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Embed : public Layer
+struct Embed : public Layer
 {
 public:
     Embed();

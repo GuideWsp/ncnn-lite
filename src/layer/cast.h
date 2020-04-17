@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Cast : public Layer
+struct Cast : public Layer
 {
 public:
     Cast();

@@ -17,7 +17,7 @@
 
 #include "innerproduct.h"
 
-class InnerProduct_arm : virtual public InnerProduct
+struct InnerProduct_arm : virtual public InnerProduct
 {
 public:
     InnerProduct_arm();

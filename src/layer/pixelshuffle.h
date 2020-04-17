@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class PixelShuffle : public Layer
+struct PixelShuffle : public Layer
 {
 public:
     PixelShuffle();

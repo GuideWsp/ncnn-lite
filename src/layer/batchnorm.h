@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class BatchNorm : public Layer
+struct BatchNorm : public Layer
 {
 public:
     BatchNorm();

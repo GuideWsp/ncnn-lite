@@ -17,7 +17,7 @@
 
 #include "reshape.h"
 
-class Reshape_arm : virtual public Reshape
+struct Reshape_arm : virtual public Reshape
 {
 public:
     Reshape_arm();

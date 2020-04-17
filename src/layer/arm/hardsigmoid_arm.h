@@ -17,7 +17,7 @@
 
 #include "hardsigmoid.h"
 
-class HardSigmoid_arm : virtual public HardSigmoid
+struct HardSigmoid_arm : virtual public HardSigmoid
 {
 public:
     HardSigmoid_arm();

@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Flatten : public Layer
+struct Flatten : public Layer
 {
 public:
     Flatten();

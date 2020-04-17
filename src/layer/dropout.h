@@ -17,7 +17,7 @@
 
 #include "layer.h"
 
-class Dropout : public Layer
+struct Dropout : public Layer
 {
 public:
     Dropout();
