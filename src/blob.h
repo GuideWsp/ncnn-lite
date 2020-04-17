@@ -15,8 +15,7 @@
 #ifndef NCNN_BLOB_H
 #define NCNN_BLOB_H
 
-#include <string>
-#include <vector>
+#include "cstl/vector.h"
 #include "platform.h"
 #include "mat.h"
 
@@ -24,15 +23,16 @@ struct Blob
 {
     // empty
     Blob();
+    ~Blob();
 
 #if NCNN_STRING
     // blob name
-    std::string name;
+    char name[256];
 #endif // NCNN_STRING
     // layer index which produce this blob as output
     int producer;
     // layer index which need this blob as input
-    std::vector<int> consumers;
+    vector_def(int) consumers;
     // shape hint
     Mat shape;
 };

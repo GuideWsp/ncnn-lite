@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <list>
-#include <vector>
 #include "platform.h"
 
 // the alignment of all the allocated buffers

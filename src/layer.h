@@ -74,9 +74,9 @@ struct Layer
     int typeindex;
 #if NCNN_STRING
     // layer type name
-    std::string type;
+    char type[256];
     // layer name
-    std::string name;
+    char name[256];
 #endif // NCNN_STRING
     // blob index which this layer needs as input
     std::vector<int> bottoms;

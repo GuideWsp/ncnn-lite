@@ -334,7 +334,9 @@ static int setup_thread_affinity_masks()
 #ifdef __ANDROID__
     int max_freq_khz_min = INT_MAX;
     int max_freq_khz_max = 0;
-    std::vector<int> cpu_max_freq_khz(get_cpu_count());
+    vector_def(int) cpu_max_freq_khz;
+    vector_init(cpu_max_freq_khz);
+    vector_resize(cpu_max_freq_khz, get_cpu_count());
     for (int i=0; i<get_cpu_count(); i++)
     {
         int max_freq_khz = get_max_freq_khz(i);
@@ -364,6 +366,7 @@ static int setup_thread_affinity_masks()
         else
             g_thread_affinity_mask_big |= (1 << i);
     }
+    vector_destroy(cpu_max_freq_khz);
 #else
     // TODO implement me for other platforms
     g_thread_affinity_mask_little = 0;
@@ -415,17 +418,20 @@ int set_cpu_thread_affinity(size_t thread_affinity_mask)
 #ifdef _OPENMP
     // set affinity for each thread
     set_omp_num_threads(num_threads);
-    std::vector<int> ssarets(num_threads, 0);
+    vector_def(int) ssarets;
+    vector_init(ssarets);
+    vector_resize(ssarets, num_threads);
     #pragma omp parallel for num_threads(num_threads)
     for (int i=0; i<num_threads; i++)
     {
-        ssarets[i] = set_sched_affinity(thread_affinity_mask);
+        vector_get(ssarets, i) = set_sched_affinity(thread_affinity_mask);
     }
     for (int i=0; i<num_threads; i++)
     {
-        if (ssarets[i] != 0)
+        if (vector_get(ssarets, i) != 0)
             return -1;
     }
+    vector_destroy(ssarets);
 #else
     int ssaret = set_sched_affinity(thread_affinity_mask);
     if (ssaret != 0)

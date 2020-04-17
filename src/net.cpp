@@ -26,6 +26,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "cstl/strings.h"
+
 #if NCNN_BENCHMARK
 #include "benchmark.h"
 #endif // NCNN_BENCHMARK
@@ -152,8 +154,8 @@ int Net::load_param(const DataReader& dr)
             return -1;
         }
 
-        layer->type = std::string(layer_type);
-        layer->name = std::string(layer_name);
+        strcpy_s(layer->type, 256, layer_type);
+        strcpy_s(layer->name, 256, layer_name);
 //         fprintf(stderr, "new layer %d %s\n", i, layer_name);
 
         layer->bottoms.resize(bottom_count);
@@ -170,7 +172,7 @@ int Net::load_param(const DataReader& dr)
 
                 bottom_blob_index = blob_index;
 
-                blob.name = std::string(bottom_name);
+                strcpy_s(blob.name, 256, bottom_name);
 //                 fprintf(stderr, "new blob %s\n", bottom_name);
 
                 blob_index++;
@@ -178,7 +180,7 @@ int Net::load_param(const DataReader& dr)
 
             Blob& blob = blobs[bottom_blob_index];
 
-            blob.consumers.push_back(i);
+            vector_pushback(blob.consumers, i);
 
             layer->bottoms[j] = bottom_blob_index;
         }
@@ -191,7 +193,7 @@ int Net::load_param(const DataReader& dr)
             char blob_name[256];
             SCAN_VALUE("%255s", blob_name)
 
-            blob.name = std::string(blob_name);
+            strcpy_s(blob.name, 256, blob_name);
 //             fprintf(stderr, "new blob %s\n", blob_name);
 
             blob.producer = i;
@@ -318,8 +320,8 @@ int Net::load_param_bin(const DataReader& dr)
             return -1;
         }
 
-//         layer->type = std::string(layer_type);
-//         layer->name = std::string(layer_name);
+//         strcpy_s(layer->type, 256, layer_type);
+//         strcpy_s(layer->name, 256, layer_name);
 //         fprintf(stderr, "new layer %d\n", typeindex);
 
         layer->bottoms.resize(bottom_count);
@@ -330,7 +332,7 @@ int Net::load_param_bin(const DataReader& dr)
 
             Blob& blob = blobs[bottom_blob_index];
 
-            blob.consumers.push_back(i);
+            vector_pushback(blob.consumers, i);
 
             layer->bottoms[j] = bottom_blob_index;
         }
@@ -343,7 +345,7 @@ int Net::load_param_bin(const DataReader& dr)
 
             Blob& blob = blobs[top_blob_index];
 
-//             blob.name = std::string(blob_name);
+//             strcpy_s(blob.name, 256, blob_name);
 //             fprintf(stderr, "new blob %s\n", blob_name);
 
             blob.producer = i;
@@ -593,9 +595,9 @@ int Net::fuse_network()
             if (layer->type == "ConvolutionDepthWise" && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
                 continue;
 
-            for (size_t n=0; n<blobs[layer->tops[0]].consumers.size(); n++)
+            for (size_t n=0; n<vector_size(blobs[layer->tops[0]].consumers); n++)
             {
-                int layer_next_index = blobs[layer->tops[0]].consumers[n];
+                int layer_next_index = vector_get(blobs[layer->tops[0]].consumers, n);
                 Layer* layer_next = layers[layer_next_index];
 
                 if (layer_next->type == "Convolution" || layer_next->type == "ConvolutionDepthWise")
@@ -629,7 +631,7 @@ int Net::fuse_network()
                 }                  
                 else if (layer_next->type == "ReLU")
                 {
-                    int layer_next_2_index = blobs[layer_next->tops[0]].consumers[0];
+                    int layer_next_2_index = vector_get(blobs[layer_next->tops[0]].consumers, 0);
                     Layer* layer_next_2 = layers[layer_next_2_index];
 
                     if (layer_next_2->type == "Convolution" || layer_next_2->type == "ConvolutionDepthWise")
@@ -666,7 +668,7 @@ int Net::fuse_network()
                         bool all_conv = true;
                         for (size_t i=0; i<layer_next_2->tops.size(); i++)
                         {
-                            int layer_next_3_index = blobs[layer_next_2->tops[i]].consumers[0];
+                            int layer_next_3_index = vector_get(blobs[layer_next_2->tops[i]].consumers, 0);
                             if (layers[layer_next_3_index]->type != "Convolution" && layers[layer_next_3_index]->type != "ConvolutionDepthWise" && layers[layer_next_3_index]->type != "PriorBox" )
                             {
                                 // fprintf(stderr, "%s, %s, %s, %s\n", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str(), layers[layer_next_3_index]->name.c_str());
@@ -679,7 +681,7 @@ int Net::fuse_network()
                             // fprintf(stderr, "%s, %s, %s, ", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str());
                             for (size_t i=0; i<layer_next_2->tops.size(); i++)
                             {
-                                int layer_next_3_index = blobs[layer_next_2->tops[i]].consumers[0];
+                                int layer_next_3_index = vector_get(blobs[layer_next_2->tops[i]].consumers, 0);
                                 Layer* layer_next_3 = layers[layer_next_3_index];
 
                                 // fprintf(stderr, "%s, ", layer_next_3->name.c_str());
@@ -741,7 +743,7 @@ int Net::find_blob_index_by_name(const char* name) const
     for (size_t i=0; i<blobs.size(); i++)
     {
         const Blob& blob = blobs[i];
-        if (blob.name == name)
+        if (strcmp(blob.name, name) == 0)
         {
             return static_cast<int>(i);
         }

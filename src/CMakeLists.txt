@@ -221,7 +221,7 @@ else()
             target_compile_options(ncnn PRIVATE -Ofast)
         endif()
 
-        target_compile_options(ncnn PRIVATE -ffast-math)
+        target_compile_options(ncnn PRIVATE -ffast-math -fpermissive)
     endif()
 
     if(PI3)

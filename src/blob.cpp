@@ -17,4 +17,10 @@
 Blob::Blob()
 {
     producer = -1;
+    vector_init(consumers);
+}
+
+Blob::~Blob()
+{
+    vector_destroy(consumers);
 }
