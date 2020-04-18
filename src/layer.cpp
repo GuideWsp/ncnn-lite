@@ -29,42 +29,57 @@
 #pragma clang diagnostic pop
 #endif
 
-Layer::Layer()
+void *Layer_ctor(void *_self, va_list *args)
 {
-    one_blob_only = false;
-    support_inplace = false;
-    support_packing = false;
+    Layer *self = (Layer *)_self;
 
-    support_bf16_storage = false;
+    self->load_param = va_arg(*args, int (*)(Layer*, const ParamDict&));
+    self->load_model = va_arg(*args, int (*)(Layer*, const ModelBin&));
+    self->create_pipeline = va_arg(*args, int (*)(Layer*, const Option&));
+    self->destroy_pipeline = va_arg(*args, int (*)(Layer*, const Option&));
+    self->forward_multi = va_arg(*args, int (*)(Layer*, const std::vector<Mat>&, std::vector<Mat>&, const Option&));
+    self->forward = va_arg(*args, int (*)(Layer*, const Mat&, Mat&, const Option&));
+    self->forward_inplace_multi = va_arg(*args, int (*)(Layer*, std::vector<Mat>&, const Option&));
+    self->forward_inplace = va_arg(*args, int (*)(Layer*, Mat&, const Option&));
+
+    self->one_blob_only = false;
+    self->support_inplace = false;
+    self->support_packing = false;
+
+    self->support_bf16_storage = false;
+
+    return _self;
 }
 
-Layer::~Layer()
+// layer destructor
+void *Layer_dtor(void *_self)
 {
+    return _self;
 }
 
-int Layer::load_param(const ParamDict& /*pd*/)
+int Layer_create_pipeline(Layer *self, const Option& opt)
 {
     return 0;
 }
 
-int Layer::load_model(const ModelBin& /*mb*/)
+int Layer_destroy_pipeline(Layer *self, const Option& opt)
 {
     return 0;
 }
 
-int Layer::create_pipeline(const Option& /*opt*/)
+int Layer_load_param(Layer *self, const ParamDict& pd)
 {
     return 0;
 }
 
-int Layer::destroy_pipeline(const Option& /*opt*/)
+int Layer_load_model(Layer *self, const ModelBin& mb)
 {
     return 0;
 }
 
-int Layer::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int Layer_forward_multi(Layer *self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
-    if (!support_inplace)
+    if (!self->support_inplace)
         return -1;
 
     top_blobs = bottom_blobs;
@@ -75,27 +90,27 @@ int Layer::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
             return -100;
     }
 
-    return forward_inplace(top_blobs, opt);
+    return self->forward_inplace_multi(self, top_blobs, opt);
 }
 
-int Layer::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Layer_forward(Layer *self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
-    if (!support_inplace)
+    if (!self->support_inplace)
         return -1;
 
     top_blob = bottom_blob.clone(opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
-    return forward_inplace(top_blob, opt);
+    return self->forward_inplace(self, top_blob, opt);
 }
 
-int Layer::forward_inplace(std::vector<Mat>& /*bottom_top_blobs*/, const Option& /*opt*/) const
+int Layer_forward_inplace_multi(Layer *self, std::vector<Mat>& /*bottom_top_blobs*/, const Option& /*opt*/)
 {
     return -1;
 }
 
-int Layer::forward_inplace(Mat& /*bottom_top_blob*/, const Option& /*opt*/) const
+int Layer_forward_inplace(Layer *self, Mat& /*bottom_top_blob*/, const Option& /*opt*/)
 {
     return -1;
 }

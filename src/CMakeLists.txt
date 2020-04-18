@@ -29,6 +29,7 @@ set(ncnn_SRCS
     option.cpp
     paramdict.cpp
     benchmark.cpp
+    cstl/class.c
 )
 
 ncnn_src_group(ncnn_SRCS "sources")
@@ -65,32 +66,60 @@ macro(ncnn_add_layer class)
         endif()
     endif()
 
-    # generate layer_declaration and layer_registry file
+    # cpu implemented layer
     if(WITH_LAYER_${name})
+        # header include
+        set(layer_declaration "${layer_declaration}#include \"layer.h\"\n")
         set(layer_declaration "${layer_declaration}#include \"layer/${name}.h\"\n")
-        set(layer_declaration_class "class ${class}_final : virtual public ${class}")
-        set(create_pipeline_content "        { int ret = ${class}::create_pipeline(opt); if (ret) return ret; }\n")
-        set(destroy_pipeline_content "        { int ret = ${class}::destroy_pipeline(opt); if (ret) return ret; }\n")
+        # ctor and dtor function (call in order)
+        set(ctor_content "    { Layer_ctor(_self, args); }\n    { ${class}_ctor(_self, args); }\n")
+        set(dtor_content "    { ${class}_dtor(_self); }\n    { Layer_dtor(_self); }\n")
+        # pipeline function (call in order)
+        set(create_pipeline_content "    { int ret = ${class}_create_pipeline(self, opt); if (ret) return ret; }\n")
+        set(destroy_pipeline_content "    { int ret = ${class}_destroy_pipeline(self, opt); if (ret) return ret; }\n")
+        # forward function override
+        set(forward_content "")
+        set(forward_content "${forward_content}#define ${class}_final_forward_multi ${class}_forward_multi\n")
+        set(forward_content "${forward_content}#define ${class}_final_forward ${class}_forward\n")
+        set(forward_content "${forward_content}#define ${class}_final_forward_inplace_multi ${class}_forward_inplace_multi\n")
+        set(forward_content "${forward_content}#define ${class}_final_forward_inplace ${class}_forward_inplace\n")
 
         source_group ("sources\\\\layers" FILES "${CMAKE_CURRENT_SOURCE_DIR}/layer/${name}.cpp")
+
+        # platform optimization
+        if(WITH_LAYER_${name}_${arch})
+            # header include
+            set(layer_declaration "${layer_declaration}#include \"layer/${arch}/${name}_${arch}.h\"\n")
+            # ctor and dtor function (call in order)
+            set(ctor_content "${ctor_content}    { ${class}_${arch}_ctor(_self, args); }\n")
+            set(dtor_content "    { ${class}_${arch}_dtor(_self); }\n${dtor_content}")
+            # pipeline function (call in order)
+            set(create_pipeline_content "${create_pipeline_content}    { int ret = ${class}_${arch}_create_pipeline(self, opt); if (ret) return ret; }\n")
+            set(destroy_pipeline_content "    { int ret = ${class}_${arch}_destroy_pipeline(self, opt); if (ret) return ret; }\n${destroy_pipeline_content}")
+            # forward function override
+            set(forward_content "")
+            set(forward_content "${forward_content}#define ${class}_final_forward_multi ${class}_${arch}_forward_multi\n")
+            set(forward_content "${forward_content}#define ${class}_final_forward ${class}_${arch}_forward\n")
+            set(forward_content "${forward_content}#define ${class}_final_forward_inplace_multi ${class}_${arch}_forward_inplace_multi\n")
+            set(forward_content "${forward_content}#define ${class}_final_forward_inplace ${class}_${arch}_forward_inplace\n")
+
+            source_group ("sources\\\\layers\\\\${arch}" FILES "${CMAKE_CURRENT_SOURCE_DIR}/layer/${arch}/${name}_${arch}.cpp")
+        endif()
     endif()
 
-    if(WITH_LAYER_${name}_${arch})
-        set(layer_declaration "${layer_declaration}#include \"layer/${arch}/${name}_${arch}.h\"\n")
-        set(layer_declaration_class "${layer_declaration_class}, virtual public ${class}_${arch}")
-        set(create_pipeline_content "${create_pipeline_content}        { int ret = ${class}_${arch}::create_pipeline(opt); if (ret) return ret; }\n")
-        set(destroy_pipeline_content "        { int ret = ${class}_${arch}::destroy_pipeline(opt); if (ret) return ret; }\n${destroy_pipeline_content}")
-
-        source_group ("sources\\\\layers\\\\${arch}" FILES "${CMAKE_CURRENT_SOURCE_DIR}/layer/${arch}/${name}_${arch}.cpp")
-    endif()
-
+    # generate layer_declaration and layer_registry file
     if(WITH_LAYER_${name})
-        set(layer_declaration "${layer_declaration}${layer_declaration_class}\n{\n")
-        set(layer_declaration "${layer_declaration}public:\n")
-        set(layer_declaration "${layer_declaration}    virtual int create_pipeline(const Option& opt) {\n${create_pipeline_content}        return 0;\n    }\n")
-        set(layer_declaration "${layer_declaration}    virtual int destroy_pipeline(const Option& opt) {\n${destroy_pipeline_content}        return 0;\n    }\n")
-        set(layer_declaration "${layer_declaration}};\n")
-        set(layer_declaration "${layer_declaration}DEFINE_LAYER_CREATOR(${class}_final)\n\n")
+        # header include
+        set(layer_declaration "${layer_declaration}\n")
+        # ctor and dtor function (call in order)
+        set(layer_declaration "${layer_declaration}void *${class}_final_ctor(void *_self, va_list *args) {\n${ctor_content}    return _self;\n}\n")
+        set(layer_declaration "${layer_declaration}void *${class}_final_dtor(void *_self) {\n${dtor_content}    return _self;\n}\n")
+        # pipeline function (call in order)
+        set(layer_declaration "${layer_declaration}int ${class}_final_create_pipeline(Layer *self, const Option& opt) {\n${create_pipeline_content}    return 0;\n}\n")
+        set(layer_declaration "${layer_declaration}int ${class}_final_destroy_pipeline(Layer *self, const Option& opt) {\n${destroy_pipeline_content}    return 0;\n}\n")
+        # forward functions (override)
+        set(layer_declaration "${layer_declaration}${forward_content}")
+        set(layer_declaration "${layer_declaration}DEFINE_LAYER_CREATOR(${class})\n\n")
     endif()
 
     if(WITH_LAYER_${name})
@@ -208,7 +237,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
         PRIVATE _SCL_SECURE_NO_WARNINGS _CRT_SECURE_NO_DEPRECATE)
 else()
     target_compile_options(ncnn
-        PRIVATE -Wall -Wextra -Wno-unused-function -Wno-unused-variable)
+        PRIVATE -Wall -Wextra -Wno-unused-function -Wno-unused-variable -Wno-unused-parameter)
     if(NOT NCNN_DISABLE_PIC)
         set_target_properties(ncnn
             PROPERTIES

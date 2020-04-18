@@ -53,8 +53,8 @@ int Reshape_arm::destroy_pipeline(const Option& opt)
 {
     if (flatten)
     {
-        flatten->destroy_pipeline(opt);
-        delete flatten;
+        flatten->destroy_pipeline(flatten, opt);
+        cdelete(flatten);
         flatten = 0;
     }
 

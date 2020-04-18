@@ -33,12 +33,12 @@ Yolov3DetectionOutput::Yolov3DetectionOutput()
     ParamDict pd;
     pd.set(0, 0);// axis
 
-    //softmax->load_param(pd);
+    //softmax->load_param(softmax, pd);
 }
 
 Yolov3DetectionOutput::~Yolov3DetectionOutput()
 {
-    //delete softmax;
+    //cdelete(softmax);
 }
 
 int Yolov3DetectionOutput::load_param(const ParamDict& pd)

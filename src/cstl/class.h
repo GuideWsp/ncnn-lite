@@ -26,6 +26,10 @@
 
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // basic class definition with ctor and dtor
 typedef struct _cclass
 {
@@ -36,5 +40,13 @@ typedef struct _cclass
     void *(*ctor)(void *self, va_list *args);
     void *(*dtor)(void *self);
 } cclass;
+
+extern void *cnew(void *def, ...);
+
+extern void *cdelete(void *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __GENERIC_CLASS_H__ */

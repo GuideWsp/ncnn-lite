@@ -36,7 +36,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
         ParamDict pd;
         pd.set(0, c);
 
-        op->load_param(pd);
+        op->load_param(op, pd);
 
         Mat weights[1];
         weights[0] = Mat(c);
@@ -45,7 +45,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
             weights[0][q] = -mean_vals[q];
         }
 
-        op->load_model(ModelBinFromMatArray(weights));
+        op->load_model(op, ModelBinFromMatArray(weights));
     }
     else if (!mean_vals && norm_vals)
     {
@@ -55,7 +55,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
         ParamDict pd;
         pd.set(0, c);
 
-        op->load_param(pd);
+        op->load_param(op, pd);
 
         Mat weights[1];
         weights[0] = Mat(c);
@@ -64,7 +64,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
             weights[0][q] = norm_vals[q];
         }
 
-        op->load_model(ModelBinFromMatArray(weights));
+        op->load_model(op, ModelBinFromMatArray(weights));
     }
     else if (mean_vals && norm_vals)
     {
@@ -75,7 +75,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
         pd.set(0, c);
         pd.set(1, 1);
 
-        op->load_param(pd);
+        op->load_param(op, pd);
 
         Mat weights[2];
         weights[0] = Mat(c);
@@ -86,7 +86,7 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
             weights[1][q] = - mean_vals[q] * norm_vals[q];
         }
 
-        op->load_model(ModelBinFromMatArray(weights));
+        op->load_model(op, ModelBinFromMatArray(weights));
     }
     else // if (!mean_vals && !norm_vals)
     {
@@ -96,13 +96,13 @@ void Mat::substract_mean_normalize(const float* mean_vals, const float* norm_val
     Option opt;
     opt.num_threads = 1;// TODO
 
-    op->create_pipeline(opt);
+    op->create_pipeline(op, opt);
 
-    op->forward_inplace(*this, opt);
+    op->forward_inplace(op, *this, opt);
 
-    op->destroy_pipeline(opt);
+    op->destroy_pipeline(op, opt);
 
-    delete op;
+    cdelete(op);
 }
 
 Mat Mat::from_float16(const unsigned short* data, int size)
@@ -299,15 +299,15 @@ void copy_make_border(const Mat& src, Mat& dst, int top, int bottom, int left, i
     pd.set(4, type);
     pd.set(5, v);
 
-    padding->load_param(pd);
+    padding->load_param(padding, pd);
 
-    padding->create_pipeline(opt);
+    padding->create_pipeline(padding, opt);
 
-    padding->forward(src, dst, opt);
+    padding->forward(padding, src, dst, opt);
 
-    padding->destroy_pipeline(opt);
+    padding->destroy_pipeline(padding, opt);
 
-    delete padding;
+    cdelete(padding);
 }
 
 void copy_cut_border(const Mat& src, Mat& dst, int top, int bottom, int left, int right, const Option& opt)
@@ -322,15 +322,15 @@ void copy_cut_border(const Mat& src, Mat& dst, int top, int bottom, int left, in
     pd.set(4, src.h - top - bottom);
     pd.set(5, -233);
 
-    crop->load_param(pd);
+    crop->load_param(crop, pd);
 
-    crop->create_pipeline(opt);
+    crop->create_pipeline(crop, opt);
 
-    crop->forward(src, dst, opt);
+    crop->forward(crop, src, dst, opt);
 
-    crop->destroy_pipeline(opt);
+    crop->destroy_pipeline(crop, opt);
 
-    delete crop;
+    cdelete(crop);
 }
 
 void resize_bilinear(const Mat& src, Mat& dst, int w, int h, const Option& opt)
@@ -342,15 +342,15 @@ void resize_bilinear(const Mat& src, Mat& dst, int w, int h, const Option& opt)
     pd.set(3, h);
     pd.set(4, w);
 
-    interp->load_param(pd);
+    interp->load_param(interp, pd);
 
-    interp->create_pipeline(opt);
+    interp->create_pipeline(interp, opt);
 
-    interp->forward(src, dst, opt);
+    interp->forward(interp, src, dst, opt);
 
-    interp->destroy_pipeline(opt);
+    interp->destroy_pipeline(interp, opt);
 
-    delete interp;
+    cdelete(interp);
 }
 
 void resize_bicubic(const Mat& src, Mat& dst, int w, int h, const Option& opt)
@@ -362,15 +362,15 @@ void resize_bicubic(const Mat& src, Mat& dst, int w, int h, const Option& opt)
     pd.set(3, h);
     pd.set(4, w);
 
-    interp->load_param(pd);
+    interp->load_param(interp, pd);
 
-    interp->create_pipeline(opt);
+    interp->create_pipeline(interp, opt);
 
-    interp->forward(src, dst, opt);
+    interp->forward(interp, src, dst, opt);
 
-    interp->destroy_pipeline(opt);
+    interp->destroy_pipeline(interp, opt);
 
-    delete interp;
+    cdelete(interp);
 }
 
 void convert_packing(const Mat& src, Mat& dst, int _elempack, const Option& opt)
@@ -380,15 +380,15 @@ void convert_packing(const Mat& src, Mat& dst, int _elempack, const Option& opt)
     ParamDict pd;
     pd.set(0, _elempack);
 
-    packing->load_param(pd);
+    packing->load_param(packing, pd);
 
-    packing->create_pipeline(opt);
+    packing->create_pipeline(packing, opt);
 
-    packing->forward(src, dst, opt);
+    packing->forward(packing, src, dst, opt);
 
-    packing->destroy_pipeline(opt);
+    packing->destroy_pipeline(packing, opt);
 
-    delete packing;
+    cdelete(packing);
 }
 
 void cast_float32_to_float16(const Mat& src, Mat& dst, const Option& opt)
@@ -399,15 +399,15 @@ void cast_float32_to_float16(const Mat& src, Mat& dst, const Option& opt)
     pd.set(0, 1);
     pd.set(1, 2);
 
-    cast->load_param(pd);
+    cast->load_param(cast, pd);
 
-    cast->create_pipeline(opt);
+    cast->create_pipeline(cast, opt);
 
-    cast->forward(src, dst, opt);
+    cast->forward(cast, src, dst, opt);
 
-    cast->destroy_pipeline(opt);
+    cast->destroy_pipeline(cast, opt);
 
-    delete cast;
+    cdelete(cast);
 }
 
 void cast_float16_to_float32(const Mat& src, Mat& dst, const Option& opt)
@@ -418,15 +418,15 @@ void cast_float16_to_float32(const Mat& src, Mat& dst, const Option& opt)
     pd.set(0, 2);
     pd.set(1, 1);
 
-    cast->load_param(pd);
+    cast->load_param(cast, pd);
 
-    cast->create_pipeline(opt);
+    cast->create_pipeline(cast, opt);
 
-    cast->forward(src, dst, opt);
+    cast->forward(cast, src, dst, opt);
 
-    cast->destroy_pipeline(opt);
+    cast->destroy_pipeline(cast, opt);
 
-    delete cast;
+    cdelete(cast);
 }
 
 void cast_int8_to_float32(const Mat& src, Mat& dst, const Option& opt)
@@ -437,15 +437,15 @@ void cast_int8_to_float32(const Mat& src, Mat& dst, const Option& opt)
     pd.set(0, 3);
     pd.set(1, 1);
 
-    cast->load_param(pd);
+    cast->load_param(cast, pd);
 
-    cast->create_pipeline(opt);
+    cast->create_pipeline(cast, opt);
 
-    cast->forward(src, dst, opt);
+    cast->forward(cast, src, dst, opt);
 
-    cast->destroy_pipeline(opt);
+    cast->destroy_pipeline(cast, opt);
 
-    delete cast;
+    cdelete(cast);
 }
 
 void cast_float32_to_bfloat16(const Mat& src, Mat& dst, const Option& opt)
@@ -456,15 +456,15 @@ void cast_float32_to_bfloat16(const Mat& src, Mat& dst, const Option& opt)
     pd.set(0, 1);
     pd.set(1, 4);
 
-    cast->load_param(pd);
+    cast->load_param(cast, pd);
 
-    cast->create_pipeline(opt);
+    cast->create_pipeline(cast, opt);
 
-    cast->forward(src, dst, opt);
+    cast->forward(cast, src, dst, opt);
 
-    cast->destroy_pipeline(opt);
+    cast->destroy_pipeline(cast, opt);
 
-    delete cast;
+    cdelete(cast);
 }
 
 void cast_bfloat16_to_float32(const Mat& src, Mat& dst, const Option& opt)
@@ -475,15 +475,15 @@ void cast_bfloat16_to_float32(const Mat& src, Mat& dst, const Option& opt)
     pd.set(0, 4);
     pd.set(1, 1);
 
-    cast->load_param(pd);
+    cast->load_param(cast, pd);
 
-    cast->create_pipeline(opt);
+    cast->create_pipeline(cast, opt);
 
-    cast->forward(src, dst, opt);
+    cast->forward(cast, src, dst, opt);
 
-    cast->destroy_pipeline(opt);
+    cast->destroy_pipeline(cast, opt);
 
-    delete cast;
+    cdelete(cast);
 }
 
 void quantize_float32_to_int8(const Mat& src, Mat& dst, float scale, const Option& opt)
@@ -493,15 +493,15 @@ void quantize_float32_to_int8(const Mat& src, Mat& dst, float scale, const Optio
     ParamDict pd;
     pd.set(0, scale);
 
-    quantize->load_param(pd);
+    quantize->load_param(quantize, pd);
 
-    quantize->create_pipeline(opt);
+    quantize->create_pipeline(quantize, opt);
 
-    quantize->forward(src, dst, opt);
+    quantize->forward(quantize, src, dst, opt);
 
-    quantize->destroy_pipeline(opt);
+    quantize->destroy_pipeline(quantize, opt);
 
-    delete quantize;
+    cdelete(quantize);
 }
 
 void dequantize_int32_to_float32(Mat& m, float scale, const float* bias, int bias_data_size, const Option& opt)
@@ -513,20 +513,20 @@ void dequantize_int32_to_float32(Mat& m, float scale, const float* bias, int bia
     pd.set(1, bias ? 1 : 0);
     pd.set(2, bias_data_size);
 
-    dequantize->load_param(pd);
+    dequantize->load_param(dequantize, pd);
 
     Mat weights[1];
     weights[0] = Mat(bias_data_size, (void*)bias);
 
-    dequantize->load_model(ModelBinFromMatArray(weights));
+    dequantize->load_model(dequantize, ModelBinFromMatArray(weights));
 
-    dequantize->create_pipeline(opt);
+    dequantize->create_pipeline(dequantize, opt);
 
-    dequantize->forward_inplace(m, opt);
+    dequantize->forward_inplace(dequantize, m, opt);
 
-    dequantize->destroy_pipeline(opt);
+    dequantize->destroy_pipeline(dequantize, opt);
 
-    delete dequantize;
+    cdelete(dequantize);
 }
 
 void requantize_int8_to_int8(const Mat& src, Mat& dst, float scale_in, float scale_out, const float* bias, int bias_data_size, int fusion_relu, const Option& opt)
@@ -540,18 +540,18 @@ void requantize_int8_to_int8(const Mat& src, Mat& dst, float scale_in, float sca
     pd.set(3, bias_data_size);
     pd.set(4, fusion_relu);
 
-    requantize->load_param(pd);
+    requantize->load_param(requantize, pd);
 
     Mat weights[1];
     weights[0] = Mat(bias_data_size, (void*)bias);
 
-    requantize->load_model(ModelBinFromMatArray(weights));
+    requantize->load_model(requantize, ModelBinFromMatArray(weights));
 
-    requantize->create_pipeline(opt);
+    requantize->create_pipeline(requantize, opt);
 
-    requantize->forward(src, dst, opt);
+    requantize->forward(requantize, src, dst, opt);
 
-    requantize->destroy_pipeline(opt);
+    requantize->destroy_pipeline(requantize, opt);
 
-    delete requantize;
+    cdelete(requantize);
 }

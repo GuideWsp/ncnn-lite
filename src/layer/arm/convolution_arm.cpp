@@ -431,15 +431,15 @@ int Convolution_arm::destroy_pipeline(const Option& opt)
 {
     if (activation)
     {
-        activation->destroy_pipeline(opt);
-        delete activation;
+        activation->destroy_pipeline(activation, opt);
+        cdelete(activation);
         activation = 0;
     }
 
     if (convolution_dilation1)
     {
-        convolution_dilation1->destroy_pipeline(opt);
-        delete convolution_dilation1;
+        convolution_dilation1->destroy_pipeline(convolution_dilation1, opt);
+        cdelete(convolution_dilation1);
         convolution_dilation1 = 0;
     }
 

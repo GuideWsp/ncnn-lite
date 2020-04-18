@@ -17,11 +17,18 @@
 
 #include "layer.h"
 
-struct AbsVal : public Layer
-{
-    AbsVal();
+void *AbsVal_ctor(void *_self, va_list *args);
 
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-};
+int AbsVal_forward_inplace(Layer *self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define AbsVal_dtor                     Layer_dtor
+#define AbsVal_load_param               Layer_load_param
+#define AbsVal_load_model               Layer_load_model
+#define AbsVal_create_pipeline          Layer_create_pipeline
+#define AbsVal_destroy_pipeline         Layer_destroy_pipeline
+#define AbsVal_forward_multi            Layer_forward_multi
+#define AbsVal_forward                  Layer_forward
+#define AbsVal_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_ABSVAL_H

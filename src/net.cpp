@@ -257,7 +257,7 @@ int Net::load_param(const DataReader& dr)
             layer->top_shapes[j] = vector_get(blobs, layer->tops[j]).shape;
         }
 
-        int lr = layer->load_param(pd);
+        int lr = layer->load_param(layer, pd);
         if (lr != 0)
         {
             fprintf(stderr, "layer load_param failed\n");
@@ -407,7 +407,7 @@ int Net::load_param_bin(const DataReader& dr)
             layer->top_shapes[j] = vector_get(blobs, layer->tops[j]).shape;
         }
 
-        int lr = layer->load_param(pd);
+        int lr = layer->load_param(layer, pd);
         if (lr != 0)
         {
             fprintf(stderr, "layer load_param failed\n");
@@ -445,7 +445,7 @@ int Net::load_model(const DataReader& dr)
             break;
         }
 
-        int lret = layer->load_model(mb);
+        int lret = layer->load_model(layer, mb);
         if (lret != 0)
         {
             fprintf(stderr, "layer load_model %d failed\n", (int)i);
@@ -468,7 +468,7 @@ int Net::load_model(const DataReader& dr)
             break;
         }
 
-        int cret = layer->create_pipeline(opt);
+        int cret = layer->create_pipeline(layer, opt);
         if (cret != 0)
         {
             fprintf(stderr, "layer create_pipeline %d failed\n", (int)i);
@@ -728,14 +728,14 @@ void Net::clear()
     vector_clear(blobs);
     for (size_t i=0; i<vector_size(layers); i++)
     {
-        int dret = vector_get(layers, i)->destroy_pipeline(opt);
+        int dret = vector_get(layers, i)->destroy_pipeline(vector_get(layers, i), opt);
         if (dret != 0)
         {
             fprintf(stderr, "layer destroy_pipeline failed\n");
             // ignore anyway
         }
 
-        delete vector_get(layers, i);
+        cdelete(vector_get(layers, i));
     }
     vector_clear(layers);
 }
@@ -814,7 +814,7 @@ Layer* create_custom_layer_by_index(Net *net, int index)
 
 int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const
 {
-    const Layer* layer = vector_get(layers, layer_index);
+    Layer* layer = vector_get(layers, layer_index);
 
 //     fprintf(stderr, "forward_layer %d %s\n", layer_index, layer->name.c_str());
 
@@ -875,11 +875,11 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
             Mat& bottom_top_blob = bottom_blob;
 #if NCNN_BENCHMARK
             double start = get_current_time();
-            int ret = layer->forward_inplace(bottom_top_blob, opt);
+            int ret = layer->forward_inplace(layer, bottom_top_blob, opt);
             double end = get_current_time();
             benchmark(layer, bottom_top_blob, bottom_top_blob, start, end);
 #else
-            int ret = layer->forward_inplace(bottom_top_blob, opt);
+            int ret = layer->forward_inplace(layer, bottom_top_blob, opt);
 #endif // NCNN_BENCHMARK
             if (ret != 0)
                 return ret;
@@ -892,11 +892,11 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
             Mat top_blob;
 #if NCNN_BENCHMARK
             double start = get_current_time();
-            int ret = layer->forward(bottom_blob, top_blob, opt);
+            int ret = layer->forward(layer, bottom_blob, top_blob, opt);
             double end = get_current_time();
             benchmark(layer, bottom_blob, top_blob, start, end);
 #else
-            int ret = layer->forward(bottom_blob, top_blob, opt);
+            int ret = layer->forward(layer, bottom_blob, top_blob, opt);
 #endif // NCNN_BENCHMARK
             if (ret != 0)
                 return ret;
@@ -966,11 +966,11 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
             std::vector<Mat>& bottom_top_blobs = bottom_blobs;
 #if NCNN_BENCHMARK
             double start = get_current_time();
-            int ret = layer->forward_inplace(bottom_top_blobs, opt);
+            int ret = layer->forward_inplace_multi(layer, bottom_top_blobs, opt);
             double end = get_current_time();
             benchmark(layer, start, end);
 #else
-            int ret = layer->forward_inplace(bottom_top_blobs, opt);
+            int ret = layer->forward_inplace_multi(layer, bottom_top_blobs, opt);
 #endif // NCNN_BENCHMARK
             if (ret != 0)
                 return ret;
@@ -988,11 +988,11 @@ int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt
             std::vector<Mat> top_blobs(layer->tops.size());
 #if NCNN_BENCHMARK
             double start = get_current_time();
-            int ret = layer->forward(bottom_blobs, top_blobs, opt);
+            int ret = layer->forward_multi(layer, bottom_blobs, top_blobs, opt);
             double end = get_current_time();
             benchmark(layer, start, end);
 #else
-            int ret = layer->forward(bottom_blobs, top_blobs, opt);
+            int ret = layer->forward_multi(layer, bottom_blobs, top_blobs, opt);
 #endif // NCNN_BENCHMARK
             if (ret != 0)
                 return ret;

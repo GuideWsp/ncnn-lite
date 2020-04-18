@@ -79,7 +79,9 @@ int DeconvolutionDepthWise_arm::create_pipeline(const Option& opt)
     {
         // group deconvolution
         for (int i=0; i<(int)group_ops.size(); i++)
-            delete group_ops[i];
+        {
+            cdelete(group_ops[i]);
+        }
 
         group_ops.clear();
 
@@ -146,7 +148,7 @@ int DeconvolutionDepthWise_arm::destroy_pipeline(const Option& opt)
     for (int i=0; i<(int)group_ops.size(); i++)
     {
         group_ops[i]->destroy_pipeline(opt);
-        delete group_ops[i];
+        cdelete(group_ops[i]);
     }
     group_ops.clear();
 

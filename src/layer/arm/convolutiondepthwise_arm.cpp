@@ -155,7 +155,9 @@ int ConvolutionDepthWise_arm::create_pipeline(const Option& opt)
 
     // group convolution
     for (int i=0; i<(int)group_ops.size(); i++)
-        delete group_ops[i];
+    {
+        cdelete(group_ops[i]);
+    }
 
     group_ops.clear();
 
@@ -235,15 +237,15 @@ int ConvolutionDepthWise_arm::destroy_pipeline(const Option& opt)
 {
     if (activation)
     {
-        activation->destroy_pipeline(opt);
-        delete activation;
+        activation->destroy_pipeline(activation, opt);
+        cdelete(activation);
         activation = 0;
     }
 
     for (int i=0; i<(int)group_ops.size(); i++)
     {
-        group_ops[i]->destroy_pipeline(opt);
-        delete group_ops[i];
+        group_ops[i]->destroy_pipeline(group_ops[i], opt);
+        cdelete(group_ops[i]);
     }
     group_ops.clear();
 

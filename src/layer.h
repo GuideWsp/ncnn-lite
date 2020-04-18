@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <stdarg.h>
 #include <vector>
 #include <math.h>
 #include "platform.h"
@@ -25,28 +26,32 @@
 #include "option.h"
 #include "paramdict.h"
 
+#include "cstl/class.h"
+
 struct Layer
 {
-    // empty
-    Layer();
-    // virtual destructor
-    virtual ~Layer();
+    // cclass def
+    cclass *clazz;
+
+    // constructor and destructor
+    // int (*ctor)(void *_self);
+    // int (*dtor)(void *_self);
 
     // load layer specific parameter from parsed dict
     // return 0 if success
-    virtual int load_param(const ParamDict& pd);
+    int (*load_param)(Layer *self, const ParamDict& pd);
 
     // load layer specific weight data from model binary
     // return 0 if success
-    virtual int load_model(const ModelBin& mb);
+    int (*load_model)(Layer *self, const ModelBin& mb);
 
     // layer implementation specific setup
     // return 0 if success
-    virtual int create_pipeline(const Option& opt);
+    int (*create_pipeline)(Layer *self, const Option& opt);
 
     // layer implementation specific clean
     // return 0 if success
-    virtual int destroy_pipeline(const Option& opt);
+    int (*destroy_pipeline)(Layer *self, const Option& opt);
 
     // one input and one output blob
     bool one_blob_only;
@@ -62,13 +67,13 @@ struct Layer
 
     // implement inference
     // return 0 if success
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
+    int (*forward_multi)(Layer *self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+    int (*forward)(Layer *self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
 
     // implement inplace inference
     // return 0 if success
-    virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
+    int (*forward_inplace_multi)(Layer *self, std::vector<Mat>& bottom_top_blobs, const Option& opt);
+    int (*forward_inplace)(Layer *self, Mat& bottom_top_blob, const Option& opt);
 
     // layer type index
     int typeindex;
@@ -86,6 +91,28 @@ struct Layer
     std::vector<Mat> bottom_shapes;
     std::vector<Mat> top_shapes;
 };
+
+// layer constructor
+extern void *Layer_ctor(void *_self, va_list *args);
+
+// layer destructor
+extern void *Layer_dtor(void *_self);
+
+int Layer_create_pipeline(Layer *self, const Option& opt);
+
+int Layer_destroy_pipeline(Layer *self, const Option& opt);
+
+int Layer_load_param(Layer *self, const ParamDict& pd);
+
+int Layer_load_model(Layer *self, const ModelBin& mb);
+
+int Layer_forward_multi(Layer *self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+int Layer_forward(Layer *self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+int Layer_forward_inplace_multi(Layer *self, std::vector<Mat>& /*bottom_top_blobs*/, const Option& /*opt*/);
+
+int Layer_forward_inplace(Layer *self, Mat& /*bottom_top_blob*/, const Option& /*opt*/);
 
 // layer factory function
 typedef Layer* (*layer_creator_func)();
@@ -110,6 +137,20 @@ Layer* create_layer(const char* type);
 Layer* create_layer(int index);
 
 #define DEFINE_LAYER_CREATOR(name) \
-    ::Layer* name##_layer_creator() { return new name; }
+    const cclass cclazz_##name = {                               \
+        .ctor = name##_final_ctor,                                      \
+        .dtor = name##_final_dtor                                      \
+    };                                                          \
+    Layer* name##_final_layer_creator() { \
+        return cnew(&cclazz_##name, \
+                    name##_load_param,                                \
+                    name##_load_model,                                \
+                    name##_final_create_pipeline,                \
+                    name##_final_destroy_pipeline,              \
+                    name##_final_forward_multi,                    \
+                    name##_final_forward,                                \
+                    name##_final_forward_inplace_multi,    \
+                    name##_final_forward_inplace                 \
+        ); }
 
 #endif // NCNN_LAYER_H

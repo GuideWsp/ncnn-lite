@@ -66,8 +66,8 @@ int Slice_arm::destroy_pipeline(const Option& opt)
 
     if (packing_pack1)
     {
-        packing_pack1->destroy_pipeline(opt);
-        delete packing_pack1;
+        packing_pack1->destroy_pipeline(packing_pack1, opt);
+        cdelete(packing_pack1);
         packing_pack1 = 0;
     }
 

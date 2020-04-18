@@ -14,15 +14,17 @@
 
 #include "absval.h"
 
-DEFINE_LAYER_CREATOR(AbsVal)
-
-AbsVal::AbsVal()
+void *AbsVal_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = true;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = true;
+
+    return _self;
 }
 
-int AbsVal::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int AbsVal_forward_inplace(Layer *self, Mat& bottom_top_blob, const Option& opt)
 {
     int w = bottom_top_blob.w;
     int h = bottom_top_blob.h;

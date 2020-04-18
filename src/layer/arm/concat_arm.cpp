@@ -62,8 +62,8 @@ int Concat_arm::destroy_pipeline(const Option& opt)
 
     if (packing_pack4)
     {
-        packing_pack4->destroy_pipeline(opt);
-        delete packing_pack4;
+        packing_pack4->destroy_pipeline(packing_pack4, opt);
+        cdelete(packing_pack4);
         packing_pack4 = 0;
     }
 

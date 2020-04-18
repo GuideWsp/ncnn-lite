@@ -127,7 +127,7 @@ int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
             pd.set(2, weight_data_size);
             pd.set(8, int8_scale_term);
 
-            op->load_param(pd);
+            op->load_param(op, pd);
 
             // set weights
             Mat weights[4];
@@ -140,14 +140,14 @@ int Convolution::forward(const Mat& bottom_blob, Mat& top_blob, const Option& op
                 weights[3] = Mat(1, (size_t)4u, (void*)&bottom_blob_int8_scale);
             }
 
-            op->load_model(ModelBinFromMatArray(weights));
+            op->load_model(op, ModelBinFromMatArray(weights));
 
-            op->create_pipeline(opt);
+            op->create_pipeline(op, opt);
 
             // forward
-            op->forward(bottom_blob, top_blob, opt);
+            op->forward(op, bottom_blob, top_blob, opt);
 
-            delete op;
+            cdelete(op);
 
             return 0;
         }

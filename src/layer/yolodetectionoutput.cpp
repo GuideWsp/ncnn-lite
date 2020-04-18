@@ -46,9 +46,9 @@ int YoloDetectionOutput::create_pipeline(const Option& opt)
         ParamDict pd;
         pd.set(0, 0);// axis
 
-        softmax->load_param(pd);
+        softmax->load_param(softmax, pd);
 
-        softmax->create_pipeline(opt);
+        softmax->create_pipeline(softmax, opt);
     }
 
     return 0;
@@ -59,7 +59,7 @@ int YoloDetectionOutput::destroy_pipeline(const Option& opt)
     if (softmax)
     {
         softmax->destroy_pipeline(opt);
-        delete softmax;
+        cdelete(softmax);
         softmax = 0;
     }
 

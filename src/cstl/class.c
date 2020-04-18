@@ -22,6 +22,7 @@
  */
 
 #include "class.h"
+#include <stdlib.h>
 
 void *cnew(void *def, ...)
 {
@@ -53,4 +54,6 @@ void *cdelete(void *ptr)
         ptr = object->dtor(ptr);
     }
     free(ptr);
+
+    return ptr;
 }
