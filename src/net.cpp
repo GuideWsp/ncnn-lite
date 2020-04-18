@@ -35,12 +35,16 @@
 Net::Net()
 {
     vector_init_ctor_dtor(blobs, Blob_ctor, Blob_dtor);
+    vector_init(layers);
+    vector_init(custom_layer_registry);
 }
 
 Net::~Net()
 {
     clear();
     vector_destroy(blobs);
+    vector_destroy(layers);
+    vector_destroy(custom_layer_registry);
 }
 
 #if NCNN_STRING
@@ -53,17 +57,17 @@ int Net::register_custom_layer(const char* type, layer_creator_func creator)
         return -1;
     }
 
-    int custom_index = custom_layer_to_index(type);
+    int custom_index = custom_layer_to_index(this, type);
     if (custom_index == -1)
     {
         struct layer_registry_entry entry = { type, creator };
-        custom_layer_registry.push_back(entry);
+        vector_pushback(custom_layer_registry, entry);
     }
     else
     {
         fprintf(stderr, "overwrite existing custom layer type %s\n", type);
-        custom_layer_registry[custom_index].name = type;
-        custom_layer_registry[custom_index].creator = creator;
+        vector_get(custom_layer_registry, custom_index).name = type;
+        vector_get(custom_layer_registry, custom_index).creator = creator;
     }
 
     return 0;
@@ -79,22 +83,22 @@ int Net::register_custom_layer(int index, layer_creator_func creator)
         return -1;
     }
 
-    if ((int)custom_layer_registry.size() <= custom_index)
+    if ((int)vector_size(custom_layer_registry) <= custom_index)
     {
 #if NCNN_STRING
         struct layer_registry_entry dummy = { "", 0 };
 #else
         struct layer_registry_entry dummy = { 0 };
 #endif // NCNN_STRING
-        custom_layer_registry.resize(custom_index + 1, dummy);
+        vector_resize_with_value(custom_layer_registry, custom_index + 1, dummy);
     }
 
-    if (custom_layer_registry[custom_index].creator)
+    if (vector_get(custom_layer_registry, custom_index).creator)
     {
         fprintf(stderr, "overwrite existing custom layer index %d\n", custom_index);
     }
 
-    custom_layer_registry[custom_index].creator = creator;
+    vector_get(custom_layer_registry, custom_index).creator = creator;
     return 0;
 }
 
@@ -127,7 +131,7 @@ int Net::load_param(const DataReader& dr)
         return -1;
     }
 
-    layers.resize((size_t)layer_count);
+    vector_resize(layers, layer_count);
     vector_resize(blobs, blob_count);
 
     ParamDict pd;
@@ -147,7 +151,7 @@ int Net::load_param(const DataReader& dr)
         Layer* layer = create_layer(layer_type);
         if (!layer)
         {
-            layer = create_custom_layer(layer_type);
+            layer = create_custom_layer_by_type(this, layer_type);
         }
         if (!layer)
         {
@@ -167,7 +171,7 @@ int Net::load_param(const DataReader& dr)
             char bottom_name[256];
             SCAN_VALUE("%255s", bottom_name)
 
-            int bottom_blob_index = find_blob_index_by_name(bottom_name);
+            int bottom_blob_index = find_blob_index_by_name(this, bottom_name);
             if (bottom_blob_index == -1)
             {
                 Blob& blob = vector_get(blobs, blob_index);
@@ -260,7 +264,7 @@ int Net::load_param(const DataReader& dr)
             continue;
         }
 
-        layers[i] = layer;
+        vector_get(layers, i) = layer;
     }
 
 #undef SCAN_VALUE
@@ -295,7 +299,7 @@ int Net::load_param_bin(const DataReader& dr)
         return -1;
     }
 
-    layers.resize(layer_count);
+    vector_resize(layers, layer_count);
     vector_resize(blobs, blob_count);
 
     ParamDict pd;
@@ -313,7 +317,7 @@ int Net::load_param_bin(const DataReader& dr)
         if (!layer)
         {
             int custom_index = typeindex & ~CustomBit;
-            layer = create_custom_layer(custom_index);
+            layer = create_custom_layer_by_index(this, custom_index);
         }
         if (!layer)
         {
@@ -410,7 +414,7 @@ int Net::load_param_bin(const DataReader& dr)
             continue;
         }
 
-        layers[i] = layer;
+        vector_get(layers, i) = layer;
     }
 
 #undef READ_VALUE
@@ -419,7 +423,7 @@ int Net::load_param_bin(const DataReader& dr)
 
 int Net::load_model(const DataReader& dr)
 {
-    if (layers.empty())
+    if (vector_empty(layers))
     {
         fprintf(stderr, "network graph not ready\n");
         return -1;
@@ -429,9 +433,9 @@ int Net::load_model(const DataReader& dr)
     int ret = 0;
 
     ModelBinFromDataReader mb(dr);
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(layers); i++)
     {
-        Layer* layer = layers[i];
+        Layer* layer = vector_get(layers, i);
 
         //Here we found inconsistent content in the parameter file.
         if (!layer)
@@ -450,11 +454,11 @@ int Net::load_model(const DataReader& dr)
         }
     }
 
-    fuse_network();
+    fuse_network(this);
 
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(layers); i++)
     {
-        Layer* layer = layers[i];
+        Layer* layer = vector_get(layers, i);
 
         //Here we found inconsistent content in the parameter file.
         if (!layer)
@@ -563,16 +567,16 @@ int Net::load_model(const unsigned char* _mem)
     return static_cast<int>(mem - _mem);
 }
 
-int Net::fuse_network()
+int fuse_network(Net *net)
 {
     // set the int8 op fusion:requantize
 #if NCNN_STRING && NCNN_REQUANT    
     // fprintf(stderr, "Test op fusion to int8 implement:\n");
     // parse the network whether is a quantization model
     bool net_quantized = false;
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(net->layers); i++)
     {
-        Layer* layer = layers[i];
+        Layer* layer = vector_get(net->layers, i);
         if (layer->type == "Convolution" || layer->type == "ConvolutionDepthWise")
         {
             if (layer->type == "Convolution" && (((Convolution*)layer)->weight_data.elemsize != 1u))
@@ -586,9 +590,9 @@ int Net::fuse_network()
     if (net_quantized == false)
         return 0;
 
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(net->layers); i++)
     {
-        Layer* layer = layers[i];
+        Layer* layer = vector_get(net->layers, i);
 
         if (layer->type == "Convolution" || layer->type == "ConvolutionDepthWise")
         {
@@ -597,10 +601,10 @@ int Net::fuse_network()
             if (layer->type == "ConvolutionDepthWise" && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
                 continue;
 
-            for (size_t n=0; n<vector_size(blobs[layer->tops[0]].consumers); n++)
+            for (size_t n=0; n<vector_size(vector_get(net->blobs, layer->tops[0]).consumers); n++)
             {
-                int layer_next_index = vector_get(blobs[layer->tops[0]].consumers, n);
-                Layer* layer_next = layers[layer_next_index];
+                int layer_next_index = vector_get(vector_get(net->blobs, layer->tops[0]).consumers, n);
+                Layer* layer_next = vector_get(net->layers, layer_next_index);
 
                 if (layer_next->type == "Convolution" || layer_next->type == "ConvolutionDepthWise")
                 {
@@ -633,8 +637,8 @@ int Net::fuse_network()
                 }                  
                 else if (layer_next->type == "ReLU")
                 {
-                    int layer_next_2_index = vector_get(blobs[layer_next->tops[0]].consumers, 0);
-                    Layer* layer_next_2 = layers[layer_next_2_index];
+                    int layer_next_2_index = vector_get(vector_get(net->blobs, layer_next->tops[0]).consumers, 0);
+                    Layer* layer_next_2 = vector_get(net->layers, layer_next_2_index);
 
                     if (layer_next_2->type == "Convolution" || layer_next_2->type == "ConvolutionDepthWise")
                     {
@@ -670,8 +674,10 @@ int Net::fuse_network()
                         bool all_conv = true;
                         for (size_t i=0; i<layer_next_2->tops.size(); i++)
                         {
-                            int layer_next_3_index = vector_get(blobs[layer_next_2->tops[i]].consumers, 0);
-                            if (layers[layer_next_3_index]->type != "Convolution" && layers[layer_next_3_index]->type != "ConvolutionDepthWise" && layers[layer_next_3_index]->type != "PriorBox" )
+                            int layer_next_3_index = vector_get(vector_get(net->blobs, layer_next_2->tops[i]).consumers, 0);
+                            if (vector_get(net->layers, layer_next_3_index)->type != "Convolution" &&
+                                vector_get(net->layers, layer_next_3_index)->type != "ConvolutionDepthWise" &&
+                                vector_get(net->layers, layer_next_3_index)->type != "PriorBox" )
                             {
                                 // fprintf(stderr, "%s, %s, %s, %s\n", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str(), layers[layer_next_3_index]->name.c_str());
                                 all_conv = false;
@@ -683,8 +689,8 @@ int Net::fuse_network()
                             // fprintf(stderr, "%s, %s, %s, ", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str());
                             for (size_t i=0; i<layer_next_2->tops.size(); i++)
                             {
-                                int layer_next_3_index = vector_get(blobs[layer_next_2->tops[i]].consumers, 0);
-                                Layer* layer_next_3 = layers[layer_next_3_index];
+                                int layer_next_3_index = vector_get(vector_get(net->blobs, layer_next_2->tops[i]).consumers, 0);
+                                Layer* layer_next_3 = vector_get(net->layers, layer_next_3_index);
 
                                 // fprintf(stderr, "%s, ", layer_next_3->name.c_str());
                                 if (layer_next_3->type == "Convolution")
@@ -720,31 +726,32 @@ int Net::fuse_network()
 void Net::clear()
 {
     vector_clear(blobs);
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(layers); i++)
     {
-        int dret = layers[i]->destroy_pipeline(opt);
+        int dret = vector_get(layers, i)->destroy_pipeline(opt);
         if (dret != 0)
         {
             fprintf(stderr, "layer destroy_pipeline failed\n");
             // ignore anyway
         }
 
-        delete layers[i];
+        delete vector_get(layers, i);
     }
-    layers.clear();
+    vector_clear(layers);
 }
 
-Extractor Net::create_extractor() const
+// construct an Extractor from network
+Extractor create_extractor(Net *net)
 {
-    return Extractor(this, vector_size(blobs));
+    return Extractor(net, vector_size(net->blobs));
 }
 
 #if NCNN_STRING
-int Net::find_blob_index_by_name(const char* name) const
+int find_blob_index_by_name(Net *net, const char* name)
 {
-    for (size_t i=0; i<vector_size(blobs); i++)
+    for (size_t i=0; i<vector_size(net->blobs); i++)
     {
-        const Blob& blob = vector_get(blobs, i);
+        const Blob& blob = vector_get(net->blobs, i);
         if (strcmp(blob.name, name) == 0)
         {
             return static_cast<int>(i);
@@ -755,11 +762,11 @@ int Net::find_blob_index_by_name(const char* name) const
     return -1;
 }
 
-int Net::find_layer_index_by_name(const char* name) const
+int find_layer_index_by_name(Net *net, const char* name)
 {
-    for (size_t i=0; i<layers.size(); i++)
+    for (size_t i=0; i<vector_size(net->layers); i++)
     {
-        const Layer* layer = layers[i];
+        const Layer* layer = vector_get(net->layers, i);
         if (layer->name == name)
         {
             return static_cast<int>(i);
@@ -770,35 +777,35 @@ int Net::find_layer_index_by_name(const char* name) const
     return -1;
 }
 
-int Net::custom_layer_to_index(const char* type)
+int custom_layer_to_index(Net *net, const char* type)
 {
-    const size_t custom_layer_registry_entry_count = custom_layer_registry.size();
+    const size_t custom_layer_registry_entry_count = vector_size(net->custom_layer_registry);
     for (size_t i=0; i<custom_layer_registry_entry_count; i++)
     {
-        if (strcmp(type, custom_layer_registry[i].name) == 0)
+        if (strcmp(type, vector_get(net->custom_layer_registry, i).name) == 0)
             return static_cast<int>(i);
     }
 
     return -1;
 }
 
-Layer* Net::create_custom_layer(const char* type)
+Layer* create_custom_layer_by_type(Net *net, const char* type)
 {
-    int index = custom_layer_to_index(type);
+    int index = custom_layer_to_index(net, type);
     if (index == -1)
         return 0;
 
-    return create_custom_layer(index);
+    return create_custom_layer_by_index(net, index);
 }
 #endif // NCNN_STRING
 
-Layer* Net::create_custom_layer(int index)
+Layer* create_custom_layer_by_index(Net *net, int index)
 {
-    const size_t custom_layer_registry_entry_count = custom_layer_registry.size();
+    const size_t custom_layer_registry_entry_count = vector_size(net->custom_layer_registry);
     if (index < 0 || static_cast<unsigned int>(index) >= custom_layer_registry_entry_count)
         return 0;
 
-    layer_creator_func layer_creator = custom_layer_registry[index].creator;
+    layer_creator_func layer_creator = vector_get(net->custom_layer_registry, index).creator;
     if (!layer_creator)
         return 0;
 
@@ -807,7 +814,7 @@ Layer* Net::create_custom_layer(int index)
 
 int Net::forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const
 {
-    const Layer* layer = layers[layer_index];
+    const Layer* layer = vector_get(layers, layer_index);
 
 //     fprintf(stderr, "forward_layer %d %s\n", layer_index, layer->name.c_str());
 
@@ -1041,7 +1048,7 @@ void Extractor::set_workspace_allocator(Allocator* allocator)
 #if NCNN_STRING
 int Extractor::input(const char* blob_name, const Mat& in)
 {
-    int blob_index = net->find_blob_index_by_name(blob_name);
+    int blob_index = find_blob_index_by_name(net, blob_name);
     if (blob_index == -1)
         return -1;
 
@@ -1050,7 +1057,7 @@ int Extractor::input(const char* blob_name, const Mat& in)
 
 int Extractor::extract(const char* blob_name, Mat& feat)
 {
-    int blob_index = net->find_blob_index_by_name(blob_name);
+    int blob_index = find_blob_index_by_name(net, blob_name);
     if (blob_index == -1)
         return -1;
 

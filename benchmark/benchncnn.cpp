@@ -81,7 +81,7 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
     // warm up
     for (int i=0; i<g_warmup_loop_count; i++)
     {
-        Extractor ex = net.create_extractor();
+        Extractor ex = create_extractor(&net);
         ex.input("data", in);
         ex.extract("output", out);
     }
@@ -95,7 +95,7 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
         double start = get_current_time();
 
         {
-            Extractor ex = net.create_extractor();
+            Extractor ex = create_extractor(&net);
             ex.input("data", in);
             ex.extract("output", out);
         }

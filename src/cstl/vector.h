@@ -123,6 +123,38 @@
 /* Judge whether the vector is empty */
 #define vector_empty(vector) ((vector).count == 0)
 
+/* Resize the vector size with given default value */
+#define vector_resize_with_value(vector, new_size, new_value) do {  \
+    if ((new_size) <= (vector).size)                                \
+    {                                                               \
+        (vector).count = new_size;                                  \
+        (vector).err_num = ERR_OK;                                  \
+    }                                                               \
+    else                                                            \
+    {                                                               \
+        void *ptr = malloc(sizeof(*(vector).data_ptr) * new_size);  \
+        if (ptr == NULL)                                            \
+        {                                                           \
+            (vector).err_num = ERR_MEMORY_FAILURE;                  \
+        }                                                           \
+        else                                                        \
+        {                                                           \
+            free((vector).data_ptr);                                \
+            (vector).data_ptr = ptr;                                \
+            (vector).size = new_size;                               \
+            (vector).count = new_size;                              \
+            (vector).err_num = ERR_OK;                              \
+        }                                                           \
+    }                                                               \
+    if ((vector).err_num == ERR_OK)                                 \
+    {                                                               \
+        for (int i = 0; i < (new_size); i++)                        \
+        {                                                           \
+            vector_get(vector, i) = (new_value);                    \
+        }                                                           \
+    }                                                               \
+} while (0)
+
 /* Resize the vector size */
 #define vector_resize(vector, new_size) do {                                \
     if ((new_size) <= (vector).size)                                        \

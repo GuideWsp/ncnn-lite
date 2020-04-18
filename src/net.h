@@ -103,27 +103,31 @@ struct Net
     // unload network structure and weight data
     void clear();
 
-    // construct an Extractor from network
-    Extractor create_extractor() const;
-
-    // parse the structure of network
-    // fuse int8 op dequantize and quantize by requantize
-    int fuse_network();
-
-#if NCNN_STRING
-    int find_blob_index_by_name(const char* name) const;
-    int find_layer_index_by_name(const char* name) const;
-    int custom_layer_to_index(const char* type);
-    Layer* create_custom_layer(const char* type);
-#endif // NCNN_STRING
-    Layer* create_custom_layer(int index);
     int forward_layer(int layer_index, std::vector<Mat>& blob_mats, Option& opt) const;
 
     vector_def(Blob) blobs;
-    std::vector<Layer*> layers;
+    vector_def(Layer*) layers;
 
-    std::vector<layer_registry_entry> custom_layer_registry;
+    vector_def(layer_registry_entry) custom_layer_registry;
 };
+
+// construct an Extractor from network
+extern Extractor create_extractor(Net *net);
+
+#if NCNN_STRING
+
+extern int find_blob_index_by_name(Net *net, const char* name);
+extern int find_layer_index_by_name(Net *net, const char* name);
+extern int custom_layer_to_index(Net *net, const char* type);
+extern Layer* create_custom_layer_by_type(Net *net, const char* type);
+
+#endif // NCNN_STRING
+
+extern Layer* create_custom_layer_by_index(Net *net, int index);
+
+// parse the structure of network
+// fuse int8 op dequantize and quantize by requantize
+int fuse_network(Net *net);
 
 struct Extractor
 {
