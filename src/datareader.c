@@ -14,17 +14,18 @@
 
 #include "datareader.h"
 #include <string.h>
+#include <stdlib.h>
 
 #if NCNN_STDIO
 #if NCNN_STRING
-int DataReaderFromStdio_scan(void *_self, const char* format, void* p)
+int DataReaderFromStdio_scan(const void *_self, const char* format, void* p)
 {
     FILE *fp = (FILE *)((struct DataReader *)_self)->dr_handle;
     return fscanf(fp, format, p);
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromStdio_read(void *_self, void* buf, size_t size)
+size_t DataReaderFromStdio_read(const void *_self, void* buf, size_t size)
 {
     FILE *fp = (FILE *)((struct DataReader *)_self)->dr_handle;
     return fread(buf, 1, size, fp);
@@ -32,7 +33,7 @@ size_t DataReaderFromStdio_read(void *_self, void* buf, size_t size)
 #endif // NCNN_STDIO
 
 #if NCNN_STRING
-int DataReaderFromMemory_scan(void *_self, const char* format, void* p)
+int DataReaderFromMemory_scan(const void *_self, const char* format, void* p)
 {
     char **mem_ptr = (char **)((struct DataReader *)_self)->dr_handle;
     size_t fmtlen = strlen(format);
@@ -50,7 +51,7 @@ int DataReaderFromMemory_scan(void *_self, const char* format, void* p)
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromMemory_read(void *_self, void* buf, size_t size)
+size_t DataReaderFromMemory_read(const void *_self, void* buf, size_t size)
 {
     char **mem_ptr = (char **)((struct DataReader *)_self)->dr_handle;
     memcpy(buf, *mem_ptr, size);

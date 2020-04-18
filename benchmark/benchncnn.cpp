@@ -27,12 +27,12 @@
 
 // DataReaderFromEmpty creator
 
-int DataReaderFromEmpty_scan(void *_self, const char* format, void* p)
+int DataReaderFromEmpty_scan(const void *_self, const char* format, void* p)
 {
     return 0;
 }
 
-size_t DataReaderFromEmpty_read(void *_self, void* buf, size_t size)
+size_t DataReaderFromEmpty_read(const void *_self, void* buf, size_t size)
 {
     memset(buf, 0, size);
     return size;

@@ -40,7 +40,7 @@ struct Net
 #if NCNN_STRING
     // register custom layer by layer type name
     // return 0 if success
-    int register_custom_layer(const char* type, layer_creator_func creator);
+    int register_custom_layer_by_type(const char* type, layer_creator_func creator);
 #endif // NCNN_STRING
     // register custom layer by layer type
     // return 0 if success
@@ -116,7 +116,7 @@ extern Extractor create_extractor(Net *net);
 
 #if NCNN_STRING
 
-extern int find_blob_index_by_name(Net *net, const char* name);
+extern int find_blob_index_by_name(const Net *net, const char* name);
 extern int find_layer_index_by_name(Net *net, const char* name);
 extern int custom_layer_to_index(Net *net, const char* type);
 extern Layer* create_custom_layer_by_type(Net *net, const char* type);

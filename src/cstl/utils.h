@@ -41,7 +41,7 @@
     uint32 swp_size = min(sizeof(x), sizeof(y));    \
     char *ptr1 = (char *)&(x);                      \
     char *ptr2 = (char *)&(y);                      \
-    for (int i = 0; i < swp_size; i++)              \
+    for (uint32 i = 0; i < swp_size; i++)           \
     {                                               \
         ptr1[i] ^= ptr2[i];                         \
         ptr2[i] ^= ptr1[i];                         \

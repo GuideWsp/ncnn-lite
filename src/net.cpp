@@ -48,7 +48,7 @@ Net::~Net()
 }
 
 #if NCNN_STRING
-int Net::register_custom_layer(const char* type, layer_creator_func creator)
+int Net::register_custom_layer_by_type(const char* type, layer_creator_func creator)
 {
     int typeindex = layer_to_index(type);
     if (typeindex != -1)
@@ -577,11 +577,11 @@ int fuse_network(Net *net)
     for (size_t i=0; i<vector_size(net->layers); i++)
     {
         Layer* layer = vector_get(net->layers, i);
-        if (layer->type == "Convolution" || layer->type == "ConvolutionDepthWise")
+        if (strcmp(layer->type, "Convolution") == 0 || strcmp(layer->type, "ConvolutionDepthWise") == 0)
         {
-            if (layer->type == "Convolution" && (((Convolution*)layer)->weight_data.elemsize != 1u))
+            if (strcmp(layer->type, "Convolution") == 0 && (((Convolution*)layer)->weight_data.elemsize != 1u))
                 continue;
-            if (layer->type == "ConvolutionDepthWise" && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
+            if (strcmp(layer->type, "ConvolutionDepthWise") == 0 && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
                 continue;    
             net_quantized = true;
         }
@@ -594,11 +594,11 @@ int fuse_network(Net *net)
     {
         Layer* layer = vector_get(net->layers, i);
 
-        if (layer->type == "Convolution" || layer->type == "ConvolutionDepthWise")
+        if (strcmp(layer->type, "Convolution") == 0 || strcmp(layer->type, "ConvolutionDepthWise") == 0)
         {
-            if (layer->type == "Convolution" && (((Convolution*)layer)->weight_data.elemsize != 1u))
+            if (strcmp(layer->type, "Convolution") == 0 && (((Convolution*)layer)->weight_data.elemsize != 1u))
                 continue;
-            if (layer->type == "ConvolutionDepthWise" && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
+            if (strcmp(layer->type, "ConvolutionDepthWise") == 0 && (((ConvolutionDepthWise*)layer)->weight_data.elemsize != 1u))
                 continue;
 
             for (size_t n=0; n<vector_size(vector_get(net->blobs, layer->tops[0]).consumers); n++)
@@ -606,25 +606,25 @@ int fuse_network(Net *net)
                 int layer_next_index = vector_get(vector_get(net->blobs, layer->tops[0]).consumers, n);
                 Layer* layer_next = vector_get(net->layers, layer_next_index);
 
-                if (layer_next->type == "Convolution" || layer_next->type == "ConvolutionDepthWise")
+                if (strcmp(layer_next->type, "Convolution") == 0 || strcmp(layer_next->type, "ConvolutionDepthWise") == 0)
                 {
-                    if (layer_next->type == "Convolution" && ((Convolution*)layer_next)->weight_data.elemsize != 1u)
+                    if (strcmp(layer_next->type, "Convolution") == 0 && ((Convolution*)layer_next)->weight_data.elemsize != 1u)
                         continue;
-                    if (layer_next->type == "ConvolutionDepthWise" && ((ConvolutionDepthWise*)layer_next)->weight_data.elemsize != 1u)
+                    if (strcmp(layer_next->type, "ConvolutionDepthWise") == 0 && ((ConvolutionDepthWise*)layer_next)->weight_data.elemsize != 1u)
                         continue;    
 
                     // fprintf(stderr, "%s, %s\n", layer->name.c_str(), layer_next->name.c_str());
-                    if (layer->type == "Convolution" && layer_next->type == "Convolution")
+                    if (strcmp(layer->type, "Convolution") == 0 && strcmp(layer_next->type, "Convolution") == 0)
                     {
                         ((Convolution*)layer)->use_int8_requantize = true;
                         ((Convolution*)layer)->top_blob_int8_scale = ((Convolution*)layer_next)->bottom_blob_int8_scale;
                     }
-                    else if (layer->type == "ConvolutionDepthWise" && layer_next->type == "Convolution")
+                    else if (strcmp(layer->type, "ConvolutionDepthWise") == 0 && strcmp(layer_next->type, "Convolution") == 0)
                     {
                         ((ConvolutionDepthWise*)layer)->use_int8_requantize = true;
                         ((ConvolutionDepthWise*)layer)->top_blob_int8_scale = ((Convolution*)layer_next)->bottom_blob_int8_scale;
                     }
-                    else if (layer->type == "Convolution" && layer_next->type == "ConvolutionDepthWise")
+                    else if (strcmp(layer->type, "Convolution") == 0 && strcmp(layer_next->type, "ConvolutionDepthWise") == 0)
                     {
                         ((Convolution*)layer)->use_int8_requantize = true;
                         ((Convolution*)layer)->top_blob_int8_scale = ((ConvolutionDepthWise*)layer_next)->bottom_blob_int8_scales[0];
@@ -635,30 +635,30 @@ int fuse_network(Net *net)
                         ((ConvolutionDepthWise*)layer)->top_blob_int8_scale = ((ConvolutionDepthWise*)layer_next)->bottom_blob_int8_scales[0];
                     }
                 }                  
-                else if (layer_next->type == "ReLU")
+                else if (strcmp(layer_next->type, "ReLU") == 0)
                 {
                     int layer_next_2_index = vector_get(vector_get(net->blobs, layer_next->tops[0]).consumers, 0);
                     Layer* layer_next_2 = vector_get(net->layers, layer_next_2_index);
 
-                    if (layer_next_2->type == "Convolution" || layer_next_2->type == "ConvolutionDepthWise")
+                    if (strcmp(layer_next_2->type, "Convolution") == 0 || strcmp(layer_next_2->type, "ConvolutionDepthWise") == 0)
                     {
-                        if (layer_next_2->type == "Convolution" && ((Convolution*)layer_next_2)->weight_data.elemsize != 1u)
+                        if (strcmp(layer_next_2->type, "Convolution") == 0 && ((Convolution*)layer_next_2)->weight_data.elemsize != 1u)
                             continue;
-                        if (layer_next_2->type == "ConvolutionDepthWise" && ((ConvolutionDepthWise*)layer_next_2)->weight_data.elemsize != 1u)
+                        if (strcmp(layer_next_2->type, "ConvolutionDepthWise") == 0 && ((ConvolutionDepthWise*)layer_next_2)->weight_data.elemsize != 1u)
                             continue;    
 
 //                         fprintf(stderr, "%s, %s, %s\n", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str());
-                        if (layer->type == "Convolution" && layer_next_2->type == "Convolution")
+                        if (strcmp(layer->type, "Convolution") == 0 && strcmp(layer_next_2->type, "Convolution") == 0)
                         {
                             ((Convolution*)layer)->use_int8_requantize = true;
                             ((Convolution*)layer)->top_blob_int8_scale = ((Convolution*)layer_next_2)->bottom_blob_int8_scale;
                         }
-                        else if (layer->type == "ConvolutionDepthWise" && layer_next_2->type == "Convolution")
+                        else if (strcmp(layer->type, "ConvolutionDepthWise") == 0 && strcmp(layer_next_2->type, "Convolution") == 0)
                         {
                             ((ConvolutionDepthWise*)layer)->use_int8_requantize = true;
                             ((ConvolutionDepthWise*)layer)->top_blob_int8_scale = ((Convolution*)layer_next_2)->bottom_blob_int8_scale;
                         }
-                        else if (layer->type == "Convolution" && layer_next_2->type == "ConvolutionDepthWise")
+                        else if (strcmp(layer->type, "Convolution") == 0 && strcmp(layer_next_2->type, "ConvolutionDepthWise") == 0)
                         {
                             ((Convolution*)layer)->use_int8_requantize = true;
                             ((Convolution*)layer)->top_blob_int8_scale = ((ConvolutionDepthWise*)layer_next_2)->bottom_blob_int8_scales[0];
@@ -669,15 +669,15 @@ int fuse_network(Net *net)
                             ((ConvolutionDepthWise*)layer)->top_blob_int8_scale = ((ConvolutionDepthWise*)layer_next_2)->bottom_blob_int8_scales[0];
                         }
                     }
-                    else if (layer_next_2->type == "Split")
+                    else if (strcmp(layer_next_2->type, "Split") == 0)
                     {
                         bool all_conv = true;
                         for (size_t i=0; i<layer_next_2->tops.size(); i++)
                         {
                             int layer_next_3_index = vector_get(vector_get(net->blobs, layer_next_2->tops[i]).consumers, 0);
-                            if (vector_get(net->layers, layer_next_3_index)->type != "Convolution" &&
-                                vector_get(net->layers, layer_next_3_index)->type != "ConvolutionDepthWise" &&
-                                vector_get(net->layers, layer_next_3_index)->type != "PriorBox" )
+                            if (strcmp(vector_get(net->layers, layer_next_3_index)->type, "Convolution") != 0 &&
+                                strcmp(vector_get(net->layers, layer_next_3_index)->type, "ConvolutionDepthWise") != 0 &&
+                                strcmp(vector_get(net->layers, layer_next_3_index)->type, "PriorBox") != 0 )
                             {
                                 // fprintf(stderr, "%s, %s, %s, %s\n", layer->name.c_str(), layer_next->name.c_str(), layer_next_2->name.c_str(), layers[layer_next_3_index]->name.c_str());
                                 all_conv = false;
@@ -693,7 +693,7 @@ int fuse_network(Net *net)
                                 Layer* layer_next_3 = vector_get(net->layers, layer_next_3_index);
 
                                 // fprintf(stderr, "%s, ", layer_next_3->name.c_str());
-                                if (layer_next_3->type == "Convolution")
+                                if (strcmp(layer_next_3->type, "Convolution") == 0)
                                 {
                                     ((Convolution*)layer)->top_blob_int8_scale = ((Convolution*)layer_next_3)->bottom_blob_int8_scale; 
                                 }    
@@ -708,7 +708,7 @@ int fuse_network(Net *net)
                         // fprintf(stderr, "%s, %s\n", layer->name.c_str(), layer_next->name.c_str());
                     }
                 }
-                else if (layer_next->type == "Pooling")
+                else if (strcmp(layer_next->type, "Pooling") == 0)
                 {
                     // ToDo
                 }
@@ -747,7 +747,7 @@ Extractor create_extractor(Net *net)
 }
 
 #if NCNN_STRING
-int find_blob_index_by_name(Net *net, const char* name)
+int find_blob_index_by_name(const Net *net, const char* name)
 {
     for (size_t i=0; i<vector_size(net->blobs); i++)
     {

@@ -24,23 +24,24 @@
 #ifndef __GENERIC_VECTOR_H__
 #define __GENERIC_VECTOR_H__
 
+#include "defs.h"
 #include "errnum.h"
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
 
 /* Vector struct definition */
-#define vector_def(type)            \
-    struct {                        \
-        type *data_ptr;             \
-        unsigned int size;          \
-        unsigned int count;         \
-        unsigned int err_num;       \
-        pthread_mutex_t mutex;      \
-        pthread_cond_t cond;        \
-        type* (*get)(void *, int);  \
-        void (*ctor)(void *);       \
-        void (*dtor)(void *);       \
+#define vector_def(type)                    \
+    struct {                                \
+        type *data_ptr;                     \
+        unsigned int size;                  \
+        unsigned int count;                 \
+        unsigned int err_num;               \
+        pthread_mutex_t mutex;              \
+        pthread_cond_t cond;                \
+        type* (*get)(void *, int);          \
+        void *(*ctor)(void *, va_list *);   \
+        void *(*dtor)(void *);              \
     }
 
 /* Extern the vector to a type, so we can use the pointer in param */
@@ -84,7 +85,7 @@
 #define vector_destroy(vector) do { \
     if ((vector).dtor)                              \
     {                                               \
-        for (int i = 0; i < (vector).size; i++)     \
+        for (uint32 i = 0; i < (vector).size; i++)  \
         {                                           \
             (vector).dtor(&vector_get(vector, i));  \
         }                                           \
@@ -125,7 +126,7 @@
 
 /* Resize the vector size with given default value */
 #define vector_resize_with_value(vector, new_size, new_value) do {  \
-    if ((new_size) <= (vector).size)                                \
+    if ((uint32)(new_size) <= (vector).size)                        \
     {                                                               \
         (vector).count = new_size;                                  \
         (vector).err_num = ERR_OK;                                  \
@@ -157,7 +158,7 @@
 
 /* Resize the vector size */
 #define vector_resize(vector, new_size) do {                                \
-    if ((new_size) <= (vector).size)                                        \
+    if ((uint32)(new_size) <= (vector).size)                                \
     {                                                                       \
         (vector).count = new_size;                                          \
         (vector).err_num = ERR_OK;                                          \
@@ -180,9 +181,9 @@
             (vector).size = new_size;                                       \
             if ((vector).ctor)                                              \
             {                                                               \
-                for (int i = (vector).count; i < (new_size); i++)           \
+                for (int i = (vector).count; i < (int)(new_size); i++)      \
                 {                                                           \
-                    (vector).ctor(&vector_get(vector, i));                  \
+                    (vector).ctor(&vector_get(vector, i), NULL);            \
                 }                                                           \
             }                                                               \
             (vector).count = new_size;                                      \
