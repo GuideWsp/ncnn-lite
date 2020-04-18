@@ -17,24 +17,30 @@
 
 #include "cstl/utils.h"
 
-DEFINE_LAYER_CREATOR(Eltwise)
-
-Eltwise::Eltwise()
+void *Eltwise_ctor(void *_self, va_list *args)
 {
-    one_blob_only = false;
-    support_inplace = false;// TODO inplace reduction
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = false;
+    self->support_inplace = false;// TODO inplace reduction
+
+    return _self;
 }
 
-int Eltwise::load_param(const ParamDict& pd)
+int Eltwise_load_param(void *_self, const ParamDict& pd)
 {
-    op_type = pd.get(0, 0);
-    coeffs = pd.get(1, Mat());
+    Eltwise *self = (Eltwise *)_self;
+
+    self->op_type = pd.get(0, 0);
+    self->coeffs = pd.get(1, Mat());
 
     return 0;
 }
 
-int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int Eltwise_forward(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    Eltwise *self = (Eltwise *)_self;
+
     const Mat& bottom_blob = bottom_blobs[0];
     int w = bottom_blob.w;
     int h = bottom_blob.h;
@@ -47,7 +53,7 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
     if (top_blob.empty())
         return -100;
 
-    if (op_type == Operation_PROD)
+    if (self->op_type == Operation_PROD)
     {
         // first blob
         const Mat& bottom_blob1 = bottom_blobs[1];
@@ -80,9 +86,9 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             }
         }
     }
-    else if (op_type == Operation_SUM)
+    else if (self->op_type == Operation_SUM)
     {
-        if (coeffs.w == 0)
+        if (self->coeffs.w == 0)
         {
             // first blob
             const Mat& bottom_blob1 = bottom_blobs[1];
@@ -119,8 +125,8 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
         {
             // first blob
             const Mat& bottom_blob1 = bottom_blobs[1];
-            float coeff0 = coeffs[0];
-            float coeff1 = coeffs[1];
+            float coeff0 = self->coeffs[0];
+            float coeff1 = self->coeffs[1];
             #pragma omp parallel for num_threads(opt.num_threads)
             for (int q=0; q<channels; q++)
             {
@@ -137,7 +143,7 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             for (size_t b=2; b<bottom_blobs.size(); b++)
             {
                 const Mat& bottom_blob1 = bottom_blobs[b];
-                float coeff = coeffs[b];
+                float coeff = self->coeffs[b];
                 #pragma omp parallel for num_threads(opt.num_threads)
                 for (int q=0; q<channels; q++)
                 {
@@ -152,7 +158,7 @@ int Eltwise::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             }
         }
     }
-    else if (op_type == Operation_MAX)
+    else if (self->op_type == Operation_MAX)
     {
         // first blob
         const Mat& bottom_blob1 = bottom_blobs[1];
