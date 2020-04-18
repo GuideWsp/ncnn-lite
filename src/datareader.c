@@ -17,24 +17,24 @@
 
 #if NCNN_STDIO
 #if NCNN_STRING
-int DataReaderFromStdio_scan(void *handle, const char* format, void* p)
+int DataReaderFromStdio_scan(void *_self, const char* format, void* p)
 {
-    FILE *fp = (FILE *)handle;
+    FILE *fp = (FILE *)((struct DataReader *)_self)->dr_handle;
     return fscanf(fp, format, p);
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromStdio_read(void *handle, void* buf, size_t size)
+size_t DataReaderFromStdio_read(void *_self, void* buf, size_t size)
 {
-    FILE *fp = (FILE *)handle;
+    FILE *fp = (FILE *)((struct DataReader *)_self)->dr_handle;
     return fread(buf, 1, size, fp);
 }
 #endif // NCNN_STDIO
 
 #if NCNN_STRING
-int DataReaderFromMemory_scan(void *handle, const char* format, void* p)
+int DataReaderFromMemory_scan(void *_self, const char* format, void* p)
 {
-    char **mem_ptr = (char **)handle;
+    char **mem_ptr = (char **)((struct DataReader *)_self)->dr_handle;
     size_t fmtlen = strlen(format);
 
     char* format_with_n = (char *)malloc(fmtlen + 3);
@@ -50,9 +50,9 @@ int DataReaderFromMemory_scan(void *handle, const char* format, void* p)
 }
 #endif // NCNN_STRING
 
-size_t DataReaderFromMemory_read(void *handle, void* buf, size_t size)
+size_t DataReaderFromMemory_read(void *_self, void* buf, size_t size)
 {
-    char **mem_ptr = (char **)handle;
+    char **mem_ptr = (char **)((struct DataReader *)_self)->dr_handle;
     memcpy(buf, *mem_ptr, size);
     *mem_ptr += size;
     return size;

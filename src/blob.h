@@ -24,7 +24,7 @@
 typedef struct _Blob
 {
     // cclass def
-    void *base;
+    cclass *clazz;
 
 #if NCNN_STRING
     // blob name

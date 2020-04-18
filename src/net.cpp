@@ -99,10 +99,10 @@ int Net::register_custom_layer(int index, layer_creator_func creator)
 }
 
 #if NCNN_STRING
-int Net::load_param(void *dr_handle, const DataReader& dr)
+int Net::load_param(const DataReader& dr)
 {
 #define SCAN_VALUE(fmt, v) \
-    if (dr.scan(dr_handle, fmt, &v) != 1) \
+    if (dr.scan(&dr, fmt, &v) != 1) \
     { \
         fprintf(stderr, "parse " #v " failed\n"); \
         return -1; \
@@ -206,7 +206,7 @@ int Net::load_param(void *dr_handle, const DataReader& dr)
         }
 
         // layer specific params
-        int pdlr = pd.load_param(dr_handle, dr);
+        int pdlr = pd.load_param(dr);
         if (pdlr != 0)
         {
             fprintf(stderr, "ParamDict load_param failed\n");
@@ -268,10 +268,10 @@ int Net::load_param(void *dr_handle, const DataReader& dr)
 }
 #endif // NCNN_STRING
 
-int Net::load_param_bin(void *dr_handle, const DataReader& dr)
+int Net::load_param_bin(const DataReader& dr)
 {
 #define READ_VALUE(buf) \
-    if (dr.read(dr_handle, &buf, sizeof(buf)) != sizeof(buf)) \
+    if (dr.read(&dr, &buf, sizeof(buf)) != sizeof(buf)) \
     { \
         fprintf(stderr, "read " #buf " failed\n"); \
         return -1; \
@@ -356,7 +356,7 @@ int Net::load_param_bin(void *dr_handle, const DataReader& dr)
         }
 
         // layer specific params
-        int pdlr = pd.load_param_bin(dr_handle, dr);
+        int pdlr = pd.load_param_bin(dr);
         if (pdlr != 0)
         {
             fprintf(stderr, "ParamDict load_param failed\n");
@@ -417,7 +417,7 @@ int Net::load_param_bin(void *dr_handle, const DataReader& dr)
     return 0;
 }
 
-int Net::load_model(void *dr_handle, const DataReader& dr)
+int Net::load_model(const DataReader& dr)
 {
     if (layers.empty())
     {
@@ -428,7 +428,7 @@ int Net::load_model(void *dr_handle, const DataReader& dr)
     // load file
     int ret = 0;
 
-    ModelBinFromDataReader mb(dr_handle, dr);
+    ModelBinFromDataReader mb(dr);
     for (size_t i=0; i<layers.size(); i++)
     {
         Layer* layer = layers[i];
@@ -480,15 +480,15 @@ int Net::load_model(void *dr_handle, const DataReader& dr)
 #if NCNN_STRING
 int Net::load_param(FILE* fp)
 {
-    DataReader dr = { .scan = DataReaderFromStdio_scan, .read = DataReaderFromStdio_read };
-    return load_param(fp, dr);
+    DataReader dr = createDataReaderFromStdio(fp);
+    return load_param(dr);
 }
 
 int Net::load_param_mem(const char* _mem)
 {
     const unsigned char* mem = (const unsigned char*)_mem;
-    DataReader dr = { .scan = DataReaderFromMemory_scan, .read = DataReaderFromMemory_read };
-    return load_param(&mem, dr);
+    DataReader dr = createDataReaderFromMemory(&mem);
+    return load_param(dr);
 }
 
 int Net::load_param(const char* protopath)
@@ -508,8 +508,8 @@ int Net::load_param(const char* protopath)
 
 int Net::load_param_bin(FILE* fp)
 {
-    DataReader dr = { .scan = DataReaderFromStdio_scan, .read = DataReaderFromStdio_read };
-    return load_param_bin(fp, dr);
+    DataReader dr = createDataReaderFromStdio(fp);
+    return load_param_bin(dr);
 }
 
 int Net::load_param_bin(const char* protopath)
@@ -528,8 +528,8 @@ int Net::load_param_bin(const char* protopath)
 
 int Net::load_model(FILE* fp)
 {
-    DataReader dr = { .scan = DataReaderFromStdio_scan, .read = DataReaderFromStdio_read };
-    return load_model(fp, dr);
+    DataReader dr = createDataReaderFromStdio(fp);
+    return load_model(dr);
 }
 
 int Net::load_model(const char* modelpath)
@@ -550,16 +550,16 @@ int Net::load_model(const char* modelpath)
 int Net::load_param(const unsigned char* _mem)
 {
     const unsigned char* mem = _mem;
-    DataReader dr = { .scan = DataReaderFromMemory_scan, .read = DataReaderFromMemory_read };
-    load_param_bin(&mem, dr);
+    DataReader dr = createDataReaderFromMemory(&mem);
+    load_param_bin(dr);
     return static_cast<int>(mem - _mem);
 }
 
 int Net::load_model(const unsigned char* _mem)
 {
     const unsigned char* mem = _mem;
-    DataReader dr = { .scan = DataReaderFromMemory_scan, .read = DataReaderFromMemory_read };
-    load_model(&mem, dr);
+    DataReader dr = createDataReaderFromMemory(&mem);
+    load_model(dr);
     return static_cast<int>(mem - _mem);
 }
 

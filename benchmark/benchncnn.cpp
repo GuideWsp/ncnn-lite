@@ -25,15 +25,23 @@
 
 #include "cstl/utils.h"
 
-int DataReaderFromEmpty_scan(void *handle, const char* format, void* p)
+// DataReaderFromEmpty creator
+
+int DataReaderFromEmpty_scan(void *_self, const char* format, void* p)
 {
     return 0;
 }
 
-size_t DataReaderFromEmpty_read(void *handle, void* buf, size_t size)
+size_t DataReaderFromEmpty_read(void *_self, void* buf, size_t size)
 {
     memset(buf, 0, size);
     return size;
+}
+
+#define createDataReaderFromEmpty()  {  \
+    .dr_handle = NULL,                  \
+    .scan = DataReaderFromEmpty_scan,   \
+    .read = DataReaderFromEmpty_read    \
 }
 
 static int g_warmup_loop_count = 8;
@@ -56,8 +64,8 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
     sprintf(parampath, "%s.param", comment);
     net.load_param(parampath);
 
-    DataReader dr = { .scan = DataReaderFromEmpty_scan, .read = DataReaderFromEmpty_read };
-    net.load_model(NULL, dr);
+    DataReader dr = createDataReaderFromEmpty();
+    net.load_model(dr);
 
     g_blob_pool_allocator.clear();
     g_workspace_pool_allocator.clear();

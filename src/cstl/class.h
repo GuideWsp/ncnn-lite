@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 
+// basic class definition with ctor and dtor
 typedef struct _cclass
 {
     // object info
