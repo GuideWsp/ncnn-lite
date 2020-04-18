@@ -18,16 +18,18 @@
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-DEFINE_LAYER_CREATOR(AbsVal_arm)
-
-AbsVal_arm::AbsVal_arm()
+void *AbsVal_arm_ctor(void *_self, va_list *args)
 {
+    Layer *self = (Layer *)_self;
+
 #if __ARM_NEON
     support_packing = true;
 #endif // __ARM_NEON
+
+    return _self;
 }
 
-int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int AbsVal_arm_forward_inplace(Mat& bottom_top_blob, const Option& opt)
 {
     int w = bottom_top_blob.w;
     int h = bottom_top_blob.h;

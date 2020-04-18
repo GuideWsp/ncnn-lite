@@ -17,11 +17,18 @@
 
 #include "absval.h"
 
-struct AbsVal_arm : virtual public AbsVal
-{
-    AbsVal_arm();
+void *AbsVal_arm_ctor(void *_self, va_list *args);
 
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-};
+int AbsVal_arm_forward_inplace(Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define AbsVal_arm_dtor                     Layer_dtor
+#define AbsVal_arm_load_param               Layer_load_param
+#define AbsVal_arm_load_model               Layer_load_model
+#define AbsVal_arm_create_pipeline          Layer_create_pipeline
+#define AbsVal_arm_destroy_pipeline         Layer_destroy_pipeline
+#define AbsVal_arm_forward_multi            Layer_forward_multi
+#define AbsVal_arm_forward                  Layer_forward
+#define AbsVal_arm_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_ABSVAL_ARM_H
