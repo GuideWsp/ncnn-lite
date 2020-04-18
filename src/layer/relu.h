@@ -17,16 +17,30 @@
 
 #include "layer.h"
 
-struct ReLU : public Layer
+struct ReLU
 {
-    ReLU();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-    virtual int forward_inplace_int8(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     float slope;
 };
+
+void *ReLU_ctor(void *_self, va_list *args);
+
+int ReLU_load_param(void *_self, const ParamDict& pd);
+
+int ReLU_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+int ReLU_forward_inplace_int8(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define ReLU_dtor                     Layer_dtor
+#define ReLU_load_model               Layer_load_model
+#define ReLU_create_pipeline          Layer_create_pipeline
+#define ReLU_destroy_pipeline         Layer_destroy_pipeline
+#define ReLU_forward_multi            Layer_forward_multi
+#define ReLU_forward                  Layer_forward
+#define ReLU_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_RELU_H

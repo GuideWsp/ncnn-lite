@@ -17,15 +17,28 @@
 
 #include "layer.h"
 
-struct Quantize : public Layer
+struct Quantize
 {
-    Quantize();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     float scale;
 };
+
+void *Quantize_ctor(void *_self, va_list *args);
+
+int Quantize_load_param(void *_self, const ParamDict& pd);
+
+int Quantize_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define Quantize_dtor                     Layer_dtor
+#define Quantize_load_model               Layer_load_model
+#define Quantize_create_pipeline          Layer_create_pipeline
+#define Quantize_destroy_pipeline         Layer_destroy_pipeline
+#define Quantize_forward_multi            Layer_forward_multi
+#define Quantize_forward_inplace_multi    Layer_forward_inplace_multi
+#define Quantize_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_QUANTIZE_H

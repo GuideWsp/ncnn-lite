@@ -15,24 +15,30 @@
 #include "dropout.h"
 #include <math.h>
 
-DEFINE_LAYER_CREATOR(Dropout)
-
-Dropout::Dropout()
+void *Dropout_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = true;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = true;
+
+    return _self;
 }
 
-int Dropout::load_param(const ParamDict& pd)
+int Dropout_load_param(void *_self, const ParamDict& pd)
 {
-    scale = pd.get(0, 1.f);
+    Dropout *self = (Dropout *)_self;
+
+    self->scale = pd.get(0, 1.f);
 
     return 0;
 }
 
-int Dropout::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int Dropout_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
-    if (scale == 1.f)
+    Dropout *self = (Dropout *)_self;
+
+    if (self->scale == 1.f)
     {
         return 0;
     }
@@ -49,7 +55,7 @@ int Dropout::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
         for (int i=0; i<size; i++)
         {
-            ptr[i] = ptr[i] * scale;
+            ptr[i] = ptr[i] * self->scale;
         }
     }
 

@@ -17,15 +17,28 @@
 
 #include "layer.h"
 
-struct Dropout : public Layer
+struct Dropout
 {
-    Dropout();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     float scale;
 };
+
+void *Dropout_ctor(void *_self, va_list *args);
+
+int Dropout_load_param(void *_self, const ParamDict& pd);
+
+int Dropout_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define Dropout_dtor                     Layer_dtor
+#define Dropout_load_model               Layer_load_model
+#define Dropout_create_pipeline          Layer_create_pipeline
+#define Dropout_destroy_pipeline         Layer_destroy_pipeline
+#define Dropout_forward_multi            Layer_forward_multi
+#define Dropout_forward                  Layer_forward
+#define Dropout_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_DROPOUT_H
