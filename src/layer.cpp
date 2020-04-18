@@ -33,14 +33,14 @@ void *Layer_ctor(void *_self, va_list *args)
 {
     Layer *self = (Layer *)_self;
 
-    self->load_param = va_arg(*args, int (*)(Layer*, const ParamDict&));
-    self->load_model = va_arg(*args, int (*)(Layer*, const ModelBin&));
-    self->create_pipeline = va_arg(*args, int (*)(Layer*, const Option&));
-    self->destroy_pipeline = va_arg(*args, int (*)(Layer*, const Option&));
-    self->forward_multi = va_arg(*args, int (*)(Layer*, const std::vector<Mat>&, std::vector<Mat>&, const Option&));
-    self->forward = va_arg(*args, int (*)(Layer*, const Mat&, Mat&, const Option&));
-    self->forward_inplace_multi = va_arg(*args, int (*)(Layer*, std::vector<Mat>&, const Option&));
-    self->forward_inplace = va_arg(*args, int (*)(Layer*, Mat&, const Option&));
+    self->load_param = va_arg(*args, int (*)(void*, const ParamDict&));
+    self->load_model = va_arg(*args, int (*)(void*, const ModelBin&));
+    self->create_pipeline = va_arg(*args, int (*)(void*, const Option&));
+    self->destroy_pipeline = va_arg(*args, int (*)(void*, const Option&));
+    self->forward_multi = va_arg(*args, int (*)(void*, const std::vector<Mat>&, std::vector<Mat>&, const Option&));
+    self->forward = va_arg(*args, int (*)(void*, const Mat&, Mat&, const Option&));
+    self->forward_inplace_multi = va_arg(*args, int (*)(void*, std::vector<Mat>&, const Option&));
+    self->forward_inplace = va_arg(*args, int (*)(void*, Mat&, const Option&));
 
     self->one_blob_only = false;
     self->support_inplace = false;
@@ -57,28 +57,30 @@ void *Layer_dtor(void *_self)
     return _self;
 }
 
-int Layer_create_pipeline(Layer *self, const Option& opt)
+int Layer_create_pipeline(void *_self, const Option& opt)
 {
     return 0;
 }
 
-int Layer_destroy_pipeline(Layer *self, const Option& opt)
+int Layer_destroy_pipeline(void *_self, const Option& opt)
 {
     return 0;
 }
 
-int Layer_load_param(Layer *self, const ParamDict& pd)
+int Layer_load_param(void *_self, const ParamDict& pd)
 {
     return 0;
 }
 
-int Layer_load_model(Layer *self, const ModelBin& mb)
+int Layer_load_model(void *_self, const ModelBin& mb)
 {
     return 0;
 }
 
-int Layer_forward_multi(Layer *self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
+int Layer_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    Layer *self = (Layer *)_self;
+
     if (!self->support_inplace)
         return -1;
 
@@ -93,8 +95,10 @@ int Layer_forward_multi(Layer *self, const std::vector<Mat>& bottom_blobs, std::
     return self->forward_inplace_multi(self, top_blobs, opt);
 }
 
-int Layer_forward(Layer *self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
+int Layer_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Layer *self = (Layer *)_self;
+
     if (!self->support_inplace)
         return -1;
 
@@ -105,12 +109,12 @@ int Layer_forward(Layer *self, const Mat& bottom_blob, Mat& top_blob, const Opti
     return self->forward_inplace(self, top_blob, opt);
 }
 
-int Layer_forward_inplace_multi(Layer *self, std::vector<Mat>& /*bottom_top_blobs*/, const Option& /*opt*/)
+int Layer_forward_inplace_multi(void *_self, std::vector<Mat>& /*bottom_top_blobs*/, const Option& /*opt*/)
 {
     return -1;
 }
 
-int Layer_forward_inplace(Layer *self, Mat& /*bottom_top_blob*/, const Option& /*opt*/)
+int Layer_forward_inplace(void *_self, Mat& /*bottom_top_blob*/, const Option& /*opt*/)
 {
     return -1;
 }

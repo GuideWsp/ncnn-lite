@@ -24,7 +24,7 @@ void *AbsVal_ctor(void *_self, va_list *args)
     return _self;
 }
 
-int AbsVal_forward_inplace(Layer *self, Mat& bottom_top_blob, const Option& opt)
+int AbsVal_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
     int w = bottom_top_blob.w;
     int h = bottom_top_blob.h;

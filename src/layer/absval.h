@@ -17,9 +17,15 @@
 
 #include "layer.h"
 
+struct AbsVal
+{
+    // layer base
+    Layer layer;
+};
+
 void *AbsVal_ctor(void *_self, va_list *args);
 
-int AbsVal_forward_inplace(Layer *self, Mat& bottom_top_blob, const Option& opt);
+int AbsVal_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
 
 // default operators
 #define AbsVal_dtor                     Layer_dtor

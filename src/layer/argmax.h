@@ -17,16 +17,29 @@
 
 #include "layer.h"
 
-struct ArgMax : public Layer
+struct ArgMax
 {
-    ArgMax();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     int out_max_val;
     int topk;
 };
+
+void *ArgMax_ctor(void *_self, va_list *args);
+
+int ArgMax_load_param(void *_self, const ParamDict& pd);
+
+int ArgMax_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define ArgMax_dtor                     Layer_dtor
+#define ArgMax_load_model               Layer_load_model
+#define ArgMax_create_pipeline          Layer_create_pipeline
+#define ArgMax_destroy_pipeline         Layer_destroy_pipeline
+#define ArgMax_forward_multi            Layer_forward_multi
+#define ArgMax_forward_inplace_multi    Layer_forward_inplace_multi
+#define ArgMax_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_ARGMAX_H
