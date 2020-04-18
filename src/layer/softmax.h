@@ -17,15 +17,28 @@
 
 #include "layer.h"
 
-struct Softmax : public Layer
+struct Softmax
 {
-    Softmax();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     int axis;
 };
+
+void *Softmax_ctor(void *_self, va_list *args);
+
+int Softmax_load_param(void *_self, const ParamDict& pd);
+
+int Softmax_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define Softmax_dtor                     Layer_dtor
+#define Softmax_load_model               Layer_load_model
+#define Softmax_create_pipeline          Layer_create_pipeline
+#define Softmax_destroy_pipeline         Layer_destroy_pipeline
+#define Softmax_forward_multi            Layer_forward_multi
+#define Softmax_forward                  Layer_forward
+#define Softmax_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_SOFTMAX_H

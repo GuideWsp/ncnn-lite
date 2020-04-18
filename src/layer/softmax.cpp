@@ -19,22 +19,26 @@
 
 #include "cstl/utils.h"
 
-DEFINE_LAYER_CREATOR(Softmax)
-
-Softmax::Softmax()
+void *Softmax_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = true;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = true;
+
+    return _self;
 }
 
-int Softmax::load_param(const ParamDict& pd)
+int Softmax_load_param(void *_self, const ParamDict& pd)
 {
-    axis = pd.get(0, 0);
+    Softmax *self = (Softmax *)_self;
+
+    self->axis = pd.get(0, 0);
 
     // the original softmax handle axis on 3-dim blob incorrectly
     // ask user to regenerate param instead of producing wrong result
     int fixbug0 = pd.get(1, 0);
-    if (fixbug0 == 0 && axis != 0)
+    if (fixbug0 == 0 && self->axis != 0)
     {
         fprintf(stderr, "param is too old, please regenerate!\n");
         return -1;
@@ -43,8 +47,10 @@ int Softmax::load_param(const ParamDict& pd)
     return 0;
 }
 
-int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int Softmax_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
+    Softmax *self = (Softmax *)_self;
+
     // value = exp( value - global max value )
     // sum all value
     // value = value / sum
@@ -79,7 +85,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         return 0;
     }
 
-    if (dims == 2 && axis == 0)
+    if (dims == 2 && self->axis == 0)
     {
         int w = bottom_top_blob.w;
         int h = bottom_top_blob.h;
@@ -127,7 +133,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         return 0;
     }
 
-    if (dims == 2 && axis == 1)
+    if (dims == 2 && self->axis == 1)
     {
         int w = bottom_top_blob.w;
         int h = bottom_top_blob.h;
@@ -157,7 +163,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         return 0;
     }
 
-    if (dims == 3 && axis == 0)
+    if (dims == 3 && self->axis == 0)
     {
         int w = bottom_top_blob.w;
         int h = bottom_top_blob.h;
@@ -209,7 +215,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         return 0;
     }
 
-    if (dims == 3 && axis == 1)
+    if (dims == 3 && self->axis == 1)
     {
         int w = bottom_top_blob.w;
         int h = bottom_top_blob.h;
@@ -281,7 +287,7 @@ int Softmax::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         return 0;
     }
 
-    if (dims == 3 && axis == 2)
+    if (dims == 3 && self->axis == 2)
     {
         int w = bottom_top_blob.w;
         int h = bottom_top_blob.h;
