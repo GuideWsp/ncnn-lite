@@ -57,145 +57,151 @@
 #include "convolution_7x7_pack1to4_bf16s.h"
 #endif // __ARM_NEON
 
-
-DEFINE_LAYER_CREATOR(Convolution_arm)
-
-Convolution_arm::Convolution_arm()
+void *Convolution_arm_ctor(void *_self, va_list *args)
 {
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Layer *layer = (Layer *)_self;
+
 #if __ARM_NEON
-    support_packing = true;
+    layer->support_packing = true;
 #endif // __ARM_NEON
 
-    support_bf16_storage = true;
+    layer->support_bf16_storage = true;
 
-    activation = 0;
-    convolution_dilation1 = 0;
+    self->activation = 0;
+    self->convolution_dilation1 = 0;
+
+    return _self;
 }
 
-int Convolution_arm::create_pipeline(const Option& opt)
+int Convolution_arm_create_pipeline(void *_self, const Option& opt)
 {
-    if (activation_type == 1)
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+    Layer *layer = (Layer *)_self;
+
+    if (parent->activation_type == 1)
     {
-        activation = create_layer(ReLU);
+        self->activation = create_layer(LayerReLU);
 
         ParamDict pd;
-        activation->load_param(pd);
+        self->activation->load_param(self->activation, pd);
     }
-    else if (activation_type == 2)
+    else if (parent->activation_type == 2)
     {
-        activation = create_layer(ReLU);
+        self->activation = create_layer(LayerReLU);
 
         ParamDict pd;
-        pd.set(0, activation_params[0]);// slope
-        activation->load_param(pd);
+        pd.set(0, parent->activation_params[0]);// slope
+        self->activation->load_param(self->activation, pd);
     }
-    else if (activation_type == 3)
+    else if (parent->activation_type == 3)
     {
-        activation = create_layer(Clip);
+        self->activation = create_layer(LayerClip);
 
         ParamDict pd;
-        pd.set(0, activation_params[0]);// min
-        pd.set(1, activation_params[1]);// max
-        activation->load_param(pd);
+        pd.set(0, parent->activation_params[0]);// min
+        pd.set(1, parent->activation_params[1]);// max
+        self->activation->load_param(self->activation, pd);
     }
-    else if (activation_type == 4)
+    else if (parent->activation_type == 4)
     {
-        activation = create_layer(Sigmoid);
+        self->activation = create_layer(LayerSigmoid);
 
         ParamDict pd;
-        activation->load_param(pd);
+        self->activation->load_param(self->activation, pd);
     }
 
-    if (activation)
+    if (self->activation)
     {
-        activation->create_pipeline(opt);
+        self->activation->create_pipeline(self->activation, opt);
     }
 
     if (opt.use_bf16_storage)
     {
-        return create_pipeline_bf16s(opt);
+        return Convolution_arm_create_pipeline_bf16s(self, opt);
     }
 
-    if (opt.use_int8_inference && weight_data.elemsize == (size_t)1u)
+    if (opt.use_int8_inference && parent->weight_data.elemsize == (size_t)1u)
     {
-        support_packing = false;
+        layer->support_packing = false;
 
-        return create_pipeline_int8_arm(opt);
+        return Convolution_arm_create_pipeline_int8_arm(self, opt);
     }
 
-    if (opt.use_packing_layout == false && kernel_w == kernel_h && dilation_w != 1 && dilation_h == dilation_w && stride_w == 1 && stride_h == 1)
+    if (opt.use_packing_layout == false && parent->kernel_w == parent->kernel_h && parent->dilation_w != 1 && parent->dilation_h == parent->dilation_w && parent->stride_w == 1 && parent->stride_h == 1)
     {
-        convolution_dilation1 = create_layer(Convolution);
+        self->convolution_dilation1 = create_layer(LayerConvolution);
 
         // set param
         ParamDict pd;
-        pd.set(0, num_output);// num_output
-        pd.set(1, kernel_w);
-        pd.set(11, kernel_h);
+        pd.set(0, parent->num_output);// parent->num_output
+        pd.set(1, parent->kernel_w);
+        pd.set(11, parent->kernel_h);
         pd.set(2, 1);
         pd.set(12, 1);
-        pd.set(3, 1);// stride_w
-        pd.set(13, 1);// stride_h
+        pd.set(3, 1);// parent->stride_w
+        pd.set(13, 1);// parent->stride_h
         pd.set(4, 0);// pad_w
         pd.set(14, 0);// pad_h
-        pd.set(5, bias_term);
-        pd.set(6, weight_data_size);
+        pd.set(5, parent->bias_term);
+        pd.set(6, parent->weight_data_size);
 
-        convolution_dilation1->load_param(pd);
+        self->convolution_dilation1->load_param(self->convolution_dilation1, pd);
 
         // set weights
-        if (bias_term)
+        if (parent->bias_term)
         {
             Mat weights[2];
-            weights[0] = weight_data;
-            weights[1] = bias_data;
+            weights[0] = parent->weight_data;
+            weights[1] = parent->bias_data;
 
-            convolution_dilation1->load_model(ModelBinFromMatArray(weights));
+            self->convolution_dilation1->load_model(self->convolution_dilation1, ModelBinFromMatArray(weights));
         }
         else
         {
             Mat weights[1];
-            weights[0] = weight_data;
+            weights[0] = parent->weight_data;
 
-            convolution_dilation1->load_model(ModelBinFromMatArray(weights));
+            self->convolution_dilation1->load_model(self->convolution_dilation1, ModelBinFromMatArray(weights));
         }
 
-        convolution_dilation1->create_pipeline(opt);
+        self->convolution_dilation1->create_pipeline(self->convolution_dilation1, opt);
 
         return 0;
     }
 
-    const int maxk = kernel_w * kernel_h;
-    const int num_input = weight_data_size / maxk / num_output;
+    const int maxk = parent->kernel_w * parent->kernel_h;
+    const int num_input = parent->weight_data_size / maxk / parent->num_output;
 
     int elempack = (opt.use_packing_layout && num_input % 4 == 0) ? 4 : 1;
-    int out_elempack = (opt.use_packing_layout && num_output % 4 == 0) ? 4 : 1;
+    int out_elempack = (opt.use_packing_layout && parent->num_output % 4 == 0) ? 4 : 1;
 
 #if __ARM_NEON
     // pack4
     if (elempack == 4 && out_elempack == 4)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4_neon(weight_data, weight_data_pack4, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4_neon(parent->weight_data, weight_data_pack4, num_input, parent->num_output);
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4_neon(weight_data, weight_data_pack4, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4_neon(parent->weight_data, weight_data_pack4, num_input, parent->num_output);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_transform_kernel_pack4_neon(weight_data, weight_data_pack4, num_input, num_output);
+            conv3x3s1_winograd64_transform_kernel_pack4_neon(parent->weight_data, weight_data_pack4, num_input, parent->num_output);
         }
         else
         {
             // src = kw-kh-inch-outch
             // dst = 4b-4a-kw-kh-inch/4a-outch/4b
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack4.create(maxk, num_input/4, num_output/4, (size_t)4*16, 16);
+            weight_data_pack4.create(maxk, num_input/4, parent->num_output/4, (size_t)4*16, 16);
 
-            for (int q=0; q+3<num_output; q+=4)
+            for (int q=0; q+3<parent->num_output; q+=4)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 const Mat k1 = weight_data_r2.channel(q+1);
@@ -263,11 +269,11 @@ int Convolution_arm::create_pipeline(const Option& opt)
         // src = kw-kh-inch-outch
         // dst = 4b-kw-kh-inch-outch/4b
         {
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack1to4.create(maxk, num_input, num_output/4, (size_t)4*4, 4);
+            weight_data_pack1to4.create(maxk, num_input, parent->num_output/4, (size_t)4*4, 4);
 
-            for (int q=0; q+3<num_output; q+=4)
+            for (int q=0; q+3<parent->num_output; q+=4)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 const Mat k1 = weight_data_r2.channel(q+1);
@@ -302,27 +308,27 @@ int Convolution_arm::create_pipeline(const Option& opt)
     // pack4to1
     if (elempack == 4 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4to1_neon(weight_data, weight_data_pack4to1, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4to1_neon(parent->weight_data, weight_data_pack4to1, num_input, parent->num_output);
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4to1_neon(weight_data, weight_data_pack4to1, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4to1_neon(parent->weight_data, weight_data_pack4to1, num_input, parent->num_output);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_transform_kernel_pack4to1_neon(weight_data, weight_data_pack4to1, num_input, num_output);
+            conv3x3s1_winograd64_transform_kernel_pack4to1_neon(parent->weight_data, weight_data_pack4to1, num_input, parent->num_output);
         }
         else
         {
             // src = kw-kh-inch-outch
             // dst = 4a-kw-kh-inch/4a-outch
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack4to1.create(maxk, num_input/4, num_output, (size_t)4*4, 4);
+            weight_data_pack4to1.create(maxk, num_input/4, parent->num_output, (size_t)4*4, 4);
 
-            for (int q=0; q<num_output; q++)
+            for (int q=0; q<parent->num_output; q++)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 Mat g0 = weight_data_pack4to1.channel(q);
@@ -354,112 +360,118 @@ int Convolution_arm::create_pipeline(const Option& opt)
     // pack1
     if (elempack == 1 && out_elempack == 1)
     {
-        use_winograd3x3 = false;
-        use_sgemm1x1 = false;
+        self->use_winograd3x3 = false;
+        self->use_sgemm1x1 = false;
 
-        if (opt.use_winograd_convolution && kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (opt.use_winograd_convolution && parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
             // winograd is slow on small channel count
-            if (num_input >= 16 && num_output >= 16)
-                use_winograd3x3 = true;
+            if (num_input >= 16 && parent->num_output >= 16)
+                self->use_winograd3x3 = true;
 
-            if (use_winograd3x3)
+            if (self->use_winograd3x3)
             {
-//                 conv3x3s1_winograd64_transform_kernel_neon(weight_data, weight_3x3_winograd64_data, num_input, num_output);
-                conv3x3s1_winograd64_transform_kernel_neon5(weight_data, weight_3x3_winograd64_data, num_input, num_output);
+//                 conv3x3s1_winograd64_transform_kernel_neon(parent->weight_data, self->weight_3x3_winograd64_data, num_input, parent->num_output);
+                conv3x3s1_winograd64_transform_kernel_neon5(parent->weight_data, self->weight_3x3_winograd64_data, num_input, parent->num_output);
             }
         }
 
         // TODO assume more proper condition
-        if (opt.use_sgemm_convolution && kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (opt.use_sgemm_convolution && parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            if (num_input >= 64 && num_output >= 64)
-                use_sgemm1x1 = true;
+            if (num_input >= 64 && parent->num_output >= 64)
+                self->use_sgemm1x1 = true;
 
-            if (use_sgemm1x1)
+            if (self->use_sgemm1x1)
             {
-                conv1x1s1_sgemm_transform_kernel_neon(weight_data, weight_1x1_sgemm_data, num_input, num_output);
+                conv1x1s1_sgemm_transform_kernel_neon(parent->weight_data, self->weight_1x1_sgemm_data, num_input, parent->num_output);
             }
         }
 
-        if (impl_type > 0 && impl_type < 6 && impl_type != 4)
+        if (parent->impl_type > 0 && parent->impl_type < 6 && parent->impl_type != 4)
         {
-            switch (impl_type)
+            switch (parent->impl_type)
             {
                 case 1:
                     // winograd
-                    conv3x3s1_winograd64_transform_kernel_neon5(weight_data, weight_3x3_winograd64_data, num_input, num_output);
+                    conv3x3s1_winograd64_transform_kernel_neon5(parent->weight_data, self->weight_3x3_winograd64_data, num_input, parent->num_output);
                     break;
                 case 2:
                     // pointwise
-                    conv1x1s1_sgemm_transform_kernel_neon(weight_data, weight_1x1_sgemm_data, num_input, num_output);
+                    conv1x1s1_sgemm_transform_kernel_neon(parent->weight_data, self->weight_1x1_sgemm_data, num_input, parent->num_output);
                     break;
                 case 3:
                     // im2col
-                    conv_im2col_sgemm_transform_kernel_neon(weight_data, weight_sgemm_data, num_input, num_output, maxk);
+                    conv_im2col_sgemm_transform_kernel_neon(parent->weight_data, self->weight_sgemm_data, num_input, parent->num_output, maxk);
                     break;
 //                 case 4:
 //                     // direct
 //                     break;
                 case 5:
                     // conv3x3s2
-                    conv3x3s2_transform_kernel_neon(weight_data, weight_3x3s2_data, num_input, num_output);
+                    conv3x3s2_transform_kernel_neon(parent->weight_data, self->weight_3x3s2_data, num_input, parent->num_output);
                     break;
             }
         }
 
-        if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_transform_kernel_neon(weight_data, weight_3x3s2_data, num_input, num_output);
+            conv3x3s2_transform_kernel_neon(parent->weight_data, self->weight_3x3s2_data, num_input, parent->num_output);
         }
 
-        if (opt.use_sgemm_convolution && kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        if (opt.use_sgemm_convolution && parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv_im2col_sgemm_transform_kernel_neon(weight_data, weight_sgemm_data, num_input, num_output, maxk);
+            conv_im2col_sgemm_transform_kernel_neon(parent->weight_data, self->weight_sgemm_data, num_input, parent->num_output, maxk);
         }
 
-        if (opt.use_sgemm_convolution && kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        if (opt.use_sgemm_convolution && parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv_im2col_sgemm_transform_kernel_neon(weight_data, weight_sgemm_data, num_input, num_output, maxk);
+            conv_im2col_sgemm_transform_kernel_neon(parent->weight_data, self->weight_sgemm_data, num_input, parent->num_output, maxk);
         }
     }
 
     return 0;
 }
 
-int Convolution_arm::destroy_pipeline(const Option& opt)
+int Convolution_arm_destroy_pipeline(void *_self, const Option& opt)
 {
-    if (activation)
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
+    if (self->activation)
     {
-        activation->destroy_pipeline(activation, opt);
-        cdelete(activation);
-        activation = 0;
+        self->activation->destroy_pipeline(self->activation, opt);
+        cdelete(self->activation);
+        self->activation = 0;
     }
 
-    if (convolution_dilation1)
+    if (self->convolution_dilation1)
     {
-        convolution_dilation1->destroy_pipeline(convolution_dilation1, opt);
-        cdelete(convolution_dilation1);
-        convolution_dilation1 = 0;
+        self->convolution_dilation1->destroy_pipeline(self->convolution_dilation1, opt);
+        cdelete(self->convolution_dilation1);
+        self->convolution_dilation1 = 0;
     }
 
     return 0;
 }
 
-int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Convolution_arm_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
     if (bottom_blob.dims != 3)
     {
-        return Convolution::forward(bottom_blob, top_blob, opt);
+        return Convolution_forward(self, bottom_blob, top_blob, opt);
     }
 
-    if (opt.use_int8_inference && weight_data.elemsize == (size_t)1u)
+    if (opt.use_int8_inference && parent->weight_data.elemsize == (size_t)1u)
     {
-        return forward_int8_arm(bottom_blob, top_blob, opt);
+        return Convolution_arm_forward_int8_arm(self, bottom_blob, top_blob, opt);
     }
 
     if (opt.use_bf16_storage)
-        return forward_bf16s(bottom_blob, top_blob, opt);
+        return Convolution_arm_forward_bf16s(self, bottom_blob, top_blob, opt);
 
     int w = bottom_blob.w;
     int h = bottom_blob.h;
@@ -467,34 +479,34 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     size_t elemsize = bottom_blob.elemsize;
     int elempack = bottom_blob.elempack;
 
-//     fprintf(stderr, "Convolution input %d x %d  pad = %d %d  ksize=%d %d  stride=%d %d\n", w, h, pad_w, pad_h, kernel_w, kernel_h, stride_w, stride_h);
+//     fprintf(stderr, "Convolution input %d x %d  pad = %d %d  ksize=%d %d  stride=%d %d\n", w, h, pad_w, pad_h, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h);
 
-    const int kernel_extent_w = dilation_w * (kernel_w - 1) + 1;
-    const int kernel_extent_h = dilation_h * (kernel_h - 1) + 1;
+    const int kernel_extent_w = parent->dilation_w * (parent->kernel_w - 1) + 1;
+    const int kernel_extent_h = parent->dilation_h * (parent->kernel_h - 1) + 1;
 
     Mat bottom_blob_bordered;
-    make_padding(bottom_blob, bottom_blob_bordered, opt);
+    Convolution_make_padding(self, bottom_blob, bottom_blob_bordered, opt);
     if (bottom_blob_bordered.empty())
         return -100;
 
     w = bottom_blob_bordered.w;
     h = bottom_blob_bordered.h;
 
-    int outw = (w - kernel_extent_w) / stride_w + 1;
-    int outh = (h - kernel_extent_h) / stride_h + 1;
-    int out_elempack = (opt.use_packing_layout && num_output % 4 == 0) ? 4 : 1;
+    int outw = (w - kernel_extent_w) / parent->stride_w + 1;
+    int outh = (h - kernel_extent_h) / parent->stride_h + 1;
+    int out_elempack = (opt.use_packing_layout && parent->num_output % 4 == 0) ? 4 : 1;
     size_t out_elemsize = elemsize / elempack * out_elempack;
 
-    top_blob.create(outw, outh, num_output / out_elempack, out_elemsize, out_elempack, opt.blob_allocator);
+    top_blob.create(outw, outh, parent->num_output / out_elempack, out_elemsize, out_elempack, opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
-    if (opt.use_packing_layout == false && kernel_w == kernel_h && dilation_w != 1 && dilation_h == dilation_w && stride_w == 1 && stride_h == 1)
+    if (opt.use_packing_layout == false && parent->kernel_w == parent->kernel_h && parent->dilation_w != 1 && parent->dilation_h == parent->dilation_w && parent->stride_w == 1 && parent->stride_h == 1)
     {
-        return forwardDilation_arm(bottom_blob_bordered, top_blob, opt);
+        return Convolution_arm_forwardDilation_arm(self, bottom_blob_bordered, top_blob, opt);
     }
 
-    const int maxk = kernel_w * kernel_h;
+    const int maxk = parent->kernel_w * parent->kernel_h;
 
     // kernel offsets
     std::vector<int> _space_ofs(maxk);
@@ -502,14 +514,14 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     {
         int p1 = 0;
         int p2 = 0;
-        int gap = w * dilation_h - kernel_w * dilation_w;
-        for (int i = 0; i < kernel_h; i++)
+        int gap = w * parent->dilation_h - parent->kernel_w * parent->dilation_w;
+        for (int i = 0; i < parent->kernel_h; i++)
         {
-            for (int j = 0; j < kernel_w; j++)
+            for (int j = 0; j < parent->kernel_w; j++)
             {
                 space_ofs[p1] = p2;
                 p1++;
-                p2 += dilation_w;
+                p2 += parent->dilation_w;
             }
             p2 += gap;
         }
@@ -518,65 +530,65 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 #if __ARM_NEON
     if (elempack == 4 && out_elempack == 4)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv1x1s1_sgemm_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv1x1s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv3x3s1_winograd64_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv3x3s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv5x5s1_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv5x5s1_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv5x5s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, bias_data, opt);
+            conv5x5s2_pack4_neon(bottom_blob_bordered, top_blob, weight_data_pack4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output / out_elempack; p++)
+            for (int p=0; p<parent->num_output / out_elempack; p++)
             {
                 float* outptr = top_blob.channel(p);
 
@@ -588,7 +600,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
                         if (bias_term)
                         {
-                            _sum = vld1q_f32(((const float*)bias_data) + p * 4);
+                            _sum = vld1q_f32(((const float*)parent->bias_data) + p * 4);
                         }
 
                         const float* kptr = (const float*)weight_data_pack4 + maxk * channels * p * 16;
@@ -597,7 +609,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const float* sptr = m.row(i*stride_h) + j*stride_w * 4;
+                            const float* sptr = m.row(i*parent->stride_h) + j*parent->stride_w * 4;
 
                             for (int k = 0; k < maxk; k++) // 29.23
                             {
@@ -624,7 +636,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                             }
                         }
 
-                        _sum = activation_ps(_sum, activation_type, activation_params);
+                        _sum = activation_ps(_sum, parent->activation_type, parent->activation_params);
 
                         vst1q_f32(outptr + j * 4, _sum);
                     }
@@ -637,38 +649,38 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
     if (elempack == 1 && out_elempack == 4)
     {
-        if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, bias_data, opt);
+            conv3x3s1_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, bias_data, opt);
+            conv3x3s2_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 7 && kernel_h == 7 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 7 && parent->kernel_h == 7 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv7x7s2_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, bias_data, opt);
+            conv7x7s2_pack1to4_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output / out_elempack; p++)
+            for (int p=0; p<parent->num_output / out_elempack; p++)
             {
                 float* outptr = top_blob.channel(p);
 
@@ -680,7 +692,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
                         if (bias_term)
                         {
-                            _sum = vld1q_f32(((const float*)bias_data) + p * 4);
+                            _sum = vld1q_f32(((const float*)parent->bias_data) + p * 4);
                         }
 
                         const float* kptr = (const float*)weight_data_pack1to4 + maxk * channels * p * 4;
@@ -689,7 +701,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const float* sptr = m.row(i*stride_h) + j*stride_w;
+                            const float* sptr = m.row(i*parent->stride_h) + j*parent->stride_w;
 
                             for (int k = 0; k < maxk; k++) // 29.23
                             {
@@ -701,7 +713,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                             }
                         }
 
-                        _sum = activation_ps(_sum, activation_type, activation_params);
+                        _sum = activation_ps(_sum, parent->activation_type, parent->activation_params);
 
                         vst1q_f32(outptr + j * 4, _sum);
                     }
@@ -714,41 +726,41 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
     if (elempack == 4 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, bias_data, opt);
+            conv1x1s1_sgemm_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s2_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, bias_data, opt);
+            conv1x1s2_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
             // TODO more proper condition
-            conv3x3s1_winograd64_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, bias_data, opt);
+            conv3x3s1_winograd64_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, parent->bias_data, opt);
 
-//             conv3x3s1_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, bias_data, opt);
+//             conv3x3s1_pack4to1_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output; p++)
+            for (int p=0; p<parent->num_output; p++)
             {
                 float* outptr = top_blob.channel(p);
 
@@ -760,7 +772,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
                         if (bias_term)
                         {
-                            sum = bias_data[p];
+                            sum = parent->bias_data[p];
                         }
 
                         const float* kptr = (const float*)weight_data_pack4to1 + maxk * channels * p * 4;
@@ -769,7 +781,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const float* sptr = m.row(i*stride_h) + j*stride_w * 4;
+                            const float* sptr = m.row(i*parent->stride_h) + j*parent->stride_w * 4;
 
                             for (int k = 0; k < maxk; k++) // 29.23
                             {
@@ -788,7 +800,7 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                             }
                         }
 
-                        sum = activation_ss(sum, activation_type, activation_params);
+                        sum = activation_ss(sum, parent->activation_type, parent->activation_params);
 
                         outptr[j] = sum;
                     }
@@ -802,140 +814,140 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
 
     if (elempack == 1 && out_elempack == 1)
     {
-        if (impl_type > 0 && impl_type < 6 && impl_type != 4)
+        if (parent->impl_type > 0 && parent->impl_type < 6 && parent->impl_type != 4)
         {
             // engineering is magic.
-            switch (impl_type)
+            switch (parent->impl_type)
             {
                 case 1:
-                    conv3x3s1_winograd64_neon5(bottom_blob_bordered, top_blob, weight_3x3_winograd64_data, bias_data, opt);
+                    conv3x3s1_winograd64_neon5(bottom_blob_bordered, top_blob, self->weight_3x3_winograd64_data, parent->bias_data, opt);
                     break;
                 case 2:
-                    conv1x1s1_sgemm_neon(bottom_blob_bordered, top_blob, weight_1x1_sgemm_data, bias_data, opt);
+                    conv1x1s1_sgemm_neon(bottom_blob_bordered, top_blob, self->weight_1x1_sgemm_data, parent->bias_data, opt);
                     break;
                 case 3:
-                    conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, stride_w, stride_h, opt);
+                    conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, self->weight_sgemm_data, parent->bias_data, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h, opt);
                     break;
 //                 case 4: FIXME fallback to auto path
-//                     conv(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+//                     conv(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 //                     break;
                 case 5:
-                    conv3x3s2_packed_neon(bottom_blob_bordered, top_blob, weight_3x3s2_data, bias_data, opt);
+                    conv3x3s2_packed_neon(bottom_blob_bordered, top_blob, self->weight_3x3s2_data, parent->bias_data, opt);
                     break;
             }
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            if (use_sgemm1x1)
+            if (self->use_sgemm1x1)
             {
-                conv1x1s1_sgemm_neon(bottom_blob_bordered, top_blob, weight_1x1_sgemm_data, bias_data, opt);
+                conv1x1s1_sgemm_neon(bottom_blob_bordered, top_blob, self->weight_1x1_sgemm_data, parent->bias_data, opt);
             }
             else
             {
-                conv1x1s1_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+                conv1x1s1_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
             }
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
             if (opt.use_sgemm_convolution)
-                conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, stride_w, stride_h, opt);
+                conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, self->weight_sgemm_data, parent->bias_data, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h, opt);
             else
-                conv1x1s2_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+                conv1x1s2_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            if (use_winograd3x3 && w <= 120 && h <= 120)
+            if (self->use_winograd3x3 && w <= 120 && h <= 120)
             {
-//                 conv3x3s1_winograd64_neon4(bottom_blob_bordered, top_blob, weight_3x3_winograd64_data, bias_data, opt);
-                conv3x3s1_winograd64_neon5(bottom_blob_bordered, top_blob, weight_3x3_winograd64_data, bias_data, opt);
+//                 conv3x3s1_winograd64_neon4(bottom_blob_bordered, top_blob, self->weight_3x3_winograd64_data, parent->bias_data, opt);
+                conv3x3s1_winograd64_neon5(bottom_blob_bordered, top_blob, self->weight_3x3_winograd64_data, parent->bias_data, opt);
             }
             else
             {
-                conv3x3s1_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+                conv3x3s1_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
             }
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
             if (opt.use_sgemm_convolution && !(outw >=8 && outh >=8))
-                conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, weight_sgemm_data, bias_data, kernel_w, kernel_h, stride_w, stride_h, opt);
+                conv_im2col_sgemm_neon(bottom_blob_bordered, top_blob, self->weight_sgemm_data, parent->bias_data, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h, opt);
             else
-                conv3x3s2_packed_neon(bottom_blob_bordered, top_blob, weight_3x3s2_data, bias_data, opt);
+                conv3x3s2_packed_neon(bottom_blob_bordered, top_blob, self->weight_3x3s2_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 4 && kernel_h == 4 && dilation_w == 1 && dilation_h == 1 && stride_w == 4 && stride_h == 4)
+        else if (parent->kernel_w == 4 && parent->kernel_h == 4 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 4 && parent->stride_h == 4)
         {
-            conv4x4s4_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+            conv4x4s4_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv5x5s1_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+            conv5x5s1_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv5x5s2_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+            conv5x5s2_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 7 && kernel_h == 7 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 7 && parent->kernel_h == 7 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv7x7s1_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+            conv7x7s1_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
-        else if (kernel_w == 7 && kernel_h == 7 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 7 && parent->kernel_h == 7 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv7x7s2_neon(bottom_blob_bordered, top_blob, weight_data, bias_data, opt);
+            conv7x7s2_neon(bottom_blob_bordered, top_blob, parent->weight_data, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output; p++)
+            for (int p=0; p<parent->num_output; p++)
             {
                 float* outptr = top_blob.channel(p);
 
@@ -945,18 +957,18 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                     {
                         float sum = 0.f;
 
-                        if (bias_term)
+                        if (parent->bias_term)
                         {
-                            sum = bias_data[p];
+                            sum = parent->bias_data[p];
                         }
 
-                        const float* kptr = (const float*)weight_data + maxk * channels * p;
+                        const float* kptr = (const float*)parent->weight_data + maxk * channels * p;
 
                         // channels
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const float* sptr = m.row(i*stride_h) + j*stride_w;
+                            const float* sptr = m.row(i*parent->stride_h) + j*parent->stride_w;
 
                             for (int k = 0; k < maxk; k++)
                             {
@@ -968,25 +980,25 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
                             kptr += maxk;
                         }
 
-                        if (activation_type == 1)
+                        if (parent->activation_type == 1)
                         {
                             sum = max(sum, 0.f);
                         }
-                        else if (activation_type == 2)
+                        else if (parent->activation_type == 2)
                         {
-                            float slope = activation_params[0];
+                            float slope = parent->activation_params[0];
                             sum = sum > 0.f ? sum : sum * slope;
                         }
-                        else if (activation_type == 3)
+                        else if (parent->activation_type == 3)
                         {
-                            float min = activation_params[0];
-                            float max = activation_params[1];
+                            float min = parent->activation_params[0];
+                            float max = parent->activation_params[1];
                             if (sum < min)
                                 sum = min;
                             if (sum > max)
                                 sum = max;
                         }
-                        else if (activation_type == 4)
+                        else if (parent->activation_type == 4)
                         {
                             sum = static_cast<float>(1.f / (1.f + exp(-sum)));
                         }
@@ -1003,39 +1015,42 @@ int Convolution_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option
     return 0;
 }
 
-int Convolution_arm::create_pipeline_bf16s(const Option& opt)
+int Convolution_arm_create_pipeline_bf16s(void *_self, const Option& opt)
 {
-    const int maxk = kernel_w * kernel_h;
-    const int num_input = weight_data_size / maxk / num_output;
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
+    const int maxk = parent->kernel_w * parent->kernel_h;
+    const int num_input = parent->weight_data_size / maxk / parent->num_output;
 
     int elempack = (opt.use_packing_layout && num_input % 4 == 0) ? 4 : 1;
-    int out_elempack = (opt.use_packing_layout && num_output % 4 == 0) ? 4 : 1;
+    int out_elempack = (opt.use_packing_layout && parent->num_output % 4 == 0) ? 4 : 1;
 
 #if __ARM_NEON
     // pack4
     if (elempack == 4 && out_elempack == 4)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4_bf16s_neon(weight_data, weight_data_pack4_bf16, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4_bf16s_neon(parent->weight_data, weight_data_pack4_bf16, num_input, parent->num_output);
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4_bf16s_neon(weight_data, weight_data_pack4_bf16, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4_bf16s_neon(parent->weight_data, weight_data_pack4_bf16, num_input, parent->num_output);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_transform_kernel_pack4_neon(weight_data, weight_data_pack4_bf16, num_input, num_output);
+            conv3x3s1_winograd64_transform_kernel_pack4_neon(parent->weight_data, weight_data_pack4_bf16, num_input, parent->num_output);
         }
         else
         {
             // src = kw-kh-inch-outch
             // dst = 4b-4a-kw-kh-inch/4a-outch/4b
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack4_bf16.create(maxk, num_input/4, num_output/4, (size_t)2*16, 16);
+            weight_data_pack4_bf16.create(maxk, num_input/4, parent->num_output/4, (size_t)2*16, 16);
 
-            for (int q=0; q+3<num_output; q+=4)
+            for (int q=0; q+3<parent->num_output; q+=4)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 const Mat k1 = weight_data_r2.channel(q+1);
@@ -1103,11 +1118,11 @@ int Convolution_arm::create_pipeline_bf16s(const Option& opt)
         // src = kw-kh-inch-outch
         // dst = 4b-kw-kh-inch-outch/4b
         {
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack1to4_bf16.create(maxk, num_input, num_output/4, (size_t)2*4, 4);
+            weight_data_pack1to4_bf16.create(maxk, num_input, parent->num_output/4, (size_t)2*4, 4);
 
-            for (int q=0; q+3<num_output; q+=4)
+            for (int q=0; q+3<parent->num_output; q+=4)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 const Mat k1 = weight_data_r2.channel(q+1);
@@ -1142,27 +1157,27 @@ int Convolution_arm::create_pipeline_bf16s(const Option& opt)
     // pack4to1
     if (elempack == 4 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4to1_bf16s_neon(weight_data, weight_data_pack4to1_bf16, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4to1_bf16s_neon(parent->weight_data, weight_data_pack4to1_bf16, num_input, parent->num_output);
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s1_sgemm_transform_kernel_pack4to1_bf16s_neon(weight_data, weight_data_pack4to1_bf16, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_pack4to1_bf16s_neon(parent->weight_data, weight_data_pack4to1_bf16, num_input, parent->num_output);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_transform_kernel_pack4to1_neon(weight_data, weight_data_pack4to1_bf16, num_input, num_output);
+            conv3x3s1_winograd64_transform_kernel_pack4to1_neon(parent->weight_data, weight_data_pack4to1_bf16, num_input, parent->num_output);
         }
         else
         {
             // src = kw-kh-inch-outch
             // dst = 4a-kw-kh-inch/4a-outch
-            Mat weight_data_r2 = weight_data.reshape(maxk, num_input, num_output);
+            Mat weight_data_r2 = parent->weight_data.reshape(maxk, num_input, parent->num_output);
 
-            weight_data_pack4to1_bf16.create(maxk, num_input/4, num_output, (size_t)2*4, 4);
+            weight_data_pack4to1_bf16.create(maxk, num_input/4, parent->num_output, (size_t)2*4, 4);
 
-            for (int q=0; q<num_output; q++)
+            for (int q=0; q<parent->num_output; q++)
             {
                 const Mat k0 = weight_data_r2.channel(q);
                 Mat g0 = weight_data_pack4to1_bf16.channel(q);
@@ -1194,56 +1209,59 @@ int Convolution_arm::create_pipeline_bf16s(const Option& opt)
     // pack1
     if (elempack == 1 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_transform_kernel_bf16s_neon(weight_data, weight_data_bf16, num_input, num_output);
+            conv1x1s1_sgemm_transform_kernel_bf16s_neon(parent->weight_data, self->weight_data_bf16, num_input, parent->num_output);
         }
         else
         {
-            cast_float32_to_bfloat16(weight_data, weight_data_bf16, opt);
+            cast_float32_to_bfloat16(parent->weight_data, self->weight_data_bf16, opt);
         }
     }
 
     return 0;
 }
 
-int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Convolution_arm_forward_bf16s(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
     int w = bottom_blob.w;
     int h = bottom_blob.h;
     int channels = bottom_blob.c;
     size_t elemsize = bottom_blob.elemsize;
     int elempack = bottom_blob.elempack;
 
-//     fprintf(stderr, "Convolution input %d x %d  pad = %d %d  ksize=%d %d  stride=%d %d\n", w, h, pad_w, pad_h, kernel_w, kernel_h, stride_w, stride_h);
+//     fprintf(stderr, "Convolution input %d x %d  pad = %d %d  ksize=%d %d  stride=%d %d\n", w, h, pad_w, pad_h, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h);
 
-    const int kernel_extent_w = dilation_w * (kernel_w - 1) + 1;
-    const int kernel_extent_h = dilation_h * (kernel_h - 1) + 1;
+    const int kernel_extent_w = parent->dilation_w * (parent->kernel_w - 1) + 1;
+    const int kernel_extent_h = parent->dilation_h * (parent->kernel_h - 1) + 1;
 
     Mat bottom_blob_bordered;
-    make_padding(bottom_blob, bottom_blob_bordered, opt);
+    Convolution_make_padding(self, bottom_blob, bottom_blob_bordered, opt);
     if (bottom_blob_bordered.empty())
         return -100;
 
     w = bottom_blob_bordered.w;
     h = bottom_blob_bordered.h;
 
-    int outw = (w - kernel_extent_w) / stride_w + 1;
-    int outh = (h - kernel_extent_h) / stride_h + 1;
-    int out_elempack = (opt.use_packing_layout && num_output % 4 == 0) ? 4 : 1;
+    int outw = (w - kernel_extent_w) / parent->stride_w + 1;
+    int outh = (h - kernel_extent_h) / parent->stride_h + 1;
+    int out_elempack = (opt.use_packing_layout && parent->num_output % 4 == 0) ? 4 : 1;
     size_t out_elemsize = elemsize / elempack * out_elempack;
 
-    top_blob.create(outw, outh, num_output / out_elempack, out_elemsize, out_elempack, opt.blob_allocator);
+    top_blob.create(outw, outh, parent->num_output / out_elempack, out_elemsize, out_elempack, opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
     // FIXME
-//     if (opt.use_packing_layout == false && kernel_w == kernel_h && dilation_w != 1 && dilation_h == dilation_w && stride_w == 1 && stride_h == 1)
+//     if (opt.use_packing_layout == false && parent->kernel_w == parent->kernel_h && parent->dilation_w != 1 && parent->dilation_h == parent->dilation_w && parent->stride_w == 1 && parent->stride_h == 1)
 //     {
 //         return forwardDilation_arm(bottom_blob_bordered, top_blob, opt);
 //     }
 
-    const int maxk = kernel_w * kernel_h;
+    const int maxk = parent->kernel_w * parent->kernel_h;
 
     // kernel offsets
     std::vector<int> _space_ofs(maxk);
@@ -1251,14 +1269,14 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
     {
         int p1 = 0;
         int p2 = 0;
-        int gap = w * dilation_h - kernel_w * dilation_w;
-        for (int i = 0; i < kernel_h; i++)
+        int gap = w * parent->dilation_h - parent->kernel_w * parent->dilation_w;
+        for (int i = 0; i < parent->kernel_h; i++)
         {
-            for (int j = 0; j < kernel_w; j++)
+            for (int j = 0; j < parent->kernel_w; j++)
             {
                 space_ofs[p1] = p2;
                 p1++;
-                p2 += dilation_w;
+                p2 += parent->dilation_w;
             }
             p2 += gap;
         }
@@ -1267,65 +1285,65 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 #if __ARM_NEON
     if (elempack == 4 && out_elempack == 4)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv1x1s1_sgemm_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv1x1s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_winograd64_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv3x3s1_winograd64_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv3x3s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv5x5s1_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv5x5s1_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 5 && kernel_h == 5 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 5 && parent->kernel_h == 5 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv5x5s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, bias_data, opt);
+            conv5x5s2_pack4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output / out_elempack; p++)
+            for (int p=0; p<parent->num_output / out_elempack; p++)
             {
                 unsigned short* outptr = top_blob.channel(p);
 
@@ -1337,7 +1355,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
                         if (bias_term)
                         {
-                            _sum = vld1q_f32(((const float*)bias_data) + p * 4);
+                            _sum = vld1q_f32(((const float*)parent->bias_data) + p * 4);
                         }
 
                         const unsigned short* kptr = weight_data_pack4_bf16.channel(p);
@@ -1346,7 +1364,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const unsigned short* sptr = m.row<const unsigned short>(i*stride_h) + j*stride_w * 4;
+                            const unsigned short* sptr = m.row<const unsigned short>(i*parent->stride_h) + j*parent->stride_w * 4;
 
                             for (int k = 0; k < maxk; k++)
                             {
@@ -1373,7 +1391,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                             }
                         }
 
-                        _sum = activation_ps(_sum, activation_type, activation_params);
+                        _sum = activation_ps(_sum, parent->activation_type, parent->activation_params);
 
                         vst1_u16(outptr + j * 4, vshrn_n_u32(vreinterpretq_u32_f32(_sum), 16));
                     }
@@ -1386,38 +1404,38 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
     if (elempack == 1 && out_elempack == 4)
     {
-        if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv3x3s1_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, bias_data, opt);
+            conv3x3s1_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, bias_data, opt);
+            conv3x3s2_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 7 && kernel_h == 7 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 7 && parent->kernel_h == 7 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv7x7s2_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, bias_data, opt);
+            conv7x7s2_pack1to4_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack1to4_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output / out_elempack; p++)
+            for (int p=0; p<parent->num_output / out_elempack; p++)
             {
                 unsigned short* outptr = top_blob.channel(p);
 
@@ -1429,7 +1447,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
                         if (bias_term)
                         {
-                            _sum = vld1q_f32(((const float*)bias_data) + p * 4);
+                            _sum = vld1q_f32(((const float*)parent->bias_data) + p * 4);
                         }
 
                         const unsigned short* kptr = weight_data_pack1to4_bf16.channel(p);
@@ -1438,7 +1456,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const unsigned short* sptr = m.row<const unsigned short>(i*stride_h) + j*stride_w;
+                            const unsigned short* sptr = m.row<const unsigned short>(i*parent->stride_h) + j*parent->stride_w;
 
                             for (int k = 0; k < maxk; k++)
                             {
@@ -1450,7 +1468,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                             }
                         }
 
-                        _sum = activation_ps(_sum, activation_type, activation_params);
+                        _sum = activation_ps(_sum, parent->activation_type, parent->activation_params);
 
                         vst1_u16(outptr + j * 4, vshrn_n_u32(vreinterpretq_u32_f32(_sum), 16));
                     }
@@ -1463,41 +1481,41 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
     if (elempack == 4 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, bias_data, opt);
+            conv1x1s1_sgemm_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv1x1s2_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, bias_data, opt);
+            conv1x1s2_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
             // TODO more proper condition
-            conv3x3s1_winograd64_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, bias_data, opt);
+            conv3x3s1_winograd64_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, parent->bias_data, opt);
 
-//             conv3x3s1_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, bias_data, opt);
+//             conv3x3s1_pack4to1_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_pack4to1_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output; p++)
+            for (int p=0; p<parent->num_output; p++)
             {
                 unsigned short* outptr = top_blob.channel(p);
 
@@ -1509,7 +1527,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
                         if (bias_term)
                         {
-                            sum = bias_data[p];
+                            sum = parent->bias_data[p];
                         }
 
                         const unsigned short* kptr = weight_data_pack4to1_bf16.channel(p);
@@ -1518,7 +1536,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const unsigned short* sptr = m.row<const unsigned short>(i*stride_h) + j*stride_w * 4;
+                            const unsigned short* sptr = m.row<const unsigned short>(i*parent->stride_h) + j*parent->stride_w * 4;
 
                             for (int k = 0; k < maxk; k++)
                             {
@@ -1537,7 +1555,7 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                             }
                         }
 
-                        sum = activation_ss(sum, activation_type, activation_params);
+                        sum = activation_ss(sum, parent->activation_type, parent->activation_params);
 
                         outptr[j] = float32_to_bfloat16(sum);
                     }
@@ -1551,20 +1569,20 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
 
     if (elempack == 1 && out_elempack == 1)
     {
-        if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+        if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
         {
-            conv1x1s1_sgemm_bf16s_neon(bottom_blob_bordered, top_blob, weight_data_bf16, bias_data, opt);
+            conv1x1s1_sgemm_bf16s_neon(bottom_blob_bordered, top_blob, self->weight_data_bf16, parent->bias_data, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
         }
         else
         {
-            // num_output
+            // parent->num_output
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int p=0; p<num_output; p++)
+            for (int p=0; p<parent->num_output; p++)
             {
                 unsigned short* outptr = top_blob.channel(p);
 
@@ -1574,18 +1592,18 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                     {
                         float sum = 0.f;
 
-                        if (bias_term)
+                        if (parent->bias_term)
                         {
-                            sum = bias_data[p];
+                            sum = parent->bias_data[p];
                         }
 
-                        const unsigned short* kptr = (const unsigned short*)weight_data_bf16 + maxk * channels * p;
+                        const unsigned short* kptr = (const unsigned short*)self->weight_data_bf16 + maxk * channels * p;
 
                         // channels
                         for (int q=0; q<channels; q++)
                         {
                             const Mat m = bottom_blob_bordered.channel(q);
-                            const unsigned short* sptr = m.row<unsigned short>(i*stride_h) + j*stride_w;
+                            const unsigned short* sptr = m.row<unsigned short>(i*parent->stride_h) + j*parent->stride_w;
 
                             for (int k = 0; k < maxk; k++)
                             {
@@ -1597,25 +1615,25 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
                             kptr += maxk;
                         }
 
-                        if (activation_type == 1)
+                        if (parent->activation_type == 1)
                         {
                             sum = max(sum, 0.f);
                         }
-                        else if (activation_type == 2)
+                        else if (parent->activation_type == 2)
                         {
-                            float slope = activation_params[0];
+                            float slope = parent->activation_params[0];
                             sum = sum > 0.f ? sum : sum * slope;
                         }
-                        else if (activation_type == 3)
+                        else if (parent->activation_type == 3)
                         {
-                            float min = activation_params[0];
-                            float max = activation_params[1];
+                            float min = parent->activation_params[0];
+                            float max = parent->activation_params[1];
                             if (sum < min)
                                 sum = min;
                             if (sum > max)
                                 sum = max;
                         }
-                        else if (activation_type == 4)
+                        else if (parent->activation_type == 4)
                         {
                             sum = static_cast<float>(1.f / (1.f + exp(-sum)));
                         }
@@ -1632,43 +1650,50 @@ int Convolution_arm::forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const 
     return 0;
 }
 
-int Convolution_arm::create_pipeline_int8_arm(const Option& opt)
+int Convolution_arm_create_pipeline_int8_arm(void *_self, const Option& opt)
 {
-    const int maxk = kernel_w * kernel_h;
-    const int num_input = weight_data_size / maxk / num_output;
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
 
-    use_winograd3x3_int8 = false;
-    use_sgemm1x1_int8 = false;
+    const int maxk = parent->kernel_w * parent->kernel_h;
+    const int num_input = parent->weight_data_size / maxk / parent->num_output;
 
-    if (opt.use_winograd_convolution && kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+    self->use_winograd3x3_int8 = false;
+    self->use_sgemm1x1_int8 = false;
+
+    if (opt.use_winograd_convolution && parent->kernel_w == 3 && parent->kernel_h == 3 &&
+        parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
     {
-        use_winograd3x3_int8 = true;
-//         conv3x3s1_winograd23_transform_kernel_int8_neon(weight_data, weight_3x3_winograd23_data_int8, num_input, num_output);
-        conv3x3s1_winograd43_transform_kernel_int8_neon(weight_data, weight_3x3_winograd23_data_int8, num_input, num_output);
+        self->use_winograd3x3_int8 = true;
+//         conv3x3s1_winograd23_transform_kernel_int8_neon(parent->weight_data, self->weight_3x3_winograd23_data_int8, num_input, parent->num_output);
+        conv3x3s1_winograd43_transform_kernel_int8_neon(parent->weight_data, self->weight_3x3_winograd23_data_int8, num_input, parent->num_output);
     }
 
-    if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+    if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
     {
-        conv3x3s2_transform_kernel_int8_neon(weight_data, weight_3x3s2_data_int8, num_input, num_output);
+        conv3x3s2_transform_kernel_int8_neon(parent->weight_data, self->weight_3x3s2_data_int8, num_input, parent->num_output);
     }
-    else if (kernel_w == 1 && kernel_h == 1 && dilation_w == 1 && dilation_h == 1 && stride_w == 1 && stride_h == 1)
+    else if (parent->kernel_w == 1 && parent->kernel_h == 1 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 1 && parent->stride_h == 1)
     {
-        use_sgemm1x1_int8 = true;
-        conv1x1s1_sgemm_transform_kernel_int8_neon(weight_data, weight_1x1s1_sgemm_data_int8, num_input, num_output);
+        self->use_sgemm1x1_int8 = true;
+        conv1x1s1_sgemm_transform_kernel_int8_neon(parent->weight_data, self->weight_1x1s1_sgemm_data_int8, num_input, parent->num_output);
     }
     else
     {
-        conv_im2col_sgemm_transform_kernel_int8_neon(weight_data, weight_sgemm_data_int8, num_input, num_output, maxk);
+        conv_im2col_sgemm_transform_kernel_int8_neon(parent->weight_data, self->weight_sgemm_data_int8, num_input, parent->num_output, maxk);
     }
 
     return 0;
 }
 
-int Convolution_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Convolution_arm_forward_int8_arm(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
-    if (dilation_w > 1 || dilation_h > 1)
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
+    if (parent->dilation_w > 1 || parent->dilation_h > 1)
     {
-        return Convolution::forward(bottom_blob, top_blob, opt);
+        return Convolution_forward(self, bottom_blob, top_blob, opt);
     }
 
     int w = bottom_blob.w;
@@ -1676,10 +1701,10 @@ int Convolution_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, con
     // int channels = bottom_blob.c;
     size_t elemsize = bottom_blob.elemsize;
 
-//     fprintf(stderr, "Convolution_arm input %d x %d  ksize=%d %d  stride=%d %d\n", w, h, kernel_w, kernel_h, stride_w, stride_h);
+//     fprintf(stderr, "Convolution_arm input %d x %d  ksize=%d %d  stride=%d %d\n", w, h, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h);
 
-    const int kernel_extent_w = dilation_w * (kernel_w - 1) + 1;
-    const int kernel_extent_h = dilation_h * (kernel_h - 1) + 1;
+    const int kernel_extent_w = parent->dilation_w * (parent->kernel_w - 1) + 1;
+    const int kernel_extent_h = parent->dilation_h * (parent->kernel_h - 1) + 1;
 
     Mat bottom_blob_unbordered = bottom_blob;
     if (elemsize != 1)
@@ -1687,78 +1712,80 @@ int Convolution_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, con
         Option opt_g = opt;
         opt_g.blob_allocator = opt.workspace_allocator;
 
-        quantize_float32_to_int8(bottom_blob, bottom_blob_unbordered, bottom_blob_int8_scale, opt_g);
+        quantize_float32_to_int8(bottom_blob, bottom_blob_unbordered, parent->bottom_blob_int8_scale, opt_g);
     }
 
     Mat bottom_blob_bordered;
-    make_padding(bottom_blob_unbordered, bottom_blob_bordered, opt);
+    Convolution_make_padding(self, bottom_blob_unbordered, bottom_blob_bordered, opt);
     if (bottom_blob_bordered.empty())
         return -100;
 
     w = bottom_blob_bordered.w;
     h = bottom_blob_bordered.h;
 
-    int outw = (w - kernel_extent_w) / stride_w + 1;
-    int outh = (h - kernel_extent_h) / stride_h + 1;
+    int outw = (w - kernel_extent_w) / parent->stride_w + 1;
+    int outh = (h - kernel_extent_h) / parent->stride_h + 1;
 
     // int8
-    size_t out_elemsize = use_int8_requantize ? 1u : 4u;
+    size_t out_elemsize = parent->use_int8_requantize ? 1u : 4u;
 
-    top_blob.create(outw, outh, num_output, out_elemsize, opt.blob_allocator);
+    top_blob.create(outw, outh, parent->num_output, out_elemsize, opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
     // int8
-    if (use_int8_requantize == true)
+    if (parent->use_int8_requantize == true)
     {
         Mat top_blob_tm;
-        top_blob_tm.create(outw, outh, num_output, (size_t)4u, opt.workspace_allocator);
+        top_blob_tm.create(outw, outh, parent->num_output, (size_t)4u, opt.workspace_allocator);
         if (top_blob_tm.empty())
             return -100;
         
-        if (use_sgemm1x1_int8)
+        if (self->use_sgemm1x1_int8)
         {
             std::vector<float> requantize_scales;
-            for (int p=0; p<num_output; p++)
+            for (int p=0; p<parent->num_output; p++)
             {
                 float scale_in;
-                if (weight_data_int8_scales[p] == 0)
+                if (parent->weight_data_int8_scales[p] == 0)
                     scale_in = 0;
                 else
-                    scale_in = 1.f / (bottom_blob_int8_scale * weight_data_int8_scales[p]);
+                    scale_in = 1.f / (parent->bottom_blob_int8_scale * parent->weight_data_int8_scales[p]);
 
-                float scale_out = top_blob_int8_scale;
+                float scale_out = parent->top_blob_int8_scale;
 
                 requantize_scales.push_back(scale_in);
                 requantize_scales.push_back(scale_out);
             }
 
-            conv1x1s1_sgemm_int8_requant_neon(bottom_blob_bordered, top_blob, weight_1x1s1_sgemm_data_int8, bias_data, requantize_scales, opt);
+            conv1x1s1_sgemm_int8_requant_neon(bottom_blob_bordered, top_blob, self->weight_1x1s1_sgemm_data_int8, parent->bias_data, requantize_scales, opt);
 
-            if (activation)
+            if (self->activation)
             {
-                activation->forward_inplace(top_blob, opt);
+                self->activation->forward_inplace(self->activation, top_blob, opt);
             }
 
             return 0;
         }
-        else if (use_winograd3x3_int8)
+        else if (self->use_winograd3x3_int8)
         {
-//             conv3x3s1_winograd23_int8_neon(bottom_blob_bordered, top_blob_tm, weight_3x3_winograd23_data_int8, opt);
-            conv3x3s1_winograd43_int8_neon(bottom_blob_bordered, top_blob_tm, weight_3x3_winograd23_data_int8, opt);
+//             conv3x3s1_winograd23_int8_neon(bottom_blob_bordered, top_blob_tm, self->weight_3x3_winograd23_data_int8, opt);
+            conv3x3s1_winograd43_int8_neon(bottom_blob_bordered, top_blob_tm, self->weight_3x3_winograd23_data_int8, opt);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 &&
+                 parent->dilation_w == 1 && parent->dilation_h == 1 &&
+                 parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_packed_int8_neon(bottom_blob_bordered, top_blob_tm, weight_3x3s2_data_int8, opt);
+            conv3x3s2_packed_int8_neon(bottom_blob_bordered, top_blob_tm, self->weight_3x3s2_data_int8, opt);
         }
         else
         {
-            conv_im2col_sgemm_int8_neon(bottom_blob_bordered, top_blob_tm, weight_sgemm_data_int8, kernel_w, kernel_h, stride_w, stride_h, opt);
+            conv_im2col_sgemm_int8_neon(bottom_blob_bordered, top_blob_tm, self->weight_sgemm_data_int8, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h, opt);
         }
 
         // requantize, reverse scale inplace
         #pragma omp parallel for num_threads(opt.num_threads)
-        for (int p=0; p<num_output; p++)
+        for (int p=0; p<parent->num_output; p++)
         {
             Option opt_g = opt;
             opt_g.num_threads = 1;
@@ -1769,39 +1796,39 @@ int Convolution_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, con
 
             // requantize and relu
             float scale_in;
-            if (weight_data_int8_scales[p] == 0)
+            if (parent->weight_data_int8_scales[p] == 0)
                 scale_in = 0;
             else
-                scale_in = 1.f / (bottom_blob_int8_scale * weight_data_int8_scales[p]);
+                scale_in = 1.f / (parent->bottom_blob_int8_scale * parent->weight_data_int8_scales[p]);
 
-            float scale_out = top_blob_int8_scale;//FIXME load param
+            float scale_out = parent->top_blob_int8_scale;//FIXME load param
 
-            requantize_int8_to_int8(top_blob_tm_g, top_blob_g, scale_in, scale_out, bias_term ? (const float*)bias_data + p : 0, bias_term ? 1 : 0, 0, opt_g);
+            requantize_int8_to_int8(top_blob_tm_g, top_blob_g, scale_in, scale_out, parent->bias_term ? (const float*)parent->bias_data + p : 0, parent->bias_term ? 1 : 0, 0, opt_g);
         }
     }
     else
     {
-        if (use_sgemm1x1_int8)
+        if (self->use_sgemm1x1_int8)
         {
-            conv1x1s1_sgemm_int8_neon(bottom_blob_bordered, top_blob, weight_1x1s1_sgemm_data_int8, opt);
+            conv1x1s1_sgemm_int8_neon(bottom_blob_bordered, top_blob, self->weight_1x1s1_sgemm_data_int8, opt);
         }
-        else if (use_winograd3x3_int8)
+        else if (self->use_winograd3x3_int8)
         {
-//             conv3x3s1_winograd23_int8_neon(bottom_blob_bordered, top_blob, weight_3x3_winograd23_data_int8, opt);
-            conv3x3s1_winograd43_int8_neon(bottom_blob_bordered, top_blob, weight_3x3_winograd23_data_int8, opt);
+//             conv3x3s1_winograd23_int8_neon(bottom_blob_bordered, top_blob, self->weight_3x3_winograd23_data_int8, opt);
+            conv3x3s1_winograd43_int8_neon(bottom_blob_bordered, top_blob, self->weight_3x3_winograd23_data_int8, opt);
         }
-        else if (kernel_w == 3 && kernel_h == 3 && dilation_w == 1 && dilation_h == 1 && stride_w == 2 && stride_h == 2)
+        else if (parent->kernel_w == 3 && parent->kernel_h == 3 && parent->dilation_w == 1 && parent->dilation_h == 1 && parent->stride_w == 2 && parent->stride_h == 2)
         {
-            conv3x3s2_packed_int8_neon(bottom_blob_bordered, top_blob, weight_3x3s2_data_int8, opt);
+            conv3x3s2_packed_int8_neon(bottom_blob_bordered, top_blob, self->weight_3x3s2_data_int8, opt);
         }
         else
         {
-            conv_im2col_sgemm_int8_neon(bottom_blob_bordered, top_blob, weight_sgemm_data_int8, kernel_w, kernel_h, stride_w, stride_h, opt);
+            conv_im2col_sgemm_int8_neon(bottom_blob_bordered, top_blob, self->weight_sgemm_data_int8, parent->kernel_w, parent->kernel_h, parent->stride_w, parent->stride_h, opt);
         }
 
         // dequantize, reverse scale inplace
         #pragma omp parallel for num_threads(opt.num_threads)
-        for (int p=0; p<num_output; p++)
+        for (int p=0; p<parent->num_output; p++)
         {
             Option opt_g = opt;
             opt_g.num_threads = 1;
@@ -1811,38 +1838,41 @@ int Convolution_arm::forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, con
 
             // dequantize
             float scale_in;
-            if (weight_data_int8_scales[p] == 0)
+            if (parent->weight_data_int8_scales[p] == 0)
                 scale_in = 0;
             else
-                scale_in = 1.f / (bottom_blob_int8_scale * weight_data_int8_scales[p]);
+                scale_in = 1.f / (parent->bottom_blob_int8_scale * parent->weight_data_int8_scales[p]);
 
-            dequantize_int32_to_float32(top_blob_g, scale_in, bias_term ? (const float*)bias_data + p : 0, bias_term ? 1 : 0, opt_g);
+            dequantize_int32_to_float32(top_blob_g, scale_in, parent->bias_term ? (const float*)parent->bias_data + p : 0, parent->bias_term ? 1 : 0, opt_g);
         }
     }
 
-    if (activation)
+    if (self->activation)
     {
-        activation->forward_inplace(top_blob, opt);
+        self->activation->forward_inplace(self->activation, top_blob, opt);
     }           
 
     return 0;
 }
 
-int Convolution_arm::forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Convolution_arm_forwardDilation_arm(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Convolution_arm *self = (Convolution_arm *)_self;
+    Convolution *parent = (Convolution *)_self;
+
     int w = bottom_blob.w;
     int h = bottom_blob.h;
     size_t elemsize = bottom_blob.elemsize;
 
-    const int kernel_size = kernel_w;
-    const int stride = stride_w;
-    const int dilation = dilation_w;
+    const int kernel_size = parent->kernel_w;
+    const int stride = parent->stride_w;
+    const int dilation = parent->dilation_w;
     const int kernel_extent = dilation * (kernel_size - 1) + 1;
 
     int outw = (w - kernel_extent) / stride + 1;
     int outh = (h - kernel_extent) / stride + 1;
 
-    top_blob.create(outw, outh, num_output, elemsize, opt.blob_allocator);
+    top_blob.create(outw, outh, parent->num_output, elemsize, opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
@@ -1863,7 +1893,7 @@ int Convolution_arm::forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, 
             if (inner_bottom_blob.empty())
                 return -100;
 
-            inner_top_blob.create(inner_outw, inner_outh, num_output, elemsize, opt.workspace_allocator);
+            inner_top_blob.create(inner_outw, inner_outh, parent->num_output, elemsize, opt.workspace_allocator);
             if (inner_top_blob.empty())
                 return -100;
 
@@ -1885,10 +1915,10 @@ int Convolution_arm::forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, 
 
             Option opt_g = opt;
             opt_g.blob_allocator = inner_top_blob.allocator;
-            convolution_dilation1->forward(inner_bottom_blob, inner_top_blob, opt_g);
+            self->convolution_dilation1->forward(self->convolution_dilation1, inner_bottom_blob, inner_top_blob, opt_g);
 
             #pragma omp parallel for num_threads(opt.num_threads)
-            for (int c = 0; c < num_output; c ++)
+            for (int c = 0; c < parent->num_output; c ++)
             {
                 float *outptr = (float *) top_blob.channel(c) + x * outw + y;
                 for (int i = 0; i < inner_outh; i ++)
@@ -1904,9 +1934,9 @@ int Convolution_arm::forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, 
         }
     }
 
-    if (activation)
+    if (self->activation)
     {
-        activation->forward_inplace(top_blob, opt);
+        self->activation->forward_inplace(self->activation, top_blob, opt);
     }
 
     return 0;

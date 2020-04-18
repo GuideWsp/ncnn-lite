@@ -22,6 +22,7 @@ void *AbsVal_arm_ctor(void *_self, va_list *args);
 int AbsVal_arm_forward_inplace(Mat& bottom_top_blob, const Option& opt);
 
 // default operators
+#define AbsVal_arm                          AbsVal
 #define AbsVal_arm_dtor                     Layer_dtor
 #define AbsVal_arm_load_param               Layer_load_param
 #define AbsVal_arm_load_model               Layer_load_model

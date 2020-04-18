@@ -83,6 +83,7 @@ macro(ncnn_add_layer class)
         set(forward_content "${forward_content}#define ${class}_final_forward ${class}_forward\n")
         set(forward_content "${forward_content}#define ${class}_final_forward_inplace_multi ${class}_forward_inplace_multi\n")
         set(forward_content "${forward_content}#define ${class}_final_forward_inplace ${class}_forward_inplace\n")
+        set(forward_content "${forward_content}#define ${class}_final ${class}\n")
 
         source_group ("sources\\\\layers" FILES "${CMAKE_CURRENT_SOURCE_DIR}/layer/${name}.cpp")
 
@@ -102,6 +103,7 @@ macro(ncnn_add_layer class)
             set(forward_content "${forward_content}#define ${class}_final_forward ${class}_${arch}_forward\n")
             set(forward_content "${forward_content}#define ${class}_final_forward_inplace_multi ${class}_${arch}_forward_inplace_multi\n")
             set(forward_content "${forward_content}#define ${class}_final_forward_inplace ${class}_${arch}_forward_inplace\n")
+            set(forward_content "${forward_content}#define ${class}_final ${class}_${arch}\n")
 
             source_group ("sources\\\\layers\\\\${arch}" FILES "${CMAKE_CURRENT_SOURCE_DIR}/layer/${arch}/${name}_${arch}.cpp")
         endif()

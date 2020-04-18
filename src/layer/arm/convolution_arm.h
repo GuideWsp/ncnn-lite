@@ -17,21 +17,12 @@
 
 #include "convolution.h"
 
-struct Convolution_arm : virtual public Convolution
+struct Convolution_arm
 {
-    Convolution_arm();
+    // layer base
+    Convolution layer;
 
-    virtual int create_pipeline(const Option& opt);
-    virtual int destroy_pipeline(const Option& opt);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
-    int create_pipeline_bf16s(const Option& opt);
-    int forward_bf16s(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-    int create_pipeline_int8_arm(const Option& opt);
-    int forward_int8_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-    int forwardDilation_arm(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     Layer* activation;
     bool use_winograd3x3;
     bool use_sgemm1x1;
@@ -62,5 +53,27 @@ struct Convolution_arm : virtual public Convolution
     Mat weight_sgemm_data_int8;
     std::vector<Mat> weight_3x3_winograd23_data_int8;
 };
+
+void *Convolution_arm_ctor(void *_self, va_list *args);
+
+int Convolution_arm_create_pipeline(void *_self, const Option& opt);
+
+int Convolution_arm_destroy_pipeline(void *_self, const Option& opt);
+
+int Convolution_arm_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+int Convolution_arm_create_pipeline_bf16s(void *_self, const Option& opt);
+int Convolution_arm_forward_bf16s(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+int Convolution_arm_create_pipeline_int8_arm(void *_self, const Option& opt);
+int Convolution_arm_forward_int8_arm(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+int Convolution_arm_forwardDilation_arm(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define Convolution_arm_dtor                     Layer_dtor
+#define Convolution_arm_load_param               Layer_load_param
+#define Convolution_arm_load_model               Layer_load_model
+#define Convolution_arm_forward_multi            Layer_forward_multi
+#define Convolution_arm_forward_inplace_multi    Layer_forward_inplace_multi
+#define Convolution_arm_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_CONVOLUTION_ARM_H

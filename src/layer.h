@@ -138,7 +138,7 @@ Layer* create_layer(int index);
 
 #define DEFINE_LAYER_CREATOR(name) \
     const cclass cclazz_##name = {                      \
-        .size = sizeof(name),                           \
+        .size = sizeof(name##_final),                   \
         .ctor = name##_final_ctor,                      \
         .dtor = name##_final_dtor                       \
     };                                                  \
