@@ -116,10 +116,10 @@ void benchmark(const char* comment, const Mat& _in, const Option& opt)
 
 int main(int argc, char** argv)
 {
-    int loop_count = 4;
-    int num_threads = get_cpu_count();
+    int loop_count = 1;
+    int num_threads = 1; // get_cpu_count();
     int powersave = 0;
-    int cooling_down = 1;
+    int cooling_down = 0;
 
     if (argc >= 2)
     {
