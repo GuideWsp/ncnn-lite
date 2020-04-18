@@ -17,15 +17,28 @@
 
 #include "layer.h"
 
-struct Concat : public Layer
+struct Concat
 {
-    Concat();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
-
+    // proprietary data
     int axis;
 };
+
+void *Concat_ctor(void *_self, va_list *args);
+
+int Concat_load_param(void *_self, const ParamDict& pd);
+
+int Concat_forward(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+// default operators
+#define Concat_dtor                     Layer_dtor
+#define Concat_load_model               Layer_load_model
+#define Concat_create_pipeline          Layer_create_pipeline
+#define Concat_destroy_pipeline         Layer_destroy_pipeline
+#define Concat_forward_multi            Layer_forward_multi
+#define Concat_forward_inplace_multi    Layer_forward_inplace_multi
+#define Concat_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_CONCAT_H

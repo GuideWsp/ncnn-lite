@@ -14,24 +14,28 @@
 
 #include "input.h"
 
-DEFINE_LAYER_CREATOR(Input)
-
-Input::Input()
+void *Input_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = true;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = true;
+
+    return _self;
 }
 
-int Input::load_param(const ParamDict& pd)
+int Input_load_param(void *_self, const ParamDict& pd)
 {
-    w = pd.get(0, 0);
-    h = pd.get(1, 0);
-    c = pd.get(2, 0);
+    Input *self = (Input *)_self;
+
+    self->w = pd.get(0, 0);
+    self->h = pd.get(1, 0);
+    self->c = pd.get(2, 0);
 
     return 0;
 }
 
-int Input::forward_inplace(Mat& /*bottom_top_blob*/, const Option& /*opt*/) const
+int Input_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
     return 0;
 }

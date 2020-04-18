@@ -19,34 +19,40 @@
 
 #include "cstl/utils.h"
 
-DEFINE_LAYER_CREATOR(Pooling)
-
-Pooling::Pooling()
+void *Pooling_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = false;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = false;
+
+    return _self;
 }
 
-int Pooling::load_param(const ParamDict& pd)
+int Pooling_load_param(void *_self, const ParamDict& pd)
 {
-    pooling_type = pd.get(0, 0);
-    kernel_w = pd.get(1, 0);
-    kernel_h = pd.get(11, kernel_w);
-    stride_w = pd.get(2, 1);
-    stride_h = pd.get(12, stride_w);
-    pad_left = pd.get(3, 0);
-    pad_right = pd.get(14, pad_left);
-    pad_top = pd.get(13, pad_left);
-    pad_bottom = pd.get(15, pad_top);
-    global_pooling = pd.get(4, 0);
-    pad_mode = pd.get(5, 0);
-    avgpool_count_include_pad = pd.get(6, 0);
+    Pooling *self = (Pooling *)_self;
+
+    self->pooling_type = pd.get(0, 0);
+    self->kernel_w = pd.get(1, 0);
+    self->kernel_h = pd.get(11, self->kernel_w);
+    self->stride_w = pd.get(2, 1);
+    self->stride_h = pd.get(12, self->stride_w);
+    self->pad_left = pd.get(3, 0);
+    self->pad_right = pd.get(14, self->pad_left);
+    self->pad_top = pd.get(13, self->pad_left);
+    self->pad_bottom = pd.get(15, self->pad_top);
+    self->global_pooling = pd.get(4, 0);
+    self->pad_mode = pd.get(5, 0);
+    self->avgpool_count_include_pad = pd.get(6, 0);
 
     return 0;
 }
 
-int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Pooling_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Pooling *self = (Pooling *)_self;
+
     // max value in NxN window
     // avg value in NxN window
 
@@ -56,7 +62,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     size_t elemsize = bottom_blob.elemsize;
 
 //     fprintf(stderr, "Pooling     input %d x %d  pad = %d %d %d %d  ksize=%d %d  stride=%d %d\n", w, h, pad_left, pad_right, pad_top, pad_bottom, kernel_w, kernel_h, stride_w, stride_h);
-    if (global_pooling)
+    if (self->global_pooling)
     {
         top_blob.create(channels, elemsize, opt.blob_allocator);
         if (top_blob.empty())
@@ -64,7 +70,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
         int size = w * h;
 
-        if (pooling_type == PoolMethod_MAX)
+        if (self->pooling_type == PoolMethod_MAX)
         {
             #pragma omp parallel for num_threads(opt.num_threads)
             for (int q=0; q<channels; q++)
@@ -80,7 +86,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
                 top_blob[q] = max;
             }
         }
-        else if (pooling_type == PoolMethod_AVE)
+        else if (self->pooling_type == PoolMethod_AVE)
         {
             #pragma omp parallel for num_threads(opt.num_threads)
             for (int q=0; q<channels; q++)
@@ -101,21 +107,21 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     }
 
     Mat bottom_blob_bordered;
-    make_padding(bottom_blob, bottom_blob_bordered, opt);
+    Pooling_make_padding(self, bottom_blob, bottom_blob_bordered, opt);
     if (bottom_blob_bordered.empty())
         return -100;
 
     w = bottom_blob_bordered.w;
     h = bottom_blob_bordered.h;
 
-    int outw = (w - kernel_w) / stride_w + 1;
-    int outh = (h - kernel_h) / stride_h + 1;
+    int outw = (w - self->kernel_w) / self->stride_w + 1;
+    int outh = (h - self->kernel_h) / self->stride_h + 1;
 
     top_blob.create(outw, outh, channels, elemsize, opt.blob_allocator);
     if (top_blob.empty())
         return -100;
 
-    const int maxk = kernel_w * kernel_h;
+    const int maxk = self->kernel_w * self->kernel_h;
 
     // kernel offsets
     std::vector<int> _space_ofs(maxk);
@@ -123,10 +129,10 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     {
         int p1 = 0;
         int p2 = 0;
-        int gap = w - kernel_w;
-        for (int i = 0; i < kernel_h; i++)
+        int gap = w - self->kernel_w;
+        for (int i = 0; i < self->kernel_h; i++)
         {
-            for (int j = 0; j < kernel_w; j++)
+            for (int j = 0; j < self->kernel_w; j++)
             {
                 space_ofs[p1] = p2;
                 p1++;
@@ -136,7 +142,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
         }
     }
 
-    if (pooling_type == PoolMethod_MAX)
+    if (self->pooling_type == PoolMethod_MAX)
     {
         #pragma omp parallel for num_threads(opt.num_threads)
         for (int q=0; q<channels; q++)
@@ -148,7 +154,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             {
                 for (int j = 0; j < outw; j++)
                 {
-                    const float* sptr = m.row(i*stride_h) + j*stride_w;
+                    const float* sptr = m.row(i*self->stride_h) + j*self->stride_w;
 
                     float max = sptr[0];
 
@@ -165,17 +171,17 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             }
         }
     }
-    else if (pooling_type == PoolMethod_AVE)
+    else if (self->pooling_type == PoolMethod_AVE)
     {
-        if (avgpool_count_include_pad == 0)
+        if (self->avgpool_count_include_pad == 0)
         {
             int wtailpad = 0;
             int htailpad = 0;
 
-            if (pad_mode == 0) // full padding
+            if (self->pad_mode == 0) // full padding
             {
-                wtailpad = bottom_blob_bordered.w - bottom_blob.w - pad_left - pad_right;
-                htailpad = bottom_blob_bordered.h - bottom_blob.h - pad_top - pad_bottom;
+                wtailpad = bottom_blob_bordered.w - bottom_blob.w - self->pad_left - self->pad_right;
+                htailpad = bottom_blob_bordered.h - bottom_blob.h - self->pad_top - self->pad_bottom;
             }
 
             #pragma omp parallel for num_threads(opt.num_threads)
@@ -186,33 +192,33 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
                 for (int i = 0; i < outh; i++)
                 {
-                    int sy0 = i * stride_h;
+                    int sy0 = i * self->stride_h;
 
                     for (int j = 0; j < outw; j++)
                     {
-                        int sx0 = j * stride_w;
+                        int sx0 = j * self->stride_w;
 
                         float sum = 0;
                         int area = 0;
 
-                        for (int ki = 0; ki < kernel_h; ki++)
+                        for (int ki = 0; ki < self->kernel_h; ki++)
                         {
                             int sy = sy0 + ki;
 
-                            if (sy < pad_top)
+                            if (sy < self->pad_top)
                                 continue;
 
-                            if (sy >= h - pad_bottom - htailpad)
+                            if (sy >= h - self->pad_bottom - htailpad)
                                 break;
 
-                            for (int kj = 0; kj < kernel_w; kj++)
+                            for (int kj = 0; kj < self->kernel_w; kj++)
                             {
                                 int sx = sx0 + kj;
 
-                                if (sx < pad_left)
+                                if (sx < self->pad_left)
                                     continue;
 
-                                if (sx >= w - pad_right - wtailpad)
+                                if (sx >= w - self->pad_right - wtailpad)
                                     break;
 
                                 float val = m.row(sy)[sx];
@@ -240,7 +246,7 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
                 {
                     for (int j = 0; j < outw; j++)
                     {
-                        const float* sptr = m.row(i*stride_h) + j*stride_w;
+                        const float* sptr = m.row(i*self->stride_h) + j*self->stride_w;
 
                         float sum = 0;
 
@@ -262,19 +268,21 @@ int Pooling::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     return 0;
 }
 
-void Pooling::make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt) const
+void Pooling_make_padding(void *_self, const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt)
 {
+    Pooling *self = (Pooling *)_self;
+
     int w = bottom_blob.w;
     int h = bottom_blob.h;
 
     bottom_blob_bordered = bottom_blob;
 
     float pad_value = 0.f;
-    if (pooling_type == PoolMethod_MAX)
+    if (self->pooling_type == PoolMethod_MAX)
     {
         pad_value = -FLT_MAX;
     }
-    else if (pooling_type == PoolMethod_AVE)
+    else if (self->pooling_type == PoolMethod_AVE)
     {
         pad_value = 0.f;
     }
@@ -282,30 +290,30 @@ void Pooling::make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, co
     int wtailpad = 0;
     int htailpad = 0;
 
-    if (pad_mode == 0) // full padding
+    if (self->pad_mode == 0) // full padding
     {
-        int wtail = (w + pad_left + pad_right - kernel_w) % stride_w;
-        int htail = (h + pad_top + pad_bottom - kernel_h) % stride_h;
+        int wtail = (w + self->pad_left + self->pad_right - self->kernel_w) % self->stride_w;
+        int htail = (h + self->pad_top + self->pad_bottom - self->kernel_h) % self->stride_h;
 
         if (wtail != 0)
-            wtailpad = stride_w - wtail;
+            wtailpad = self->stride_w - wtail;
         if (htail != 0)
-            htailpad = stride_h - htail;
+            htailpad = self->stride_h - htail;
 
         Option opt_b = opt;
         opt_b.blob_allocator = opt.workspace_allocator;
-        copy_make_border(bottom_blob, bottom_blob_bordered, pad_top, pad_bottom + htailpad, pad_left, pad_right + wtailpad, BORDER_CONSTANT, pad_value, opt_b);
+        copy_make_border(bottom_blob, bottom_blob_bordered, self->pad_top, self->pad_bottom + htailpad, self->pad_left, self->pad_right + wtailpad, BORDER_CONSTANT, pad_value, opt_b);
     }
-    else if (pad_mode == 1) // valid padding
+    else if (self->pad_mode == 1) // valid padding
     {
         Option opt_b = opt;
         opt_b.blob_allocator = opt.workspace_allocator;
-        copy_make_border(bottom_blob, bottom_blob_bordered, pad_top, pad_bottom, pad_left, pad_right, BORDER_CONSTANT, pad_value, opt_b);
+        copy_make_border(bottom_blob, bottom_blob_bordered, self->pad_top, self->pad_bottom, self->pad_left, self->pad_right, BORDER_CONSTANT, pad_value, opt_b);
     }
-    else if (pad_mode == 2) // tensorflow padding=SAME or onnx padding=SAME_UPPER
+    else if (self->pad_mode == 2) // tensorflow padding=SAME or onnx padding=SAME_UPPER
     {
-        int wpad = kernel_w + (w - 1) / stride_w * stride_w - w;
-        int hpad = kernel_h + (h - 1) / stride_h * stride_h - h;
+        int wpad = self->kernel_w + (w - 1) / self->stride_w * self->stride_w - w;
+        int hpad = self->kernel_h + (h - 1) / self->stride_h * self->stride_h - h;
         if (wpad > 0 || hpad > 0)
         {
             Option opt_b = opt;
@@ -313,10 +321,10 @@ void Pooling::make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, co
             copy_make_border(bottom_blob, bottom_blob_bordered, hpad / 2, hpad - hpad / 2, wpad / 2, wpad - wpad / 2, BORDER_CONSTANT, pad_value, opt_b);
         }
     }
-    else if (pad_mode == 3) // onnx padding=SAME_LOWER
+    else if (self->pad_mode == 3) // onnx padding=SAME_LOWER
     {
-        int wpad = kernel_w + (w - 1) / stride_w * stride_w - w;
-        int hpad = kernel_h + (h - 1) / stride_h * stride_h - h;
+        int wpad = self->kernel_w + (w - 1) / self->stride_w * self->stride_w - w;
+        int hpad = self->kernel_h + (h - 1) / self->stride_h * self->stride_h - h;
         if (wpad > 0 || hpad > 0)
         {
             Option opt_b = opt;

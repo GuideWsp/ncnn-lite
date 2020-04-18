@@ -14,17 +14,19 @@
 
 #include "split.h"
 
-DEFINE_LAYER_CREATOR(Split)
-
-Split::Split()
+void *Split_ctor(void *_self, va_list *args)
 {
-    one_blob_only = false;
-    support_inplace = false;
-    support_packing = true;
-    support_bf16_storage = true;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = false;
+    self->support_inplace = false;
+    self->support_packing = true;
+    self->support_bf16_storage = true;
+
+    return _self;
 }
 
-int Split::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& /*opt*/) const
+int Split_forward(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
     const Mat& bottom_blob = bottom_blobs[0];
     for (size_t i=0; i<top_blobs.size(); i++)

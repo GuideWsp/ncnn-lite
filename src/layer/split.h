@@ -17,11 +17,24 @@
 
 #include "layer.h"
 
-struct Split : public Layer
+struct Split
 {
-    Split();
-
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
+    // layer base
+    Layer layer;
 };
+
+void *Split_ctor(void *_self, va_list *args);
+
+int Split_forward(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+// default operators
+#define Split_dtor                     Layer_dtor
+#define Split_load_param               Layer_load_param
+#define Split_load_model               Layer_load_model
+#define Split_create_pipeline          Layer_create_pipeline
+#define Split_destroy_pipeline         Layer_destroy_pipeline
+#define Split_forward_multi            Layer_forward_multi
+#define Split_forward_inplace_multi    Layer_forward_inplace_multi
+#define Split_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_SPLIT_H

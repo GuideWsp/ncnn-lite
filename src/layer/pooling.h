@@ -17,18 +17,12 @@
 
 #include "layer.h"
 
-struct Pooling : public Layer
+struct Pooling
 {
-    Pooling();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
-    enum PoolMethod { PoolMethod_MAX = 0, PoolMethod_AVE = 1 };
-
-    void make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt) const;
-
+    // proprietary data
     // param
     int pooling_type;
     int kernel_w;
@@ -43,5 +37,24 @@ struct Pooling : public Layer
     int pad_mode;// 0=full 1=valid 2=SAME_UPPER 3=SAME_LOWER
     int avgpool_count_include_pad;
 };
+
+enum PoolMethod { PoolMethod_MAX = 0, PoolMethod_AVE = 1 };
+
+void *Pooling_ctor(void *_self, va_list *args);
+
+int Pooling_load_param(void *_self, const ParamDict& pd);
+
+int Pooling_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+void Pooling_make_padding(void *_self, const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt);
+
+// default operators
+#define Pooling_dtor                     Layer_dtor
+#define Pooling_load_model               Layer_load_model
+#define Pooling_create_pipeline          Layer_create_pipeline
+#define Pooling_destroy_pipeline         Layer_destroy_pipeline
+#define Pooling_forward_multi            Layer_forward_multi
+#define Pooling_forward_inplace_multi    Layer_forward_inplace_multi
+#define Pooling_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_POOLING_H

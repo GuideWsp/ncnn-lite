@@ -17,17 +17,30 @@
 
 #include "layer.h"
 
-struct Input : public Layer
+struct Input
 {
-    Input();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     int w;
     int h;
     int c;
 };
+
+void *Input_ctor(void *_self, va_list *args);
+
+int Input_load_param(void *_self, const ParamDict& pd);
+
+int Input_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define Input_dtor                     Layer_dtor
+#define Input_load_model               Layer_load_model
+#define Input_create_pipeline          Layer_create_pipeline
+#define Input_destroy_pipeline         Layer_destroy_pipeline
+#define Input_forward_multi            Layer_forward_multi
+#define Input_forward                  Layer_forward
+#define Input_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_INPUT_H

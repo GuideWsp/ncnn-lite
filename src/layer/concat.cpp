@@ -15,23 +15,29 @@
 #include "concat.h"
 #include <algorithm>
 
-DEFINE_LAYER_CREATOR(Concat)
-
-Concat::Concat()
+void *Concat_ctor(void *_self, va_list *args)
 {
-    one_blob_only = false;
-    support_inplace = false;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = false;
+    self->support_inplace = false;
+
+    return _self;
 }
 
-int Concat::load_param(const ParamDict& pd)
+int Concat_load_param(void *_self, const ParamDict& pd)
 {
-    axis = pd.get(0, 0);
+    Concat *self = (Concat *)_self;
+
+    self->axis = pd.get(0, 0);
 
     return 0;
 }
 
-int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int Concat_forward(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    Concat *self = (Concat *)_self;
+
     int dims = bottom_blobs[0].dims;
     size_t elemsize = bottom_blobs[0].elemsize;
 
@@ -67,7 +73,7 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
         return 0;
     }
 
-    if (dims == 2 && axis == 0)
+    if (dims == 2 && self->axis == 0)
     {
         // concat image
         int w = bottom_blobs[0].w;
@@ -101,7 +107,7 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
         return 0;
     }
 
-    if (dims == 2 && axis == 1)
+    if (dims == 2 && self->axis == 1)
     {
         // interleave image row
         int h = bottom_blobs[0].h;
@@ -137,7 +143,7 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
         return 0;
     }
 
-    if (dims == 3 && axis == 0)
+    if (dims == 3 && self->axis == 0)
     {
         // concat dim
         int w = bottom_blobs[0].w;
@@ -174,7 +180,7 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
         return 0;
     }
 
-    if (dims == 3 && axis == 1)
+    if (dims == 3 && self->axis == 1)
     {
         // interleave dim height
         int w = bottom_blobs[0].w;
@@ -214,7 +220,7 @@ int Concat::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_
         return 0;
     }
 
-    if (dims == 3 && axis == 2)
+    if (dims == 3 && self->axis == 2)
     {
         // interleave dim width
         int h = bottom_blobs[0].h;

@@ -17,22 +17,12 @@
 
 #include "layer.h"
 
-struct Convolution : public Layer
+struct Convolution
 {
-    Convolution();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int load_model(const ModelBin& mb);
-
-    virtual int create_pipeline(const Option& opt);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
-    void make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt) const;
-
-    int forward_int8(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     // param
     int num_output;
     int kernel_w;
@@ -69,5 +59,26 @@ struct Convolution : public Layer
     // implementation type, 0 means do not use auto pack model 
     int impl_type;
 };
+
+void *Convolution_ctor(void *_self, va_list *args);
+
+int Convolution_load_param(void *_self, const ParamDict& pd);
+
+int Convolution_load_model(void *_self, const ModelBin& mb);
+
+int Convolution_create_pipeline(void *_self, const Option& opt);
+
+int Convolution_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+void Convolution_make_padding(void *_self, const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt);
+
+int Convolution_forward_int8(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define Convolution_dtor                     Layer_dtor
+#define Convolution_destroy_pipeline         Layer_destroy_pipeline
+#define Convolution_forward_multi            Layer_forward_multi
+#define Convolution_forward_inplace_multi    Layer_forward_inplace_multi
+#define Convolution_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_CONVOLUTION_H
