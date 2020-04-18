@@ -14,26 +14,46 @@
 
 #include "blob.h"
 
-void init_blob(Blob *blob)
+/* class definition */
+const cclass ClassBlob = {
+    .size = sizeof(Blob),
+    .ctor = Blob_ctor,
+    .dtor = Blob_dtor
+};
+
+/* blob constructor */
+void *Blob_ctor(void *_self, va_list *args)
 {
+    // get the pointer
+    Blob *self = _self;
+
     // init producer and consumers
-    blob->producer = -1;
-    vector_init(blob->consumers);
+    self->producer = -1;
+    vector_init(self->consumers);
 
     // init the matrix
-    blob->shape.data = 0;
-    blob->shape.refcount = 0;
-    blob->shape.elemsize = 0;
-    blob->shape.elempack = 0;
-    blob->shape.allocator = 0;
-    blob->shape.dims = 0;
-    blob->shape.w = 0;
-    blob->shape.h = 0;
-    blob->shape.c = 0;
-    blob->shape.cstep = 0;
+    self->shape.data = 0;
+    self->shape.refcount = 0;
+    self->shape.elemsize = 0;
+    self->shape.elempack = 0;
+    self->shape.allocator = 0;
+    self->shape.dims = 0;
+    self->shape.w = 0;
+    self->shape.h = 0;
+    self->shape.c = 0;
+    self->shape.cstep = 0;
+
+    return self;
 }
 
-void uninit_blob(Blob *blob)
+/* blob destructor */
+void *Blob_dtor(void *_self)
 {
-    vector_destroy(blob->consumers);
+    // get the pointer
+    Blob *self = _self;
+
+    // clear the consumers
+    vector_destroy(self->consumers);
+
+    return self;
 }

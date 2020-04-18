@@ -34,7 +34,7 @@
 
 Net::Net()
 {
-    vector_init(blobs);
+    vector_init_ctor_dtor(blobs, Blob_ctor, Blob_dtor);
 }
 
 Net::~Net()
@@ -128,13 +128,7 @@ int Net::load_param(void *dr_handle, const DataReader& dr)
     }
 
     layers.resize((size_t)layer_count);
-
-    // initialize blobs, need init manually
     vector_resize(blobs, blob_count);
-    for (int i = 0; i < vector_size(blobs); i++)
-    {
-        init_blob(&vector_get(blobs, i));
-    }
 
     ParamDict pd;
 
@@ -302,13 +296,7 @@ int Net::load_param_bin(void *dr_handle, const DataReader& dr)
     }
 
     layers.resize(layer_count);
-
-    // initialize blobs, need init manually
     vector_resize(blobs, blob_count);
-    for (int i = 0; i < vector_size(blobs); i++)
-    {
-        init_blob(&vector_get(blobs, i));
-    }
 
     ParamDict pd;
 
@@ -731,13 +719,7 @@ int Net::fuse_network()
 
 void Net::clear()
 {
-    // deinit blobs
-    for (int i = 0; i < vector_size(blobs); i++)
-    {
-        uninit_blob(&vector_get(blobs, i));
-    }
     vector_clear(blobs);
-
     for (size_t i=0; i<layers.size(); i++)
     {
         int dret = layers[i]->destroy_pipeline(opt);

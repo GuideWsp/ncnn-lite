@@ -19,8 +19,13 @@
 #include "platform.h"
 #include "mat.h"
 
-struct Blob
+#include "cstl/class.h"
+
+typedef struct _Blob
 {
+    // cclass def
+    void *base;
+
 #if NCNN_STRING
     // blob name
     char name[256];
@@ -31,12 +36,15 @@ struct Blob
     vector_def(int) consumers;
     // shape hint
     Mat shape;
-};
+} Blob;
 
-/* blob initialization */
-void init_blob(Blob *blob);
+/* blob constructor */
+void *Blob_ctor(void *_self, va_list *args);
 
-/* blob uninitialization */
-void uninit_blob(Blob *blob);
+/* blob destructor */
+void *Blob_dtor(void *_self);
+
+/* class definition */
+extern const cclass ClassBlob;
 
 #endif // NCNN_BLOB_H

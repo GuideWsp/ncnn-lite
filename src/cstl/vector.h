@@ -39,6 +39,8 @@
         pthread_mutex_t mutex;      \
         pthread_cond_t cond;        \
         type* (*get)(void *, int);  \
+        void (*ctor)(void *);       \
+        void (*dtor)(void *);       \
     }
 
 /* Extern the vector to a type, so we can use the pointer in param */
@@ -57,12 +59,17 @@
 /* Define a vector type */
 #define vector(type) vector_##type##_t
 
-/* Initialize */
-#define vector_init(vector) do {                            \
+/* Initialize without contructor */
+#define vector_init(vector) vector_init_ctor_dtor(vector, NULL, NULL)
+
+/* Initialize with contructor */
+#define vector_init_ctor_dtor(vector, _ctor, _dtor) do {    \
     (vector).data_ptr = NULL;                               \
     (vector).size = 0;                                      \
     (vector).count = 0;                                     \
     (vector).err_num = 0;                                   \
+    (vector).ctor = _ctor;                                  \
+    (vector).dtor = _dtor;                                  \
     if (pthread_mutex_init(&(vector).mutex, NULL) != 0)     \
     {                                                       \
         (vector).err_num = ERR_INIT_FAILURE;                \
@@ -75,11 +82,18 @@
 
 /* Uninitialize */
 #define vector_destroy(vector) do { \
-    free((vector).data_ptr);        \
-    (vector).data_ptr = NULL;       \
-    (vector).size = 0;              \
-    (vector).count = 0;             \
-    (vector).err_num = 0;           \
+    if ((vector).dtor)                              \
+    {                                               \
+        for (int i = 0; i < (vector).size; i++)     \
+        {                                           \
+            (vector).dtor(&vector_get(vector, i));  \
+        }                                           \
+    }                                               \
+    free((vector).data_ptr);                        \
+    (vector).data_ptr = NULL;                       \
+    (vector).size = 0;                              \
+    (vector).count = 0;                             \
+    (vector).err_num = 0;                           \
 } while (0)
 
 /* Get the operation number */
@@ -132,6 +146,13 @@
             free((vector).data_ptr);                                        \
             (vector).data_ptr = ptr;                                        \
             (vector).size = new_size;                                       \
+            if ((vector).ctor)                                              \
+            {                                                               \
+                for (int i = (vector).count; i < (new_size); i++)           \
+                {                                                           \
+                    (vector).ctor(&vector_get(vector, i));                  \
+                }                                                           \
+            }                                                               \
             (vector).count = new_size;                                      \
             (vector).err_num = ERR_OK;                                      \
         }                                                                   \
@@ -165,6 +186,13 @@
             free((vector).data_ptr);                                        \
             (vector).data_ptr = ptr;                                        \
             (vector).size = new_size;                                       \
+            if ((vector).ctor)                                              \
+            {                                                               \
+                for (int i = (vector).count; i < (new_size); i++)           \
+                {                                                           \
+                    (vector).ctor(&vector_get(vector, i));                  \
+                }                                                           \
+            }                                                               \
             (vector).err_num = ERR_OK;                                      \
         }                                                                   \
     }                                                                       \
