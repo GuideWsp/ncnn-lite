@@ -17,34 +17,32 @@
 
 #include "layer.h"
 
-struct BinaryOp : public Layer
+struct BinaryOp
 {
-    BinaryOp();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    using Layer::forward;
-    using Layer::forward_inplace;
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
-    enum OperationType {
-        Operation_ADD   = 0,
-        Operation_SUB   = 1,
-        Operation_MUL   = 2,
-        Operation_DIV   = 3,
-        Operation_MAX   = 4,
-        Operation_MIN   = 5,
-        Operation_POW   = 6,
-        Operation_RSUB  = 7,
-        Operation_RDIV  = 8
-    };
-
+    // proprietary data
     // param
     int op_type;
     int with_scalar;
     float b;
 };
+
+void *BinaryOp_ctor(void *_self, va_list *args);
+
+int BinaryOp_load_param(void *_self, const ParamDict& pd);
+
+int BinaryOp_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+int BinaryOp_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+// default operators
+#define BinaryOp_dtor                     Layer_dtor
+#define BinaryOp_load_model               Layer_load_model
+#define BinaryOp_create_pipeline          Layer_create_pipeline
+#define BinaryOp_destroy_pipeline         Layer_destroy_pipeline
+#define BinaryOp_forward                  Layer_forward
+#define BinaryOp_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_BINARYOP_H

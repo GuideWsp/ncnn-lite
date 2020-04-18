@@ -17,15 +17,28 @@
 
 #include "layer.h"
 
-struct ShuffleChannel : public Layer
+struct ShuffleChannel
 {
-    ShuffleChannel();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     int group;
 };
+
+void *ShuffleChannel_ctor(void *_self, va_list *args);
+
+int ShuffleChannel_load_param(void *_self, const ParamDict& pd);
+
+int ShuffleChannel_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define ShuffleChannel_dtor                     Layer_dtor
+#define ShuffleChannel_load_model               Layer_load_model
+#define ShuffleChannel_create_pipeline          Layer_create_pipeline
+#define ShuffleChannel_destroy_pipeline         Layer_destroy_pipeline
+#define ShuffleChannel_forward_multi            Layer_forward_multi
+#define ShuffleChannel_forward_inplace_multi    Layer_forward_inplace_multi
+#define ShuffleChannel_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_SHUFFLECHANNEL_H

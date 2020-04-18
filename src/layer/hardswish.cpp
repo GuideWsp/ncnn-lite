@@ -15,26 +15,32 @@
 #include "hardswish.h"
 #include <algorithm>
 
-DEFINE_LAYER_CREATOR(HardSwish)
-
-HardSwish::HardSwish()
+void *HardSwish_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = true;
+    Layer *layer = (Layer *)_self;
+
+    layer->one_blob_only = true;
+    layer->support_inplace = true;
+
+    return _self;
 }
 
-int HardSwish::load_param(const ParamDict& pd)
+int HardSwish_load_param(void *_self, const ParamDict& pd)
 {
-    alpha = pd.get(0, 0.2f);
-    beta = pd.get(1, 0.5f);
-    lower = -beta / alpha;
-    upper = (1.f / alpha) + lower;
+    HardSwish *self = (HardSwish *)_self;
+
+    self->alpha = pd.get(0, 0.2f);
+    self->beta = pd.get(1, 0.5f);
+    self->lower = -self->beta / self->alpha;
+    self->upper = (1.f / self->alpha) + self->lower;
 
     return 0;
 }
 
-int HardSwish::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int HardSwish_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
+    HardSwish *self = (HardSwish *)_self;
+
     int w = bottom_top_blob.w;
     int h = bottom_top_blob.h;
     int channels = bottom_top_blob.c;
@@ -47,11 +53,11 @@ int HardSwish::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
         for (int i=0; i<size; i++)
         {
-            if (ptr[i] < lower)
+            if (ptr[i] < self->lower)
                 ptr[i] = 0.f;
-            else if (ptr[i] > upper) ;
+            else if (ptr[i] > self->upper) ;
             else
-                ptr[i] = ptr[i] * (ptr[i] * alpha + beta);
+                ptr[i] = ptr[i] * (ptr[i] * self->alpha + self->beta);
         }
     }
 

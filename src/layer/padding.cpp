@@ -14,37 +14,44 @@
 
 #include "padding.h"
 
-DEFINE_LAYER_CREATOR(Padding)
-
-Padding::Padding()
+void *Padding_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = false;
+    Layer *self = (Layer *)_self;
+
+    self->one_blob_only = true;
+    self->support_inplace = false;
+
+    return _self;
 }
 
-int Padding::load_param(const ParamDict& pd)
+int Padding_load_param(void *_self, const ParamDict& pd)
 {
-    top = pd.get(0, 0);
-    bottom = pd.get(1, 0);
-    left = pd.get(2, 0);
-    right = pd.get(3, 0);
-    type = pd.get(4, 0);
-    value = pd.get(5, 0.f);
-    per_channel_pad_data_size = pd.get(6, 0);
+    Padding *self = (Padding *)_self;
+    Layer *layer = (Layer *)_self;
 
-    if (top == -233 && bottom == -233 && left == -233 && right == -233)
+    self->top = pd.get(0, 0);
+    self->bottom = pd.get(1, 0);
+    self->left = pd.get(2, 0);
+    self->right = pd.get(3, 0);
+    self->type = pd.get(4, 0);
+    self->value = pd.get(5, 0.f);
+    self->per_channel_pad_data_size = pd.get(6, 0);
+
+    if (self->top == -233 && self->bottom == -233 && self->left == -233 && self->right == -233)
     {
-        one_blob_only = false;
+        layer->one_blob_only = false;
     }
 
     return 0;
 }
 
-int Padding::load_model(const ModelBin& mb)
+int Padding_load_model(void *_self, const ModelBin& mb)
 {
-    if (per_channel_pad_data_size)
+    Padding *self = (Padding *)_self;
+
+    if (self->per_channel_pad_data_size)
     {
-        per_channel_pad_data = mb.load(per_channel_pad_data_size, 1);
+        self->per_channel_pad_data = mb.load(self->per_channel_pad_data_size, 1);
     }
 
     return 0;
@@ -286,9 +293,11 @@ static void copy_make_border_image(const Mat& src, Mat& dst, int top, int left, 
 
 }
 
-int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Padding_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
-    if (top == 0 && bottom == 0 && left == 0 && right == 0)
+    Padding *self = (Padding *)_self;
+
+    if (self->top == 0 && self->bottom == 0 && self->left == 0 && self->right == 0)
     {
         top_blob = bottom_blob;
         return 0;
@@ -300,7 +309,7 @@ int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     int dims = bottom_blob.dims;
     size_t elemsize = bottom_blob.elemsize;
 
-    int outw = w + left + right;
+    int outw = w + self->left + self->right;
 
     if (dims == 1)
     {
@@ -309,16 +318,16 @@ int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             return -100;
 
         if (elemsize == 1)
-            copy_make_border_image<signed char>(bottom_blob, top_blob, 0, left, type, static_cast<signed char>(value));
+            copy_make_border_image<signed char>(bottom_blob, top_blob, 0, self->left, self->type, static_cast<signed char>(self->value));
         if (elemsize == 2)
-            copy_make_border_image<unsigned short>(bottom_blob, top_blob, 0, left, type, float32_to_bfloat16(value));
+            copy_make_border_image<unsigned short>(bottom_blob, top_blob, 0, self->left, self->type, float32_to_bfloat16(self->value));
         if (elemsize == 4)
-            copy_make_border_image<float>(bottom_blob, top_blob, 0, left, type, value);
+            copy_make_border_image<float>(bottom_blob, top_blob, 0, self->left, self->type, self->value);
 
         return 0;
     }
 
-    int outh = h + top + bottom;
+    int outh = h + self->top + self->bottom;
 
     if (dims == 2)
     {
@@ -327,11 +336,11 @@ int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             return -100;
 
         if (elemsize == 1)
-            copy_make_border_image<signed char>(bottom_blob, top_blob, top, left, type, static_cast<signed char>(value));
+            copy_make_border_image<signed char>(bottom_blob, top_blob, self->top, self->left, self->type, static_cast<signed char>(self->value));
         if (elemsize == 2)
-            copy_make_border_image<unsigned short>(bottom_blob, top_blob, top, left, type, float32_to_bfloat16(value));
+            copy_make_border_image<unsigned short>(bottom_blob, top_blob, self->top, self->left, self->type, float32_to_bfloat16(self->value));
         if (elemsize == 4)
-            copy_make_border_image<float>(bottom_blob, top_blob, top, left, type, value);
+            copy_make_border_image<float>(bottom_blob, top_blob, self->top, self->left, self->type, self->value);
 
         return 0;
     }
@@ -348,14 +357,14 @@ int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             const Mat m = bottom_blob.channel(q);
             Mat borderm = top_blob.channel(q);
 
-            float pad_value = per_channel_pad_data_size ? per_channel_pad_data[q] : value;
+            float pad_value = self->per_channel_pad_data_size ? self->per_channel_pad_data[q] : self->value;
 
             if (elemsize == 1)
-                copy_make_border_image<signed char>(m, borderm, top, left, type, static_cast<signed char>(pad_value));
+                copy_make_border_image<signed char>(m, borderm, self->top, self->left, self->type, static_cast<signed char>(pad_value));
             if (elemsize == 2)
-                copy_make_border_image<unsigned short>(m, borderm, top, left, type, float32_to_bfloat16(pad_value));
+                copy_make_border_image<unsigned short>(m, borderm, self->top, self->left, self->type, float32_to_bfloat16(pad_value));
             if (elemsize == 4)
-                copy_make_border_image<float>(m, borderm, top, left, type, pad_value);
+                copy_make_border_image<float>(m, borderm, self->top, self->left, self->type, pad_value);
         }
 
         return 0;
@@ -364,8 +373,10 @@ int Padding::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
     return 0;
 }
 
-int Padding::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int Padding_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    Padding *self = (Padding *)_self;
+
     const Mat& bottom_blob = bottom_blobs[0];
     const Mat& reference_blob = bottom_blobs[1];
 
@@ -405,11 +416,11 @@ int Padding::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             return -100;
 
         if (elemsize == 1)
-            copy_make_border_image<signed char>(bottom_blob, top_blob, 0, _left, type, static_cast<signed char>(value));
+            copy_make_border_image<signed char>(bottom_blob, top_blob, 0, _left, self->type, static_cast<signed char>(self->value));
         if (elemsize == 2)
-            copy_make_border_image<unsigned short>(bottom_blob, top_blob, 0, _left, type, float32_to_bfloat16(value));
+            copy_make_border_image<unsigned short>(bottom_blob, top_blob, 0, _left, self->type, float32_to_bfloat16(self->value));
         if (elemsize == 4)
-            copy_make_border_image<float>(bottom_blob, top_blob, 0, _left, type, value);
+            copy_make_border_image<float>(bottom_blob, top_blob, 0, _left, self->type, self->value);
 
         return 0;
     }
@@ -423,11 +434,11 @@ int Padding::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             return -100;
 
         if (elemsize == 1)
-            copy_make_border_image<signed char>(bottom_blob, top_blob, _top, _left, type, static_cast<signed char>(value));
+            copy_make_border_image<signed char>(bottom_blob, top_blob, _top, _left, self->type, static_cast<signed char>(self->value));
         if (elemsize == 2)
-            copy_make_border_image<unsigned short>(bottom_blob, top_blob, _top, _left, type, float32_to_bfloat16(value));
+            copy_make_border_image<unsigned short>(bottom_blob, top_blob, _top, _left, self->type, float32_to_bfloat16(self->value));
         if (elemsize == 4)
-            copy_make_border_image<float>(bottom_blob, top_blob, _top, _left, type, value);
+            copy_make_border_image<float>(bottom_blob, top_blob, _top, _left, self->type, self->value);
 
         return 0;
     }
@@ -444,14 +455,14 @@ int Padding::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top
             const Mat m = bottom_blob.channel(q);
             Mat borderm = top_blob.channel(q);
 
-            float pad_value = per_channel_pad_data_size ? per_channel_pad_data[q] : value;
+            float pad_value = self->per_channel_pad_data_size ? self->per_channel_pad_data[q] : self->value;
 
             if (elemsize == 1)
-                copy_make_border_image<signed char>(m, borderm, _top, _left, type, static_cast<signed char>(pad_value));
+                copy_make_border_image<signed char>(m, borderm, _top, _left, self->type, static_cast<signed char>(pad_value));
             if (elemsize == 2)
-                copy_make_border_image<unsigned short>(m, borderm, _top, _left, type, float32_to_bfloat16(pad_value));
+                copy_make_border_image<unsigned short>(m, borderm, _top, _left, self->type, float32_to_bfloat16(pad_value));
             if (elemsize == 4)
-                copy_make_border_image<float>(m, borderm, _top, _left, type, pad_value);
+                copy_make_border_image<float>(m, borderm, _top, _left, self->type, pad_value);
         }
 
         return 0;

@@ -19,24 +19,41 @@
 
 #include "cstl/utils.h"
 
-DEFINE_LAYER_CREATOR(BinaryOp)
+enum OperationType {
+    Operation_ADD   = 0,
+    Operation_SUB   = 1,
+    Operation_MUL   = 2,
+    Operation_DIV   = 3,
+    Operation_MAX   = 4,
+    Operation_MIN   = 5,
+    Operation_POW   = 6,
+    Operation_RSUB  = 7,
+    Operation_RDIV  = 8
+};
 
-BinaryOp::BinaryOp()
+void *BinaryOp_ctor(void *_self, va_list *args)
 {
-    one_blob_only = false;
-    support_inplace = false;
+    Layer *layer = (Layer *)_self;
+
+    layer->one_blob_only = false;
+    layer->support_inplace = false;
+
+    return _self;
 }
 
-int BinaryOp::load_param(const ParamDict& pd)
+int BinaryOp_load_param(void *_self, const ParamDict& pd)
 {
-    op_type = pd.get(0, 0);
-    with_scalar = pd.get(1, 0);
-    b = pd.get(2, 0.f);
+    BinaryOp *self = (BinaryOp *)_self;
+    Layer *layer = (Layer *)_self;
 
-    if (with_scalar != 0)
+    self->op_type = pd.get(0, 0);
+    self->with_scalar = pd.get(1, 0);
+    self->b = pd.get(2, 0.f);
+
+    if (self->with_scalar != 0)
     {
-        one_blob_only = true;
-        support_inplace = true;
+        layer->one_blob_only = true;
+        layer->support_inplace = true;
     }
 
     return 0;
@@ -512,71 +529,75 @@ struct binary_op_rdiv {
     T operator() (const T& x, const T& y) const { return y / x; }
 };
 
-int BinaryOp::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int BinaryOp_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    BinaryOp *self = (BinaryOp *)_self;
+
     const Mat& bottom_blob = bottom_blobs[0];
     const Mat& bottom_blob1 = bottom_blobs[1];
 
     Mat& top_blob = top_blobs[0];
 
-    if (op_type == Operation_ADD)
+    if (self->op_type == Operation_ADD)
         return binary_op< std::plus<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_SUB)
+    if (self->op_type == Operation_SUB)
         return binary_op< std::minus<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_MUL)
+    if (self->op_type == Operation_MUL)
         return binary_op< std::multiplies<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_DIV)
+    if (self->op_type == Operation_DIV)
         return binary_op< std::divides<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_MAX)
+    if (self->op_type == Operation_MAX)
         return binary_op< binary_op_max<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_MIN)
+    if (self->op_type == Operation_MIN)
         return binary_op< binary_op_min<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_POW)
+    if (self->op_type == Operation_POW)
         return binary_op< binary_op_pow<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_RSUB)
+    if (self->op_type == Operation_RSUB)
         return binary_op< binary_op_rsub<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
-    if (op_type == Operation_RDIV)
+    if (self->op_type == Operation_RDIV)
         return binary_op< binary_op_rdiv<float> >(bottom_blob, bottom_blob1, top_blob, opt);
 
     return 0;
 }
 
-int BinaryOp::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+int BinaryOp_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt)
 {
-    if (op_type == Operation_ADD)
-        return binary_op_scalar_inplace< std::plus<float> >(bottom_top_blob, b, opt);
+    BinaryOp *self = (BinaryOp *)_self;
 
-    if (op_type == Operation_SUB)
-        return binary_op_scalar_inplace< std::minus<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_ADD)
+        return binary_op_scalar_inplace< std::plus<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_MUL)
-        return binary_op_scalar_inplace< std::multiplies<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_SUB)
+        return binary_op_scalar_inplace< std::minus<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_DIV)
-        return binary_op_scalar_inplace< std::divides<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_MUL)
+        return binary_op_scalar_inplace< std::multiplies<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_MAX)
-        return binary_op_scalar_inplace< binary_op_max<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_DIV)
+        return binary_op_scalar_inplace< std::divides<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_MIN)
-        return binary_op_scalar_inplace< binary_op_min<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_MAX)
+        return binary_op_scalar_inplace< binary_op_max<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_POW)
-        return binary_op_scalar_inplace< binary_op_pow<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_MIN)
+        return binary_op_scalar_inplace< binary_op_min<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_RSUB)
-        return binary_op_scalar_inplace< binary_op_rsub<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_POW)
+        return binary_op_scalar_inplace< binary_op_pow<float> >(bottom_top_blob, self->b, opt);
 
-    if (op_type == Operation_RDIV)
-        return binary_op_scalar_inplace< binary_op_rdiv<float> >(bottom_top_blob, b, opt);
+    if (self->op_type == Operation_RSUB)
+        return binary_op_scalar_inplace< binary_op_rsub<float> >(bottom_top_blob, self->b, opt);
+
+    if (self->op_type == Operation_RDIV)
+        return binary_op_scalar_inplace< binary_op_rdiv<float> >(bottom_top_blob, self->b, opt);
 
     return 0;
 }

@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making ncnn available.
 //
-// Copyright (C) 2017 THL A29 Limited, a Tencent company. All rights reserved.
+// Copyright (self->c) 2017 THL A29 Limited, a Tencent company. All rights reserved.
 //
 // Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -14,40 +14,46 @@
 
 #include "reshape.h"
 
-DEFINE_LAYER_CREATOR(Reshape)
-
-Reshape::Reshape()
+void *Reshape_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = false;
+    Layer *layer = (Layer *)_self;
+
+    layer->one_blob_only = true;
+    layer->support_inplace = false;
+
+    return _self;
 }
 
-int Reshape::load_param(const ParamDict& pd)
+int Reshape_load_param(void *_self, const ParamDict& pd)
 {
-    w = pd.get(0, -233);
-    h = pd.get(1, -233);
-    c = pd.get(2, -233);
-    permute = pd.get(3, 0);
+    Reshape *self = (Reshape *)_self;
 
-    ndim = 3;
-    if (c == -233)
-        ndim = 2;
-    if (h == -233)
-        ndim = 1;
-    if (w == -233)
-        ndim = 0;
+    self->w = pd.get(0, -233);
+    self->h = pd.get(1, -233);
+    self->c = pd.get(2, -233);
+    self->permute = pd.get(3, 0);
+
+    self->ndim = 3;
+    if (self->c == -233)
+        self->ndim = 2;
+    if (self->h == -233)
+        self->ndim = 1;
+    if (self->w == -233)
+        self->ndim = 0;
 
     return 0;
 }
 
-int Reshape::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int Reshape_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    Reshape *self = (Reshape *)_self;
+
     size_t elemsize = bottom_blob.elemsize;
     int total = bottom_blob.w * bottom_blob.h * bottom_blob.c;
 
-    if (ndim == 1)
+    if (self->ndim == 1)
     {
-        int _w = w;
+        int _w = self->w;
 
         if (_w == 0)
             _w = bottom_blob.w;
@@ -55,13 +61,13 @@ int Reshape::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
         if (_w == -1)
             _w = total;
 
-        if (permute == 1)
+        if (self->permute == 1)
         {
             top_blob.create(_w, elemsize, opt.blob_allocator);
             if (top_blob.empty())
                 return -100;
 
-            // c-h-w to h-w-c
+            // self->c-self->h-self->w to self->h-self->w-self->c
             float* ptr = top_blob;
             for (int i=0; i<bottom_blob.h; i++)
             {
@@ -80,10 +86,10 @@ int Reshape::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
             top_blob = bottom_blob.reshape(_w, opt.blob_allocator);
         }
     }
-    else if (ndim == 2)
+    else if (self->ndim == 2)
     {
-        int _w = w;
-        int _h = h;
+        int _w = self->w;
+        int _h = self->h;
 
         if (_w == 0)
             _w = bottom_blob.w;
@@ -97,11 +103,11 @@ int Reshape::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) c
 
         top_blob = bottom_blob.reshape(_w, _h, opt.blob_allocator);
     }
-    else if (ndim == 3)
+    else if (self->ndim == 3)
     {
-        int _w = w;
-        int _h = h;
-        int _c = c;
+        int _w = self->w;
+        int _h = self->h;
+        int _c = self->c;
 
         if (_w == 0)
             _w = bottom_blob.w;

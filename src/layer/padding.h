@@ -17,18 +17,12 @@
 
 #include "layer.h"
 
-struct Padding : public Layer
+struct Padding
 {
-    Padding();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int load_model(const ModelBin& mb);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
-
+    // proprietary data
     // -233 = dynamic offset from reference blob
     int top;
     int bottom;
@@ -41,5 +35,22 @@ struct Padding : public Layer
     int per_channel_pad_data_size;
     Mat per_channel_pad_data;
 };
+
+void *Padding_ctor(void *_self, va_list *args);
+
+int Padding_load_param(void *_self, const ParamDict& pd);
+
+int Padding_load_model(void *_self, const ModelBin& mb);
+
+int Padding_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+int Padding_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+// default operators
+#define Padding_dtor                     Layer_dtor
+#define Padding_create_pipeline          Layer_create_pipeline
+#define Padding_destroy_pipeline         Layer_destroy_pipeline
+#define Padding_forward_inplace_multi    Layer_forward_inplace_multi
+#define Padding_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_PADDING_H

@@ -14,28 +14,26 @@
 
 #include "slice.h"
 
-DEFINE_LAYER_CREATOR(Slice)
-
-Slice::Slice()
+int Slice_load_param(void *_self, const ParamDict& pd)
 {
-}
+    Slice *self = (Slice *)_self;
 
-int Slice::load_param(const ParamDict& pd)
-{
-    slices = pd.get(0, Mat());
-    axis = pd.get(1, 0);
+    self->slices = pd.get(0, Mat());
+    self->axis = pd.get(1, 0);
 
     return 0;
 }
 
-int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
+int Slice_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt)
 {
+    Slice *self = (Slice *)_self;
+
     const Mat& bottom_blob = bottom_blobs[0];
     int dims = bottom_blob.dims;
     size_t elemsize = bottom_blob.elemsize;
-    const int* slices_ptr = slices;
+    const int* slices_ptr = self->slices;
 
-    if (dims == 1) // axis == 0
+    if (dims == 1) // self->axis == 0
     {
         int w = bottom_blob.w;
 
@@ -63,7 +61,7 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
         return 0;
     }
 
-    if (dims == 2 && axis == 0)
+    if (dims == 2 && self->axis == 0)
     {
         int w = bottom_blob.w;
         int h = bottom_blob.h;
@@ -94,7 +92,7 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
         return 0;
     }
 
-    if (dims == 2 && axis == 1)
+    if (dims == 2 && self->axis == 1)
     {
         int w = bottom_blob.w;
         int h = bottom_blob.h;
@@ -127,7 +125,7 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
         return 0;
     }
 
-    if (dims == 3 && axis == 0)
+    if (dims == 3 && self->axis == 0)
     {
         int w = bottom_blob.w;
         int h = bottom_blob.h;
@@ -159,7 +157,7 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
         return 0;
     }
 
-    if (dims == 3 && axis == 1)
+    if (dims == 3 && self->axis == 1)
     {
         int w = bottom_blob.w;
         int h = bottom_blob.h;
@@ -195,7 +193,7 @@ int Slice::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_b
         return 0;
     }
 
-    if (dims == 3 && axis == 2)
+    if (dims == 3 && self->axis == 2)
     {
         int w = bottom_blob.w;
         int h = bottom_blob.h;

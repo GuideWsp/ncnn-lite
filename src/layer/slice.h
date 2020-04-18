@@ -17,16 +17,28 @@
 
 #include "layer.h"
 
-struct Slice : public Layer
+struct Slice
 {
-    Slice();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
-
+    // proprietary data
     Mat slices;
     int axis;
 };
+
+int Slice_load_param(void *_self, const ParamDict& pd);
+
+int Slice_forward_multi(void *_self, const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt);
+
+// default operators
+#define Slice_ctor                     Layer_ctor
+#define Slice_dtor                     Layer_dtor
+#define Slice_load_model               Layer_load_model
+#define Slice_create_pipeline          Layer_create_pipeline
+#define Slice_destroy_pipeline         Layer_destroy_pipeline
+#define Slice_forward                  Layer_forward
+#define Slice_forward_inplace_multi    Layer_forward_inplace_multi
+#define Slice_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_SLICE_H

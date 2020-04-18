@@ -17,15 +17,27 @@
 
 #include "layer.h"
 
-struct HardSigmoid : public Layer
+struct HardSigmoid
 {
-    HardSigmoid();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     float alpha, beta, lower, upper;
 };
+
+void *HardSigmoid_ctor(void *_self, va_list *args);
+
+int HardSigmoid_load_param(void *_self, const ParamDict& pd);
+
+int HardSigmoid_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+#define HardSigmoid_dtor                     Layer_dtor
+#define HardSigmoid_load_model               Layer_load_model
+#define HardSigmoid_create_pipeline          Layer_create_pipeline
+#define HardSigmoid_destroy_pipeline         Layer_destroy_pipeline
+#define HardSigmoid_forward_multi            Layer_forward_multi
+#define HardSigmoid_forward                  Layer_forward
+#define HardSigmoid_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_HARDSIGMOID_H

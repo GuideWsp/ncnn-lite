@@ -17,15 +17,27 @@
 
 #include "layer.h"
 
-struct HardSwish : public Layer
+struct HardSwish
 {
-    HardSwish();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
-
+    // proprietary data
     float alpha, beta, lower, upper;
 };
+
+void *HardSwish_ctor(void *_self, va_list *args);
+
+int HardSwish_load_param(void *_self, const ParamDict& pd);
+
+int HardSwish_forward_inplace(void *_self, Mat& bottom_top_blob, const Option& opt);
+
+#define HardSwish_dtor                     Layer_dtor
+#define HardSwish_load_model               Layer_load_model
+#define HardSwish_create_pipeline          Layer_create_pipeline
+#define HardSwish_destroy_pipeline         Layer_destroy_pipeline
+#define HardSwish_forward_multi            Layer_forward_multi
+#define HardSwish_forward                  Layer_forward
+#define HardSwish_forward_inplace_multi    Layer_forward_inplace_multi
 
 #endif // LAYER_HARDSWISH_H

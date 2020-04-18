@@ -17,14 +17,12 @@
 
 #include "layer.h"
 
-struct Reshape : public Layer
+struct Reshape
 {
-    Reshape();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     // reshape flag
     // 0 = copy from bottom
     // -1 = remaining
@@ -35,5 +33,20 @@ struct Reshape : public Layer
     int permute;
     int ndim;
 };
+
+void *Reshape_ctor(void *_self, va_list *args);
+
+int Reshape_load_param(void *_self, const ParamDict& pd);
+
+int Reshape_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define Reshape_dtor                     Layer_dtor
+#define Reshape_load_model               Layer_load_model
+#define Reshape_create_pipeline          Layer_create_pipeline
+#define Reshape_destroy_pipeline         Layer_destroy_pipeline
+#define Reshape_forward_multi            Layer_forward_multi
+#define Reshape_forward_inplace_multi    Layer_forward_inplace_multi
+#define Reshape_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_RESHAPE_H

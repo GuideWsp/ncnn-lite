@@ -14,30 +14,37 @@
 
 #include "shufflechannel.h"
 
-DEFINE_LAYER_CREATOR(ShuffleChannel)
-
-ShuffleChannel::ShuffleChannel()
+void *ShuffleChannel_ctor(void *_self, va_list *args)
 {
-    one_blob_only = true;
-    support_inplace = false;
+    Layer *layer = (Layer *)_self;
+
+    layer->one_blob_only = true;
+    layer->support_inplace = false;
+
+    return _self;
 }
 
-int ShuffleChannel::load_param(const ParamDict& pd)
+
+int ShuffleChannel_load_param(void *_self, const ParamDict& pd)
 {
-    group = pd.get(0, 1);
+    ShuffleChannel *self = (ShuffleChannel *)_self;
+
+    self->group = pd.get(0, 1);
 
     return 0;
 }
 
-int ShuffleChannel::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+int ShuffleChannel_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt)
 {
+    ShuffleChannel *self = (ShuffleChannel *)_self;
+
     int w = bottom_blob.w;
     int h = bottom_blob.h;
     int c = bottom_blob.c;
     size_t elemsize = bottom_blob.elemsize;
-    int chs_per_group = c / group;
+    int chs_per_group = c / self->group;
 
-    if (c != chs_per_group * group)
+    if (c != chs_per_group * self->group)
     {
         // reject invalid group
         return -100;
@@ -48,12 +55,12 @@ int ShuffleChannel::forward(const Mat& bottom_blob, Mat& top_blob, const Option&
         return -100;
 
     const size_t feature_sz = w * h * elemsize;
-    for (int i = 0; i != group; i++)
+    for (int i = 0; i != self->group; i++)
     {
         for (int j = 0; j != chs_per_group; j++)
         {
             int src_q = chs_per_group * i + j;
-            int dst_q = group * j + i;
+            int dst_q = self->group * j + i;
             memcpy(top_blob.channel(dst_q), bottom_blob.channel(src_q), feature_sz);
         }
     }
