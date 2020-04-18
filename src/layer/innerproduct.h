@@ -17,19 +17,12 @@
 
 #include "layer.h"
 
-struct InnerProduct : public Layer
+struct InnerProduct
 {
-    InnerProduct();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int load_model(const ModelBin& mb);
-
-    virtual int create_pipeline(const Option& opt);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-    virtual int forward_int8(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     // param
     int num_output;
     int bias_term;
@@ -49,5 +42,24 @@ struct InnerProduct : public Layer
     Mat weight_data_int8_scales;
     float bottom_blob_int8_scale;
 };
+
+void *InnerProduct_ctor(void *_self, va_list *args);
+
+int InnerProduct_load_param(void *_self, const ParamDict& pd);
+
+int InnerProduct_load_model(void *_self, const ModelBin& mb);
+
+int InnerProduct_create_pipeline(void *_self, const Option& opt);
+
+int InnerProduct_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+int InnerProduct_forward_int8(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define InnerProduct_dtor                     Layer_dtor
+#define InnerProduct_destroy_pipeline         Layer_destroy_pipeline
+#define InnerProduct_forward_multi            Layer_forward_multi
+#define InnerProduct_forward_inplace_multi    Layer_forward_inplace_multi
+#define InnerProduct_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_INNERPRODUCT_H

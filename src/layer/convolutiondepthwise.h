@@ -17,22 +17,12 @@
 
 #include "layer.h"
 
-struct ConvolutionDepthWise : public Layer
+struct ConvolutionDepthWise
 {
-    ConvolutionDepthWise();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int load_model(const ModelBin& mb);
-
-    virtual int create_pipeline(const Option& opt);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
-    void make_padding(const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt) const;
-
-    int forward_int8(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     // param
     int num_output;
     int kernel_w;
@@ -67,5 +57,26 @@ struct ConvolutionDepthWise : public Layer
 
     bool use_int8_requantize;
 };
+
+void *ConvolutionDepthWise_ctor(void *_self, va_list *args);
+
+int ConvolutionDepthWise_load_param(void *_self, const ParamDict& pd);
+
+int ConvolutionDepthWise_load_model(void *_self, const ModelBin& mb);
+
+int ConvolutionDepthWise_create_pipeline(void *_self, const Option& opt);
+
+int ConvolutionDepthWise_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+void ConvolutionDepthWise_make_padding(void *_self, const Mat& bottom_blob, Mat& bottom_blob_bordered, const Option& opt);
+
+int ConvolutionDepthWise_forward_int8(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define ConvolutionDepthWise_dtor                     Layer_dtor
+#define ConvolutionDepthWise_destroy_pipeline         Layer_destroy_pipeline
+#define ConvolutionDepthWise_forward_multi            Layer_forward_multi
+#define ConvolutionDepthWise_forward_inplace_multi    Layer_forward_inplace_multi
+#define ConvolutionDepthWise_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_CONVOLUTIONDEPTHWISE_H
