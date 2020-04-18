@@ -17,16 +17,29 @@
 
 #include "layer.h"
 
-struct Packing : public Layer
+struct Packing
 {
-    Packing();
+    // layer base
+    Layer layer;
 
-    virtual int load_param(const ParamDict& pd);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
-
+    // proprietary data
     int out_elempack;
     int use_padding;
 };
+
+void *Packing_ctor(void *_self, va_list *args);
+
+int Packing_load_param(void *_self, const ParamDict& pd);
+
+int Packing_forward(void *_self, const Mat& bottom_blob, Mat& top_blob, const Option& opt);
+
+// default operators
+#define Packing_dtor                     Layer_dtor
+#define Packing_load_model               Layer_load_model
+#define Packing_create_pipeline          Layer_create_pipeline
+#define Packing_destroy_pipeline         Layer_destroy_pipeline
+#define Packing_forward_multi            Layer_forward_multi
+#define Packing_forward_inplace_multi    Layer_forward_inplace_multi
+#define Packing_forward_inplace          Layer_forward_inplace
 
 #endif // LAYER_PACKING_H
